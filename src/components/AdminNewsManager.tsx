@@ -5,7 +5,12 @@ import {
   Save,
   X,
   Send,
-  ArrowUpDown
+  Pin,
+  PinOff,
+  Edit3,
+  Trash2,
+  Eye,
+  FileEdit
 } from 'lucide-react';
 import { NewsCategory, NewsStatus, PortalNews } from '../types';
 import { NEWS_CATEGORIES } from '../data/newsData';
@@ -18,10 +23,17 @@ import { ImageDropzone } from './ImageDropzone';
 import { showToast } from './ToastNotification';
 import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
-import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
 import { getRoleTheme } from '../utils/roleTheme';
+import {
+  GoogleWorkspaceSplitPane,
+  SidePreviewEmptyState,
+  SidePreviewHeader,
+  SidePreviewMetricsStrip,
+  WorkspaceHeaderCard,
+  getWorkspaceActiveRowClass
+} from './GoogleWorkspaceSplitPane';
 
 const adminTheme = getRoleTheme('admin');
 
@@ -56,8 +68,8 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
   const [categoryFilter, setCategoryFilter] = useState<'all' | NewsCategory>('all');
   const [pinnedFilter, setPinnedFilter] = useState<'all' | 'pinned' | 'normal'>('all');
   const [sortPreset, setSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
-  const [sortBy, setSortBy] = useState<'date' | 'title' | 'category'>('date');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
 
   const newsSortOptions = useMemo(
     () =>
@@ -91,22 +103,6 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
       );
     });
 
-    if (sortPreset === 'table_column') {
-      return [...filtered].sort((a, b) => {
-        if (sortBy === 'title') {
-          const cmp = a.title.localeCompare(b.title);
-          return sortDir === 'asc' ? cmp : -cmp;
-        }
-        if (sortBy === 'category') {
-          const cmp = a.category.localeCompare(b.category);
-          return sortDir === 'asc' ? cmp : -cmp;
-        }
-        if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
-        const diff = new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime();
-        return sortDir === 'asc' ? -diff : diff;
-      });
-    }
-
     return sortRecords(filtered, {
       sortBy: sortPreset,
       getName: (item) => item.title || '',
@@ -117,7 +113,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
         return null;
       }
     });
-  }, [newsItems, searchQuery, statusFilter, categoryFilter, pinnedFilter, sortPreset, sortBy, sortDir]);
+  }, [newsItems, searchQuery, statusFilter, categoryFilter, pinnedFilter, sortPreset]);
 
   const newsPagination = usePagination(filteredList, 7, [
     searchQuery,
@@ -125,26 +121,32 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
     categoryFilter,
     pinnedFilter,
     sortPreset,
-    sortBy,
-    sortDir,
     filteredList.length
   ]);
+
+  const statusCounts = useMemo(
+    () => ({
+      all: newsItems.length,
+      published: newsItems.filter((n) => n.status === 'published').length,
+      draft: newsItems.filter((n) => n.status === 'draft').length
+    }),
+    [newsItems]
+  );
+
+  const selectedNews = useMemo(
+    () =>
+      filteredList.find((item) => item.id === selectedNewsId) ||
+      newsPagination.paginatedItems[0] ||
+      filteredList[0] ||
+      null,
+    [filteredList, selectedNewsId, newsPagination.paginatedItems]
+  );
 
   const activeFilterCount =
     (statusFilter !== 'all' ? 1 : 0) +
     (categoryFilter !== 'all' ? 1 : 0) +
     (pinnedFilter !== 'all' ? 1 : 0) +
     (sortPreset !== DEFAULT_SORT_VALUE ? 1 : 0);
-
-  const toggleSort = (col: 'date' | 'title' | 'category') => {
-    setSortPreset('table_column');
-    if (sortBy === col) {
-      setSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setSortBy(col);
-      setSortDir(col === 'date' ? 'desc' : 'asc');
-    }
-  };
 
   if (!isAdmin) return null;
 
@@ -295,16 +297,75 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
     }
   };
 
+  const hasActiveFilters = Boolean(searchQuery.trim() || activeFilterCount > 0);
+
   return (
     <div className="space-y-4 animate-dashboard-tab">
-      {/* Header Bar */}
-      <div className={`p-4 sm:p-5 rounded-2xl border backdrop-blur-xs transition-colors ${adminTheme.surfaceClass}`}>
-        <div className="space-y-1">
-          <h3 className={`${compactHeader ? 'text-lg sm:text-xl' : 'text-xl sm:text-2xl'} font-extrabold text-black dark:text-white tracking-tight`}>
-            Urus Berita &amp; Pengumuman
-          </h3>
-        </div>
-      </div>
+      <WorkspaceHeaderCard
+        role="admin"
+        icon={<Newspaper className="w-5 h-5" />}
+        title={<span className={compactHeader ? 'text-base sm:text-lg' : ''}>Urus Berita &amp; Pengumuman</span>}
+        subtitle="Terbitkan berita, hebahan rasmi, dan sorotan utama portal belia."
+        rightActions={
+          <button
+            id="btn-admin-add-news"
+            type="button"
+            onClick={showForm ? () => setShowForm(false) : handleOpenCreate}
+            className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
+          >
+            {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            <span>{showForm ? 'Tutup Borang' : 'Tambah Berita Baharu'}</span>
+          </button>
+        }
+        tabs={[
+          { id: 'all', label: 'Semua', count: statusCounts.all },
+          { id: 'published', label: 'Disiar', count: statusCounts.published },
+          { id: 'draft', label: 'Draf', count: statusCounts.draft }
+        ]}
+        activeTab={statusFilter}
+        onTabChange={(id) => {
+          setStatusFilter(id as 'all' | 'published' | 'draft');
+          setMobilePreviewOpen(false);
+        }}
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Cari tajuk atau kategori..."
+        extraControls={
+          <>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value as 'all' | NewsCategory)}
+              aria-label="Tapis kategori berita"
+              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+            >
+              <option value="all">Semua Kategori</option>
+              {NEWS_CATEGORIES.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            <select
+              value={pinnedFilter}
+              onChange={(e) => setPinnedFilter(e.target.value as 'all' | 'pinned' | 'normal')}
+              aria-label="Tapis sorotan berita"
+              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+            >
+              <option value="all">Semua Sorotan</option>
+              <option value="pinned">Berita Utama Dipin</option>
+              <option value="normal">Artikel Biasa</option>
+            </select>
+            <select
+              value={sortPreset}
+              onChange={(e) => setSortPreset(e.target.value)}
+              aria-label="Susun artikel berita"
+              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+            >
+              {newsSortOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </>
+        }
+      />
 
       {/* Create / Edit News Form */}
       {showForm && (
@@ -471,96 +532,29 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
         </form>
       )}
 
-      {/* Admin News Table Card */}
-      <div className={`rounded-2xl border backdrop-blur-xs overflow-visible transition-colors ${adminTheme.surfaceClass}`}>
-        <ReferenceTableToolbar
-          accent="amber"
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Cari tajuk atau kategori..."
-          filterCount={activeFilterCount}
-          onResetFilters={() => {
-            setStatusFilter('all');
-            setCategoryFilter('all');
-            setPinnedFilter('all');
-            setSortPreset(DEFAULT_SORT_VALUE);
-          }}
-          sortOptions={
-            sortPreset === 'table_column'
-              ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...newsSortOptions]
-              : newsSortOptions
-          }
-          sortValue={sortPreset === 'table_column' ? '' : sortPreset}
-          onSortChange={(val) => {
-            if (val) setSortPreset(val);
-          }}
-          rightSlot={
-            <button
-              id="btn-admin-add-news"
-              type="button"
-              onClick={showForm ? () => setShowForm(false) : handleOpenCreate}
-              className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
-            >
-              {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-              <span>{showForm ? 'Tutup Borang' : 'Tambah Berita Baharu'}</span>
-            </button>
-          }
-          filterContent={
-            <>
-              <div>
-                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
-                  Status Penerbitan
-                </label>
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value as 'all' | 'published' | 'draft')}
-                  className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  <option value="all">Semua Status</option>
-                  <option value="published">Disiar (Awam)</option>
-                  <option value="draft">Draf (Admin Sahaja)</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
-                  Kategori
-                </label>
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value as 'all' | NewsCategory)}
-                  className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  <option value="all">Semua Kategori</option>
-                  {NEWS_CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
-                  Sorotan Utama
-                </label>
-                <select
-                  value={pinnedFilter}
-                  onChange={(e) => setPinnedFilter(e.target.value as 'all' | 'pinned' | 'normal')}
-                  className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  <option value="all">Semua Artikel</option>
-                  <option value="pinned">Berita Utama Dipin</option>
-                  <option value="normal">Artikel Biasa</option>
-                </select>
-              </div>
-            </>
-          }
-        />
-
-        {filteredList.length === 0 ? (
-          <div className="p-10 text-center space-y-3">
-            <Newspaper className="w-8 h-8 text-black/35 dark:text-white/35 mx-auto" />
-            <p className="text-sm font-bold text-black dark:text-white">Tiada artikel ditemui</p>
-            <p className="text-[0.9375rem] text-black/70 dark:text-white/75">
-              Cipta berita baharu atau ubah tapisan carian di atas.
-            </p>
+      {filteredList.length === 0 ? (
+        <div className={`rounded-2xl border backdrop-blur-xs p-10 text-center space-y-3 ${adminTheme.surfaceClass}`}>
+          <Newspaper className="w-8 h-8 text-black/35 dark:text-white/35 mx-auto" />
+          <p className="text-sm font-bold text-black dark:text-white kbelia-trim">Tiada artikel ditemui</p>
+          <p className="text-xs sm:text-sm text-black/70 dark:text-white/75">
+            Cipta berita baharu atau ubah tapisan carian di atas.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('');
+                  setStatusFilter('all');
+                  setCategoryFilter('all');
+                  setPinnedFilter('all');
+                  setSortPreset(DEFAULT_SORT_VALUE);
+                }}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
+              >
+                Set Semula Penapis
+              </button>
+            )}
             <button
               type="button"
               onClick={handleOpenCreate}
@@ -570,154 +564,233 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
               <span>Tambah Berita Pertama</span>
             </button>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className={`${adminTheme.surfaceMutedClass} border-b ${adminTheme.dividerClass}`}>
-                  <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                    <button
-                      type="button"
-                      onClick={() => toggleSort('title')}
-                      className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
+        </div>
+      ) : (
+        <GoogleWorkspaceSplitPane
+          role="admin"
+          mobileOpen={mobilePreviewOpen && Boolean(selectedNews)}
+          onMobileClose={() => setMobilePreviewOpen(false)}
+          mobileTitle={selectedNews?.title}
+          leftHeader={
+            <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-black/65 dark:text-white/70 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+              <span>{filteredList.length} artikel dipaparkan</span>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setStatusFilter('all');
+                    setCategoryFilter('all');
+                    setPinnedFilter('all');
+                    setSortPreset(DEFAULT_SORT_VALUE);
+                  }}
+                  className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                >
+                  Set Semula
+                </button>
+              )}
+            </div>
+          }
+          leftContent={newsPagination.paginatedItems.map((item) => {
+            const isSelected = selectedNews?.id === item.id;
+            return (
+              <div
+                key={item.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setSelectedNewsId(item.id);
+                  setMobilePreviewOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedNewsId(item.id);
+                    setMobilePreviewOpen(true);
+                  }
+                }}
+                className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                  isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                }`}
+              >
+                <div className={`w-12 h-12 rounded-xl overflow-hidden shrink-0 border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      referrerPolicy="no-referrer"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-black/55 dark:text-white/60">
+                      <Newspaper className="w-4 h-4" />
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-bold text-black dark:text-white leading-snug line-clamp-2 kbelia-trim">
+                      {item.title}
+                    </p>
+                    <span
+                      className={`text-[11px] font-bold shrink-0 px-2 py-0.5 rounded-lg ${
+                        item.status === 'published'
+                          ? 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-amber-500/12 text-amber-700 dark:text-amber-300'
+                      }`}
                     >
-                      <span>Artikel Berita</span>
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                    <button
-                      type="button"
-                      onClick={() => toggleSort('category')}
-                      className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
-                    >
-                      <span>Kategori</span>
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                    Status
-                  </th>
-                  <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                    <button
-                      type="button"
-                      onClick={() => toggleSort('date')}
-                      className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
-                    >
-                      <span>Tarikh</span>
-                      <ArrowUpDown className="w-3 h-3" />
-                    </button>
-                  </th>
-                  <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                    <span className="sr-only">Tindakan</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className={`divide-y ${adminTheme.dividerClass} text-sm`}>
-                {newsPagination.paginatedItems.map(item => (
-                  <tr
-                    key={item.id}
-                    className={`transition-colors ${adminTheme.rowHoverClass}`}
-                  >
-                    <td className="py-3.5 px-4 max-w-md">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div className={`w-14 h-14 rounded-lg overflow-hidden shrink-0 border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                          {item.imageUrl ? (
-                            <img
-                              src={item.imageUrl}
-                              alt={item.title}
-                              referrerPolicy="no-referrer"
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-black/55 dark:text-white/60">
-                              <Newspaper className="w-4 h-4" />
-                            </div>
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="font-bold text-black dark:text-white truncate">
-                            {item.title}
-                          </div>
-                          <div className="text-[0.8125rem] text-black/65 dark:text-white/65 truncate">
-                            {item.summary}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span>{item.category}</span>
-                        {item.isPinned && (
-                          <span className={`text-[0.8125rem] font-bold ${adminTheme.accentTextClass}`}>
-                            · Utama
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span
-                        className={`text-[0.8125rem] font-bold ${
-                          item.status === 'published'
-                            ? 'text-emerald-700 dark:text-emerald-400'
-                            : 'text-amber-700 dark:text-amber-300'
-                        }`}
-                      >
-                        {item.status === 'published' ? 'Disiar' : 'Draf'}
+                      {item.status === 'published' ? 'Disiar' : 'Draf'}
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-black/65 dark:text-white/65">
+                    <span>{item.category}</span>
+                    {item.isPinned && (
+                      <span className={`font-bold inline-flex items-center gap-1 ${adminTheme.accentTextClass}`}>
+                        · <Pin className="w-3 h-3" /> Utama
                       </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-black/75 dark:text-white/75 whitespace-nowrap tabular-nums">
-                      {formatDate(item.publishedAt || item.updatedAt)}
-                    </td>
-                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                      <RowActionMenu
-                        ariaLabel={`Tindakan untuk ${item.title}`}
-                        items={[
-                          {
-                            label: item.isPinned ? 'Nyahpin Berita Utama' : 'Pin Berita Utama',
-                            onClick: () => handleQuickTogglePin(item)
-                          },
-                          {
-                            label: item.status === 'published' ? 'Tukar kepada Draf' : 'Siarkan Sekarang',
-                            onClick: () => handleQuickToggleStatus(item),
-                            tone: 'accent'
-                          },
-                          {
-                            label: 'Edit Artikel',
-                            onClick: () => handleOpenEdit(item)
-                          },
-                          {
-                            label: 'Padam Berita',
-                            onClick: () =>
-                              confirmDelete({
-                                itemName: item.title,
-                                itemType: 'Berita Portal',
-                                onConfirm: () => handleDelete(item.id)
-                              }),
-                            tone: 'danger',
-                            dividerBefore: true
-                          }
-                        ]}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                    )}
+                    <span className="tabular-nums">· {formatDate(item.publishedAt || item.updatedAt)}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+          leftFooter={
+            <PaginationBar
+              currentPage={newsPagination.currentPage}
+              totalItems={newsPagination.totalItems}
+              itemsPerPage={7}
+              onPageChange={newsPagination.setCurrentPage}
+              itemLabel="artikel"
+              accent="amber"
+            />
+          }
+          rightContent={
+            selectedNews ? (
+              <div>
+                <SidePreviewHeader
+                  role="admin"
+                  title={selectedNews.title}
+                  status={
+                    <span
+                      className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                        selectedNews.status === 'published'
+                          ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                      }`}
+                    >
+                      {selectedNews.status === 'published' ? 'Disiar' : 'Draf'}
+                    </span>
+                  }
+                  subtitle={selectedNews.category}
+                  meta={
+                    <>
+                      <span>Oleh {selectedNews.authorName || 'Pentadbir KBelia'}</span>
+                      <span>·</span>
+                      <span className="tabular-nums">{formatDate(selectedNews.publishedAt || selectedNews.updatedAt)}</span>
+                      {selectedNews.isPinned && (
+                        <>
+                          <span>·</span>
+                          <span className={`font-bold ${adminTheme.accentTextClass}`}>Berita Utama Dipin</span>
+                        </>
+                      )}
+                    </>
+                  }
+                  actions={
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickTogglePin(selectedNews)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                      >
+                        {selectedNews.isPinned ? <PinOff className="w-3.5 h-3.5" /> : <Pin className="w-3.5 h-3.5" />}
+                        <span>{selectedNews.isPinned ? 'Nyahpin' : 'Pin Utama'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleQuickToggleStatus(selectedNews)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                      >
+                        {selectedNews.status === 'published' ? <FileEdit className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        <span>{selectedNews.status === 'published' ? 'Jadikan Draf' : 'Siarkan'}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(selectedNews)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          confirmDelete({
+                            itemName: selectedNews.title,
+                            itemType: 'Berita Portal',
+                            onConfirm: () => handleDelete(selectedNews.id)
+                          })
+                        }
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Padam</span>
+                      </button>
+                    </>
+                  }
+                />
 
-        {filteredList.length > 0 && (
-          <PaginationBar
-            currentPage={newsPagination.currentPage}
-            totalItems={newsPagination.totalItems}
-            itemsPerPage={7}
-            onPageChange={newsPagination.setCurrentPage}
-            itemLabel="artikel berita"
-            accent="amber"
-          />
-        )}
-      </div>
+                <div className="p-4 sm:p-5 space-y-4">
+                  {selectedNews.imageUrl && (
+                    <div className={`w-full h-48 sm:h-56 rounded-xl overflow-hidden border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                      <img
+                        src={selectedNews.imageUrl}
+                        alt={selectedNews.title}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <SidePreviewMetricsStrip
+                    role="admin"
+                    columns={3}
+                    items={[
+                      { label: 'Kategori', value: selectedNews.category },
+                      { label: 'Sorotan Utama', value: selectedNews.isPinned ? 'Dipin di Atas' : 'Artikel Biasa', accent: selectedNews.isPinned },
+                      { label: 'Tarikh Kemas Kini', value: formatDate(selectedNews.publishedAt || selectedNews.updatedAt) }
+                    ]}
+                  />
+
+                  <div className={`p-3.5 rounded-xl border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-stone-400 block mb-1">
+                      Ringkasan Berita
+                    </span>
+                    <p className="text-sm font-medium text-black/85 dark:text-white/90 leading-relaxed kbelia-prose">
+                      {selectedNews.summary}
+                    </p>
+                  </div>
+
+                  <div className={`p-4 rounded-xl border ${adminTheme.surfaceClass} ${adminTheme.dividerClass}`}>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-stone-400 block mb-2">
+                      Kandungan Penuh
+                    </span>
+                    <div className="text-sm text-black/85 dark:text-white/90 leading-relaxed whitespace-pre-line kbelia-prose">
+                      {selectedNews.content}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <SidePreviewEmptyState
+                icon={<Newspaper className="w-10 h-10" />}
+                title="Pilih artikel berita"
+                description="Klik mana-mana artikel di senarai sebelah kiri untuk membaca kandungan penuh dan mengurus status siaran."
+              />
+            )
+          }
+        />
+      )}
     </div>
   );
 };

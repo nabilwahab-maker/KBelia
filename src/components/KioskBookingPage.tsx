@@ -787,7 +787,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
               <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${roleTheme.activeMiniBtnClass}`}>
                 <Store className="w-5 h-5" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
+              <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight kbelia-trim">
                 Permohonan Sewa Kiosk Belia
               </h1>
             </div>
@@ -1563,7 +1563,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   <span>Peta Kiosk</span>
                 </button>
                 <div className="min-w-0">
-                  <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight truncate">
+                  <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight truncate kbelia-trim">
                     Kiosk Saya
                   </h1>
                   <p className="text-sm text-black/65 dark:text-white/70 truncate">
@@ -1938,7 +1938,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-black/65 dark:text-white/70">Unit Tersedia</span>
                         <span className="font-bold text-black dark:text-white tabular-nums">
-                          {availableSlots.length} / {safeAllSlots.length} Unit
+                          {availableSlots.length > 0 ? `${availableSlots.length} Unit` : 'Penuh'}
                         </span>
                       </div>
                       <div className="flex items-center justify-between gap-3">
@@ -1962,7 +1962,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-black/65 dark:text-white/70">Kuota Akaun</span>
                         <span className="font-bold text-black dark:text-white tabular-nums">
-                          0 / 1 Unit
+                          Belum Ditempah
                         </span>
                       </div>
                     </div>

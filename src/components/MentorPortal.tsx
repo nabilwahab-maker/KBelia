@@ -86,6 +86,8 @@ import { MentorProfileEditModal } from './MentorProfileEditModal';
 import { MentorScheduleCalendar } from './MentorScheduleCalendar';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast as triggerToast } from './ToastNotification';
+import { QrCodeGraphic } from './QrCodeGraphic';
+import { buildVerificationQrPayload } from '../utils/qrUtils';
 import { EditorialMetricStrip } from './EditorialMetricStrip';
 import { getRoleTheme } from '../utils/roleTheme';
 import { RoleDonutCard } from './RoleDonutCard';
@@ -115,6 +117,7 @@ import {
   ResponsiveContainer,
   LabelList
 } from 'recharts';
+import { AcronymText, MiddleTruncate } from './TypographyPrimitives';
 
 const mentorTheme = getRoleTheme('mentor');
 
@@ -1371,7 +1374,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   const handleSaveLogEntry = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newLogMenteeName.trim() || !newLogBusinessName.trim() || !newLogTopic.trim() || !newLogMinutes.trim()) {
-      triggerToast('Sila isi nama mentee, bisnes, topik dan minit bimbingan.', 'error');
+      triggerToast('Sila isi nama belia, bisnes, topik dan minit bimbingan.', 'error');
       return;
     }
 
@@ -1493,7 +1496,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   }
 
   return (
-    <div className="max-w-[1320px] mx-auto w-full space-y-4 animate-in fade-in duration-300 pb-2">
+    <div className="w-full space-y-3.5 animate-in fade-in duration-300 pb-2">
       
       {/* Toast Notification */}
       {isSuccessToast && (
@@ -1506,116 +1509,75 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         </div>
       )}
 
-      {/* 1. MENTOR PORTAL HEADER: Google Workspace Clean Bar & Breadcrumb */}
-      <div className={`rounded-2xl border p-5 sm:p-6 transition-colors ${mentorTheme.surfaceClass}`}>
-        {(() => {
-          const mentorDisplayName = currentMentor?.name || userProfile?.fullName || 'Mentor';
-          const scheduleLabel = currentMentor?.availableDays || (!isEn ? 'Isnin–Jumaat · 9:00 PG' : 'Mon–Fri · 9:00 AM');
+      {/* 1. MENTOR PORTAL HEADER: KBelia Editorial Hero */}
+      <div className={`relative overflow-hidden kbelia-ambient-sheen-soft rounded-2xl border backdrop-blur-xs p-5 sm:p-6 transition-colors ${mentorTheme.surfaceClass}`}>
+        <div className="pointer-events-none absolute -top-14 -left-10 w-52 h-52 rounded-full bg-[#2563EB]/10 blur-3xl animate-ambient-orb-a" aria-hidden="true" />
+        <div className="pointer-events-none absolute -bottom-16 right-8 w-48 h-48 rounded-full bg-[#0D9488]/10 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
 
-          const mentorHeaderMap: Record<MentorSubTab, { prefix: string; accent: string; breadcrumb: string }> = {
+        {(() => {
+          const mentorDisplayName = currentMentor?.name || userProfile?.fullName || 'Prof. Madya Dr. Wan Azhar';
+
+          const mentorHeaderMap: Record<MentorSubTab, { prefix: string; accent: string }> = {
             overview: {
               prefix: !isEn ? 'Gambaran Keseluruhan ' : 'Mentorship ',
-              accent: !isEn ? 'Bimbingan' : 'Overview',
-              breadcrumb: !isEn ? 'Dashboard' : 'Dashboard'
+              accent: !isEn ? 'Bimbingan' : 'Overview'
             },
             sessions: {
               prefix: !isEn ? 'Pengurusan ' : 'Manage ',
-              accent: !isEn ? 'Sesi Bimbingan' : 'Coaching Sessions',
-              breadcrumb: !isEn ? 'Sesi Bimbingan' : 'Coaching Sessions'
+              accent: !isEn ? 'Sesi Bimbingan' : 'Coaching Sessions'
             },
             mentees: {
-              prefix: !isEn ? 'Senarai ' : 'Mentee ',
-              accent: !isEn ? 'Mentee' : 'Directory',
-              breadcrumb: !isEn ? 'Senarai Mentee' : 'Mentee Directory'
+              prefix: !isEn ? 'Senarai ' : 'Youth ',
+              accent: !isEn ? 'Belia' : 'Directory'
             },
             schedule: {
               prefix: !isEn ? 'Pengurusan ' : 'Manage ',
-              accent: !isEn ? 'Jadual & Kalendar' : 'Schedule & Calendar',
-              breadcrumb: !isEn ? 'Jadual & Kalendar' : 'Schedule'
+              accent: !isEn ? 'Jadual & Kalendar' : 'Schedule & Calendar'
             },
             readiness: {
               prefix: !isEn ? 'Semak ' : 'Grant ',
-              accent: !isEn ? 'Geran' : 'Check',
-              breadcrumb: !isEn ? 'Semak Geran' : 'Grant Readiness'
+              accent: !isEn ? 'Geran' : 'Check'
             },
             endorsements: {
               prefix: !isEn ? 'Pengeluaran ' : 'Issue ',
-              accent: !isEn ? 'Sokongan Usahawan' : 'Support Letters',
-              breadcrumb: !isEn ? 'Sokongan Geran' : 'Grant Endorsements'
+              accent: !isEn ? 'Sokongan Usahawan' : 'Support Letters'
             },
             logbook: {
               prefix: !isEn ? 'Catatan & ' : 'Session ',
-              accent: !isEn ? 'Perkongsian Sesi' : 'Notes & Follow-up',
-              breadcrumb: !isEn ? 'Rekod Sesi' : 'Session Logbook'
+              accent: !isEn ? 'Perkongsian Sesi' : 'Notes & Follow-up'
             },
             impact: {
               prefix: !isEn ? 'Laporan ' : 'Summary ',
-              accent: !isEn ? 'Ringkas' : 'Report',
-              breadcrumb: !isEn ? 'Laporan Ringkas' : 'Summary Report'
+              accent: !isEn ? 'Ringkas' : 'Report'
             },
             profile: {
               prefix: !isEn ? 'Pengurusan ' : 'Manage ',
-              accent: !isEn ? 'Profil Mentor' : 'Mentor Profile',
-              breadcrumb: !isEn ? 'Profil Mentor' : 'Mentor Profile'
+              accent: !isEn ? 'Profil Mentor' : 'Mentor Profile'
             }
           };
           const currentMentorHeader = mentorHeaderMap[currentSubTab] || mentorHeaderMap.overview;
-          const targetActionTab: MentorSubTab =
-            currentSubTab === 'overview'
-              ? 'sessions'
-              : 'overview';
-          const actionLabel =
-            currentSubTab === 'overview'
-              ? (!isEn ? 'Semak Sesi' : 'Review Sessions')
-              : 'Dashboard';
 
           return (
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-              {/* Left Google Workspace Breadcrumb + Title */}
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="min-w-0">
-                <nav
-                  aria-label="Breadcrumb"
-                  className="flex flex-wrap items-center gap-1.5 text-xs font-medium text-[#5F6368] dark:text-[#9AA0A6]"
-                >
-                  <button
-                    type="button"
-                    onClick={() => handleSubTabChange('overview')}
-                    className="hover:text-[#1A73E8] dark:hover:text-[#8AB4F8] transition-colors cursor-pointer"
-                  >
-                    {!isEn ? 'Portal Mentor' : 'Mentor Portal'}
-                  </button>
-                  <ChevronRight className="w-3.5 h-3.5 shrink-0 opacity-65" />
-                  <span>{!isEn ? 'Ruang Bimbingan' : 'Mentorship Workspace'}</span>
-                  <ChevronRight className="w-3.5 h-3.5 shrink-0 opacity-65" />
-                  <span className={`font-semibold ${mentorTheme.accentTextClass}`}>
-                    {currentMentorHeader.breadcrumb}
-                  </span>
-                </nav>
-                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-[#1F1F1F] dark:text-[#E3E3E3] mt-1.5 leading-tight">
+                <p className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1.5">
+                  {!isEn ? 'Rangkaian Seluruh Negeri Kelantan' : 'Kelantan Statewide Network'}
+                </p>
+                <h1 className="font-display text-fluid-portal font-bold tracking-tight text-slate-900 dark:text-[#F1F5F9] leading-tight kbelia-trim">
                   {currentMentorHeader.prefix}
                   <span className={mentorTheme.accentTextClass}>{currentMentorHeader.accent}</span>
                 </h1>
-                <p className="text-[0.875rem] sm:text-[0.9375rem] text-[#5F6368] dark:text-[#9AA0A6] mt-1 max-w-2xl leading-relaxed">
+                <p className="text-[0.9375rem] text-slate-600 dark:text-slate-300 mt-1.5 max-w-2xl leading-relaxed">
                   {!isEn ? (
                     <>
-                      Selamat kembali, <span className="font-semibold text-[#1F1F1F] dark:text-[#E3E3E3]">{mentorDisplayName}</span> &middot; {scheduleLabel}
+                      Selamat kembali, <span className="font-semibold text-slate-900 dark:text-[#F1F5F9]">{mentorDisplayName}</span>
                     </>
                   ) : (
                     <>
-                      Welcome back, <span className="font-semibold text-[#1F1F1F] dark:text-[#E3E3E3]">{mentorDisplayName}</span> &middot; {scheduleLabel}
+                      Welcome back, <span className="font-semibold text-slate-900 dark:text-[#F1F5F9]">{mentorDisplayName}</span>
                     </>
                   )}
                 </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-2 self-start lg:self-auto">
-                <button
-                  type="button"
-                  onClick={() => handleSubTabChange(targetActionTab)}
-                  className={`px-4 py-2 text-xs sm:text-sm font-semibold shadow-2xs ${mentorTheme.primaryButtonClass}`}
-                >
-                  {actionLabel}
-                </button>
               </div>
             </div>
           );
@@ -1711,9 +1673,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
         return (
         <div className="space-y-4 animate-in fade-in duration-200">
-          {/* Google Workspace Quick Actions Bar */}
-          <div className={`rounded-2xl border p-3.5 sm:px-5 flex flex-wrap items-center justify-start gap-3 ${mentorTheme.surfaceClass}`}>
-            <span className="text-xs font-semibold uppercase tracking-wider text-[#5F6368] dark:text-[#9AA0A6]">
+          {/* Quick Actions Bar */}
+          <div className={`rounded-2xl border backdrop-blur-xs p-3.5 sm:px-5 flex flex-wrap items-center justify-start gap-3 ${mentorTheme.surfaceClass}`}>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               {!isEn ? 'Tindakan Pantas' : 'Quick Actions'}
             </span>
             <div className="flex flex-wrap items-center gap-2">
@@ -1805,12 +1767,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5 items-stretch">
             <div
               style={{ '--stagger': 4 } as React.CSSProperties}
-              className={`animate-dashboard-card lg:col-span-2 h-full w-full rounded-2xl p-4 sm:p-5 border transition-all duration-200 min-w-0 flex flex-col justify-between ${mentorTheme.surfaceClass}`}
+              className={`animate-dashboard-card lg:col-span-2 h-full w-full rounded-2xl backdrop-blur-xs p-4 sm:p-5 border transition-all duration-200 min-w-0 flex flex-col ${mentorTheme.surfaceClass}`}
             >
-              <div className={`flex flex-wrap items-center justify-between gap-2 pb-3 border-b mb-3 ${mentorTheme.dividerClass}`}>
+              <div className={`flex flex-wrap items-center justify-between gap-2 pb-3 border-b mb-3 shrink-0 ${mentorTheme.dividerClass}`}>
                 <div className="flex items-center gap-2">
                   <BarChart3 className={`w-5 h-5 shrink-0 ${mentorTheme.accentTextClass}`} />
-                  <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tracking-tight">
+                  <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                     Perkembangan Bimbingan Mengikut Lokasi
                   </h3>
                 </div>
@@ -1819,13 +1781,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </span>
               </div>
 
-              <div className="h-[220px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-600 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-300">
-                <ResponsiveContainer width="100%" height={220} minWidth={0} initialDimension={{ width: 640, height: 220 }}>
+              <div className="relative flex-1 min-h-[260px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-600 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-300">
+                <div className="absolute inset-0">
+                <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 640, height: 280 }}>
                   <BarChart
                     data={mentorChartData}
                     barCategoryGap="16%"
                     barGap={4}
-                    margin={{ top: 24, right: 12, left: -4, bottom: 6 }}
+                    margin={{ top: 18, right: 12, left: -4, bottom: 6 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(148, 163, 184, 0.20)" />
                     <XAxis dataKey="district" tick={{ fontSize: 12.5, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
@@ -1839,7 +1802,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <div className={`px-3.5 py-2.5 rounded-xl text-sm font-mono shadow-xl border ${mentorTheme.tooltipBgClass}`}>
                               <div className="font-bold mb-1">{d.fullName || d.district}</div>
                               <div className="opacity-90">Sesi Bimbingan: {d.sesi}</div>
-                              <div className="opacity-90">Sokongan Disyor: {d.perakuan}</div>
+                              <div className="opacity-90">Sokongan Geran: {d.perakuan}</div>
                             </div>
                           );
                         }
@@ -1874,7 +1837,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     </Bar>
                     <Bar
                       dataKey="perakuan"
-                      name="Sokongan Disyor"
+                      name="Sokongan Geran"
                       fill={mentorTheme.chartSecondary}
                       radius={[6, 6, 0, 0]}
                       maxBarSize={38}
@@ -1900,6 +1863,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
+                </div>
               </div>
             </div>
 
@@ -1910,10 +1874,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               icon={Award}
               segments={endorsementTierSegments}
               centerValue={centerEndorsedDisplay}
-              centerLabel="Jumlah Disyor"
-              valueUnit="rekod"
+              centerLabel="Nilai Sokongan"
+              valueUnit="surat"
               summaryPairs={[
-                { label: 'Sokongan Aktif', value: `${activeEndorsementsList.length} rekod`, dotColor: mentorTheme.chartPrimary },
+                { label: 'Sokongan Aktif', value: activeEndorsementsList.length > 0 ? `${activeEndorsementsList.length} Surat` : 'Tiada', dotColor: mentorTheme.chartPrimary },
                 { label: 'Purata Nilai', value: `RM ${avgEndorsedRm.toLocaleString('ms-MY')}`, dotColor: mentorTheme.chartSecondary }
               ]}
               emptyState={{
@@ -1936,7 +1900,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             >
               <div className={`flex items-center gap-2 pb-3 border-b mb-1 ${mentorTheme.dividerClass}`}>
                 <Calendar className={`w-4.5 h-4.5 shrink-0 ${mentorTheme.accentTextClass}`} />
-                <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tracking-tight">
+                <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                   Jadual Sesi Terdekat
                 </h3>
               </div>
@@ -2024,7 +1988,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               else setStatusFilter('all');
                               handleSubTabChange('sessions');
                             }}
-                            className={`px-3.5 py-2 rounded-full text-[0.8125rem] font-semibold ${mentorTheme.secondaryButtonClass}`}
+                            className={`px-3.5 py-2 rounded-xl text-[0.8125rem] font-semibold ${mentorTheme.secondaryButtonClass}`}
                           >
                             Butiran
                           </button>
@@ -2049,7 +2013,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             >
               <div className={`flex items-center gap-2 pb-3 border-b mb-1 ${mentorTheme.dividerClass}`}>
                 <Award className={`w-4.5 h-4.5 shrink-0 ${mentorTheme.accentStrongTextClass}`} />
-                <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tracking-tight">
+                <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                   Senarai Sokongan Terkini
                 </h3>
               </div>
@@ -2085,7 +2049,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           setSelectedEndorsementId(end.id);
                           handleSubTabChange('endorsements');
                         }}
-                        className={`px-3.5 py-2 rounded-full text-[0.8125rem] font-semibold shadow-2xs ${mentorTheme.secondaryButtonClass}`}
+                        className={`px-3.5 py-2 rounded-xl text-[0.8125rem] font-semibold shadow-2xs ${mentorTheme.secondaryButtonClass}`}
                       >
                         Lihat
                       </button>
@@ -2106,7 +2070,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           {/* Senarai Usahawan Dalam Bimbingan (Reference Table) */}
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tracking-tight">
+              <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                 Senarai Usahawan Dalam Bimbingan
               </h3>
             </div>
@@ -2221,7 +2185,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             }}
                             className="inline-flex items-center gap-1 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                           >
-                            <span>Keadaan</span>
+                            <span>Status</span>
                             <ArrowUpDown className="w-3 h-3" />
                           </button>
                         </th>
@@ -2270,7 +2234,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                   ? 'text-emerald-600 dark:text-emerald-400'
                                   : 'text-slate-500 dark:text-slate-400'
                               }`}>
-                                {hasEndorsement ? 'Sokongan Disahkan' : 'Belum Disyor'}
+                                {hasEndorsement ? 'Sokongan Disahkan' : 'Belum Disokong'}
                               </span>
                             </td>
                             <td className="py-3.5 px-4 whitespace-nowrap">
@@ -2388,10 +2352,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 <div className="flex items-center gap-2.5">
                   <Calendar className={`w-5 h-5 shrink-0 ${mentorTheme.accentTextClass}`} />
                   <div>
-                    <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tracking-tight">
+                    <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                       {!isEn ? 'Pengurusan Sesi Bimbingan' : 'Coaching Sessions'}
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#5F6368] dark:text-[#9AA0A6]">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                       {!isEn
                         ? 'Pilih mana-mana permohonan di kiri untuk pratonton penuh, pautan Meet, dan tindakan pengesahan.'
                         : 'Select any request on the left for full preview, Meet link, and confirmation actions.'}
@@ -2419,7 +2383,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
               </div>
 
-              {/* Gmail-style Underline Tabs */}
+              {/* Editorial Underline Tabs */}
               <div className={`px-4 sm:px-5 border-t flex items-center justify-between flex-wrap gap-3 ${mentorTheme.dividerClass}`}>
                 <div className="flex items-center gap-5 overflow-x-auto">
                   {sessionTabs.map((tab) => {
@@ -2437,10 +2401,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       >
                         <span>{tab.label}</span>
                         <span
-                          className={`px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums ${
+                          className={`px-2 py-0.5 rounded-lg text-[11px] font-bold tabular-nums ${
                             isTabActive
                               ? mentorTheme.activeNavClass
-                              : 'bg-[#F1F4F9] dark:bg-[#28292C] text-[#5F6368] dark:text-[#9AA0A6]'
+                              : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400'
                           }`}
                         >
                           {tab.count}
@@ -2453,19 +2417,19 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 {/* Search & Mode Filter */}
                 <div className="flex flex-wrap items-center gap-2 py-2">
                   <div className="relative">
-                    <Search className="w-4 h-4 text-[#5F6368] dark:text-[#9AA0A6] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder={!isEn ? 'Cari usahawan, topik...' : 'Search mentee, topic...'}
-                      className={`pl-9 pr-3 py-1.5 rounded-full text-xs sm:text-sm w-44 sm:w-56 ${mentorTheme.inputClass}`}
+                      placeholder={!isEn ? 'Cari usahawan, topik...' : 'Search youth, topic...'}
+                      className={`pl-9 pr-3 py-1.5 rounded-xl text-xs sm:text-sm w-44 sm:w-56 ${mentorTheme.inputClass}`}
                     />
                   </div>
                   <select
                     value={modeFilter}
                     onChange={(e) => setModeFilter(e.target.value as 'all' | 'Bersemuka di Kampus' | 'Google Meet')}
-                    className={`px-3 py-1.5 rounded-full text-xs sm:text-sm cursor-pointer ${mentorTheme.inputClass}`}
+                    className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm cursor-pointer ${mentorTheme.inputClass}`}
                   >
                     <option value="all">{!isEn ? 'Semua Mod' : 'All Modes'}</option>
                     <option value="Google Meet">Google Meet</option>
@@ -2478,14 +2442,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Split-Pane Layout: Left Session Queue (45%) | Right Live Detail Side Panel (55%) */}
             <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-4 items-stretch">
               {/* Left Pane: Queue List */}
-              <div className={`rounded-2xl border overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
+              <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
                 {filteredRegistrations.length === 0 ? (
                   <div className="py-12 px-4 text-center space-y-2">
-                    <GraduationCap className="w-9 h-9 text-[#5F6368] dark:text-[#9AA0A6] mx-auto opacity-60" />
-                    <p className="text-sm font-semibold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                    <GraduationCap className="w-9 h-9 text-slate-400 dark:text-slate-500 mx-auto opacity-60" />
+                    <p className="text-sm font-semibold text-slate-900 dark:text-[#F1F5F9]">
                       {!isEn ? 'Tiada rekod sesi ditemui.' : 'No sessions found.'}
                     </p>
-                    <p className="text-xs text-[#5F6368] dark:text-[#9AA0A6]">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {!isEn ? 'Cuba tukar tab status atau kata kunci carian.' : 'Try changing the status tab or search query.'}
                     </p>
                   </div>
@@ -2514,7 +2478,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             onClick={() => setSelectedSessionId(mentee.id)}
                             className={`w-full text-left p-3.5 sm:px-4 flex items-start gap-3 transition-colors cursor-pointer ${
                               isSelected
-                                ? 'bg-[#D3E3FD]/60 dark:bg-[#004A77]/50'
+                                ? 'bg-[#1D4ED8]/10 dark:bg-[#3B82F6]/18'
                                 : mentorTheme.rowHoverClass
                             }`}
                           >
@@ -2528,15 +2492,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             </div>
                             <div className="min-w-0 flex-1 space-y-1">
                               <div className="flex items-center justify-between gap-2">
-                                <span className={`text-sm font-bold truncate ${isSelected ? mentorTheme.accentStrongTextClass : 'text-[#1F1F1F] dark:text-[#E3E3E3]'}`}>
+                                <span className={`text-sm font-bold truncate ${isSelected ? mentorTheme.accentTextClass : 'text-slate-900 dark:text-[#F1F5F9]'}`}>
                                   {mentee.entrepreneurName}
                                 </span>
                                 <span
-                                  className={`text-[11px] font-semibold shrink-0 px-2 py-0.5 rounded-full ${
+                                  className={`text-[11px] font-semibold shrink-0 px-2 py-0.5 rounded-lg ${
                                     isCompleted
                                       ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
                                       : isConfirmed
-                                      ? 'bg-[#D3E3FD] text-[#041E49] dark:bg-[#004A77] dark:text-[#C2E7FF]'
+                                      ? 'bg-[#1D4ED8]/12 text-[#1D4ED8] dark:bg-[#3B82F6]/20 dark:text-[#93C5FD]'
                                       : isPending
                                       ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300'
                                       : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'
@@ -2545,13 +2509,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                   {isCompleted ? 'Selesai' : isConfirmed ? 'Disahkan' : isPending ? 'Menunggu' : 'Dibatalkan'}
                                 </span>
                               </div>
-                              <p className="text-xs font-medium text-[#5F6368] dark:text-[#9AA0A6] truncate">
+                              <p className="text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
                                 {mentee.businessName} &middot; {mentee.district || 'Kelantan'}
                               </p>
-                              <p className="text-xs text-[#1F1F1F] dark:text-[#E3E3E3] truncate font-medium">
+                              <p className="text-xs text-slate-800 dark:text-slate-200 truncate font-medium">
                                 {mentee.topic}
                               </p>
-                              <div className="flex items-center gap-2 text-[11px] text-[#5F6368] dark:text-[#9AA0A6] tabular-nums">
+                              <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 tabular-nums">
                                 <Clock className="w-3 h-3 shrink-0" />
                                 <span>{mentee.preferredDate || 'Fleksibel'} &middot; {mentee.preferredTime || '10:00 AM'}</span>
                                 <span>&middot;</span>
@@ -2575,14 +2539,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </div>
 
               {/* Right Pane: Side Detail Preview Panel */}
-              <div className={`rounded-2xl border overflow-hidden ${mentorTheme.surfaceClass}`}>
+              <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden ${mentorTheme.surfaceClass}`}>
                 {!activeSession ? (
                   <div className="py-16 px-6 text-center space-y-2">
-                    <Calendar className="w-10 h-10 text-[#5F6368] dark:text-[#9AA0A6] mx-auto opacity-50" />
-                    <p className="text-sm font-semibold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                    <Calendar className="w-10 h-10 text-slate-400 dark:text-slate-500 mx-auto opacity-50" />
+                    <p className="text-sm font-semibold text-slate-900 dark:text-[#F1F5F9]">
                       {!isEn ? 'Pilih sesi daripada senarai di sebelah kiri' : 'Select a session from the list'}
                     </p>
-                    <p className="text-xs text-[#5F6368] dark:text-[#9AA0A6]">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {!isEn ? 'Butiran cabaran usahawan, pautan Google Meet dan nota bimbingan akan dipaparkan di sini.' : 'Challenge notes, Meet links, and action plans appear here.'}
                     </p>
                   </div>
@@ -2592,7 +2556,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     <div className={`p-5 border-b flex flex-col sm:flex-row sm:items-start justify-between gap-4 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                       <div className="flex items-start gap-3.5 min-w-0">
                         {activeVisuals && (
-                          <div className={`w-14 h-14 rounded-2xl overflow-hidden border shrink-0 bg-white dark:bg-[#1E1F20] ${mentorTheme.dividerClass}`}>
+                          <div className={`w-14 h-14 rounded-2xl overflow-hidden border shrink-0 bg-white dark:bg-slate-900 ${mentorTheme.dividerClass}`}>
                             <PortalImage
                               src={activeVisuals.businessUrl}
                               alt={activeSession.businessName}
@@ -2603,11 +2567,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         )}
                         <div className="min-w-0 space-y-1">
                           <div className="flex flex-wrap items-center gap-2">
-                            <h4 className="text-base sm:text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] truncate">
+                            <h4 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] truncate">
                               {activeSession.entrepreneurName}
                             </h4>
                             <span
-                              className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                              className={`px-2.5 py-0.5 rounded-lg text-xs font-semibold ${
                                 activeSession.status === 'completed'
                                   ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
                                   : activeSession.status === 'confirmed'
@@ -2625,7 +2589,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <p className={`text-sm font-semibold ${mentorTheme.accentTextClass}`}>
                             {activeSession.businessName}
                           </p>
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#5F6368] dark:text-[#9AA0A6]">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600 dark:text-slate-400">
                             <span className="inline-flex items-center gap-1">
                               <MapPin className="w-3.5 h-3.5" />
                               <span>{activeSession.district || 'Kelantan'}</span>
@@ -2656,23 +2620,23 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       {/* Schedule & Channel Box */}
                       <div className={`grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-xl border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                         <div>
-                          <span className="text-[11px] font-semibold uppercase tracking-wider text-[#5F6368] dark:text-[#9AA0A6] block">
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                             Topik Utama
                           </span>
-                          <span className="text-sm font-semibold text-[#1F1F1F] dark:text-[#E3E3E3] mt-0.5 block">
+                          <span className="text-sm font-semibold text-slate-900 dark:text-[#F1F5F9] mt-0.5 block">
                             {activeSession.topic}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[11px] font-semibold uppercase tracking-wider text-[#5F6368] dark:text-[#9AA0A6] block">
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                             Tarikh &amp; Masa
                           </span>
-                          <span className="text-sm font-semibold text-[#1F1F1F] dark:text-[#E3E3E3] mt-0.5 block tabular-nums">
+                          <span className="text-sm font-semibold text-slate-900 dark:text-[#F1F5F9] mt-0.5 block tabular-nums">
                             {activeSession.preferredDate || 'Fleksibel'} &middot; {activeSession.preferredTime || '10:00 AM'}
                           </span>
                         </div>
                         <div>
-                          <span className="text-[11px] font-semibold uppercase tracking-wider text-[#5F6368] dark:text-[#9AA0A6] block">
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                             Mod Bimbingan
                           </span>
                           <span className={`text-sm font-semibold mt-0.5 inline-flex items-center gap-1.5 ${mentorTheme.accentTextClass}`}>
@@ -2686,10 +2650,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       {activeSession.meetingLink && (
                         <div className={`p-3.5 rounded-xl border flex flex-wrap items-center justify-between gap-3 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                           <div className="min-w-0">
-                            <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block">
                               Pautan Panggilan Video Google Meet
                             </span>
-                            <span className="text-xs font-mono text-[#1A73E8] dark:text-[#8AB4F8] truncate block">
+                            <span className={`text-xs font-mono truncate block ${mentorTheme.accentTextClass}`}>
                               {activeSession.meetingLink}
                             </span>
                           </div>
@@ -2721,11 +2685,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
                       {/* Entrepreneur Challenge Message */}
                       <div className="space-y-1.5">
-                        <h5 className="text-xs font-semibold uppercase tracking-wider text-[#5F6368] dark:text-[#9AA0A6] flex items-center gap-1.5">
+                        <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                           <MessageSquare className={`w-3.5 h-3.5 ${mentorTheme.accentTextClass}`} />
                           <span>Mesej Permohonan &amp; Cabaran Usahawan</span>
                         </h5>
-                        <div className={`p-3.5 rounded-xl border text-sm text-[#1F1F1F] dark:text-[#E3E3E3] leading-relaxed whitespace-pre-line ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
+                        <div className={`p-3.5 rounded-xl border text-sm text-slate-800 dark:text-slate-200 leading-relaxed whitespace-pre-line ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                           {activeSession.challenges
                             ? `"${activeSession.challenges}"`
                             : 'Usahawan memohon sesi bimbingan khusus bagi strategi pemasaran, pengurusan kos operasi, dan persediaan dokumentasi permohonan geran belia.'}
@@ -2735,7 +2699,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       {/* Saved Action Plan & Notes */}
                       <div className="space-y-1.5">
                         <div className="flex items-center justify-between gap-2">
-                          <h5 className="text-xs font-semibold uppercase tracking-wider text-[#5F6368] dark:text-[#9AA0A6] flex items-center gap-1.5">
+                          <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                             <FileText className={`w-3.5 h-3.5 ${mentorTheme.accentTextClass}`} />
                             <span>Nota Bimbingan &amp; Pelan Tindakan</span>
                           </h5>
@@ -2748,18 +2712,18 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           </button>
                         </div>
                         {activeSession.mentorActionPlan || activeSession.notes ? (
-                          <div className={`p-3.5 rounded-xl border space-y-2 text-sm text-[#1F1F1F] dark:text-[#E3E3E3] ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
+                          <div className={`p-3.5 rounded-xl border space-y-2 text-sm text-slate-800 dark:text-slate-200 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                             {activeSession.mentorActionPlan && (
                               <p className="whitespace-pre-line leading-relaxed">{activeSession.mentorActionPlan}</p>
                             )}
                             {activeSession.notes && (
-                              <p className="text-xs text-[#5F6368] dark:text-[#9AA0A6] pt-1 border-t border-[#E0E3E7] dark:border-[#333537]">
+                              <p className={`text-xs text-slate-600 dark:text-slate-400 pt-1 border-t ${mentorTheme.dividerClass}`}>
                                 Catatan Mentor: {activeSession.notes}
                               </p>
                             )}
                           </div>
                         ) : (
-                          <p className="text-xs text-[#5F6368] dark:text-[#9AA0A6] italic">
+                          <p className="text-xs text-slate-500 dark:text-slate-400 italic">
                             Belum ada nota pelan tindakan direkodkan bagi sesi ini.
                           </p>
                         )}
@@ -2885,14 +2849,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         return (
           <div key="mentees" className="space-y-4 animate-dashboard-tab">
             {/* Toolbar Header + View Toggle */}
-            <div className={`p-4 sm:p-5 rounded-2xl border flex flex-col lg:flex-row lg:items-center justify-between gap-3 ${mentorTheme.surfaceClass}`}>
+            <div className={`p-4 sm:p-5 rounded-2xl border backdrop-blur-xs flex flex-col lg:flex-row lg:items-center justify-between gap-3 ${mentorTheme.surfaceClass}`}>
               <div className="flex items-center gap-2.5">
                 <Users className={`w-5 h-5 shrink-0 ${mentorTheme.accentTextClass}`} />
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tracking-tight">
-                    {!isEn ? 'Senarai Mentee Bimbingan' : 'Assigned Mentees'} ({filteredMentees.length})
+                  <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
+                    {!isEn ? 'Senarai Belia Bimbingan' : 'Assigned Youth'} ({filteredMentees.length})
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#5F6368] dark:text-[#9AA0A6] mt-0.5">
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-0.5">
                     {!isEn
                       ? 'Pilih usahawan untuk memaparkan profil perniagaan, skor geran dan sejarah catatan sesi.'
                       : 'Select an entrepreneur to view business profile, grant readiness, and session logs.'}
@@ -2902,19 +2866,19 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
               <div className="flex flex-wrap items-center gap-2">
                 <div className="relative">
-                  <Search className="w-4 h-4 text-[#5F6368] dark:text-[#9AA0A6] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={menteeSearch}
                     onChange={(e) => setMenteeSearch(e.target.value)}
                     placeholder={!isEn ? 'Cari nama atau bisnes...' : 'Search name or business...'}
-                    className={`pl-9 pr-3 py-2 rounded-full text-sm w-48 sm:w-56 ${mentorTheme.inputClass}`}
+                    className={`pl-9 pr-3 py-2 rounded-xl text-sm w-48 sm:w-56 ${mentorTheme.inputClass}`}
                   />
                 </div>
                 <select
                   value={menteeDistrictFilter}
                   onChange={(e) => setMenteeDistrictFilter(e.target.value as 'all' | KelantanDistrict)}
-                  className={`px-3.5 py-2 rounded-full text-sm cursor-pointer ${mentorTheme.inputClass}`}
+                  className={`px-3.5 py-2 rounded-xl text-sm cursor-pointer ${mentorTheme.inputClass}`}
                 >
                   <option value="all">{!isEn ? 'Semua Daerah' : 'All Districts'}</option>
                   {uniqueMentorDistricts.map((d) => (
@@ -2923,15 +2887,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </select>
 
                 {/* List / Card View Toggle */}
-                <div className={`inline-flex items-center p-1 rounded-full border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
+                <div className={`inline-flex items-center p-1 rounded-xl border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                   <button
                     type="button"
                     onClick={() => setMenteeViewMode('list')}
                     aria-label="Paparan Senarai"
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
                       menteeViewMode === 'list'
-                        ? mentorTheme.activeNavClass
-                        : 'text-[#5F6368] dark:text-[#9AA0A6]'
+                        ? mentorTheme.segmentedActiveClass
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     <List className="w-3.5 h-3.5" />
@@ -2941,10 +2905,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     type="button"
                     onClick={() => setMenteeViewMode('cards')}
                     aria-label="Paparan Kad"
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold inline-flex items-center gap-1.5 transition-colors cursor-pointer ${
                       menteeViewMode === 'cards'
-                        ? mentorTheme.activeNavClass
-                        : 'text-[#5F6368] dark:text-[#9AA0A6]'
+                        ? mentorTheme.segmentedActiveClass
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     <LayoutGrid className="w-3.5 h-3.5" />
@@ -2959,9 +2923,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               {/* Left Pane */}
               <div className="min-w-0">
                 {filteredMentees.length === 0 ? (
-                  <div className={`rounded-2xl border py-12 px-4 text-center space-y-3 ${mentorTheme.surfaceClass}`}>
-                    <p className="text-sm text-[#5F6368] dark:text-[#9AA0A6]">
-                      {!isEn ? 'Tiada mentee sepadan dengan carian anda.' : 'No mentees match your search.'}
+                  <div className={`rounded-2xl border backdrop-blur-xs py-12 px-4 text-center space-y-3 ${mentorTheme.surfaceClass}`}>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                      {!isEn ? 'Tiada belia sepadan dengan carian anda.' : 'No youth match your search.'}
                     </p>
                     {(menteeSearch || menteeDistrictFilter !== 'all') && (
                       <button
@@ -2977,7 +2941,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     )}
                   </div>
                 ) : menteeViewMode === 'list' ? (
-                  <div className={`rounded-2xl border overflow-hidden divide-y ${mentorTheme.surfaceClass} ${mentorTheme.dividerClass}`}>
+                  <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden divide-y ${mentorTheme.surfaceClass} ${mentorTheme.dividerClass}`}>
                     {filteredMentees.map((m) => {
                       const isSelected = activeMentee?.key === m.key;
                       const checkScore = getCheckScore(m.key);
@@ -3003,7 +2967,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           onClick={() => setSelectedMenteeKey(m.key)}
                           className={`w-full text-left p-4 sm:px-5 flex items-start gap-3.5 transition-colors cursor-pointer ${
                             isSelected
-                              ? 'bg-[#D3E3FD]/60 dark:bg-[#004A77]/50'
+                              ? 'bg-[#1D4ED8]/10 dark:bg-[#3B82F6]/18'
                               : mentorTheme.rowHoverClass
                           }`}
                         >
@@ -3018,24 +2982,24 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <div className="min-w-0 flex-1 space-y-1.5">
                             <div className="flex flex-wrap items-center justify-between gap-2">
                               <div className="min-w-0">
-                                <span className={`text-sm font-bold truncate block ${isSelected ? mentorTheme.accentStrongTextClass : 'text-[#1F1F1F] dark:text-[#E3E3E3]'}`}>
+                                <span className={`text-sm font-bold truncate block ${isSelected ? mentorTheme.accentTextClass : 'text-slate-900 dark:text-[#F1F5F9]'}`}>
                                   {m.menteeName}
                                 </span>
-                                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] truncate block">
+                                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 truncate block">
                                   {m.businessName} &middot; {m.district}
                                 </span>
                               </div>
                               {m.hasEndorsement ? (
-                                <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 shrink-0">
+                                <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 shrink-0">
                                   Disokong
                                 </span>
                               ) : checkScore === 4 ? (
-                                <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold shrink-0 ${mentorTheme.activeNavClass}`}>
-                                  Layak 4/4
+                                <span className={`px-2.5 py-0.5 rounded-lg text-[11px] font-semibold shrink-0 border ${mentorTheme.activeNavClass}`}>
+                                  Layak Penuh
                                 </span>
                               ) : (
-                                <span className="text-xs font-medium text-[#5F6368] dark:text-[#9AA0A6] tabular-nums shrink-0">
-                                  {m.completedSessions} sesi
+                                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 tabular-nums shrink-0">
+                                  {m.completedSessions > 0 ? `${m.completedSessions} Sesi` : 'Belum Bermula'}
                                 </span>
                               )}
                             </div>
@@ -3044,10 +3008,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               {journeyStages.map((stage) => (
                                 <span
                                   key={stage.label}
-                                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${
+                                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[11px] font-semibold ${
                                     stage.done
                                       ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
-                                      : 'bg-[#F1F4F9] text-[#5F6368] dark:bg-[#28292C] dark:text-[#9AA0A6]'
+                                      : 'bg-slate-100 text-slate-600 dark:bg-slate-800/80 dark:text-slate-400'
                                   }`}
                                 >
                                   {stage.done && <CheckCircle2 className="w-3 h-3 shrink-0" />}
@@ -3085,9 +3049,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           key={m.key}
                           type="button"
                           onClick={() => setSelectedMenteeKey(m.key)}
-                          className={`text-left rounded-2xl border p-4 space-y-3 transition-all cursor-pointer ${
+                          className={`text-left rounded-2xl border backdrop-blur-xs p-4 space-y-3 transition-all cursor-pointer ${
                             isSelected
-                              ? 'bg-[#D3E3FD]/45 dark:bg-[#004A77]/35 border-[#1A73E8] dark:border-[#8AB4F8]'
+                              ? 'bg-[#1D4ED8]/10 dark:bg-[#3B82F6]/18 border-[#1D4ED8]/45 dark:border-[#60A5FA]/50'
                               : `${mentorTheme.surfaceClass} ${mentorTheme.rowHoverClass}`
                           }`}
                         >
@@ -3101,24 +3065,26 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               />
                             </div>
                             <div className="min-w-0 flex-1">
-                              <p className="text-sm font-bold text-[#1F1F1F] dark:text-[#E3E3E3] truncate">
+                              <p className="text-sm font-bold text-slate-900 dark:text-[#F1F5F9] truncate">
                                 {m.menteeName}
                               </p>
                               <p className={`text-xs font-semibold truncate ${mentorTheme.accentTextClass}`}>
                                 {m.businessName}
                               </p>
-                              <p className="text-[11px] text-[#5F6368] dark:text-[#9AA0A6] truncate mt-0.5">
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
                                 {m.district} &middot; {m.category}
                               </p>
                             </div>
                           </div>
 
                           <div className="space-y-1">
-                            <div className="flex items-center justify-between text-[11px] font-semibold text-[#5F6368] dark:text-[#9AA0A6]">
+                            <div className="flex items-center justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400">
                               <span>Kemajuan Bimbingan</span>
-                              <span className="tabular-nums">{completedStages}/4 tahap</span>
+                              <span className="tabular-nums">
+                                {completedStages > 0 ? `${completedStages} Tahap Selesai` : 'Belum Bermula'}
+                              </span>
                             </div>
-                            <div className="w-full h-1.5 rounded-full bg-[#E0E3E7] dark:bg-[#333537] overflow-hidden">
+                            <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-700/70 overflow-hidden">
                               <div
                                 className={`h-full rounded-full ${mentorTheme.progressFillClass}`}
                                 style={{ width: `${Math.round((completedStages / 4) * 100)}%` }}
@@ -3133,19 +3099,19 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </div>
 
               {/* Right Pane: Side Mentee Profile & History Panel */}
-              <div className={`rounded-2xl border overflow-hidden ${mentorTheme.surfaceClass}`}>
+              <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden ${mentorTheme.surfaceClass}`}>
                 {!activeMentee ? (
                   <div className="py-16 px-6 text-center space-y-2">
-                    <Users className="w-10 h-10 text-[#5F6368] dark:text-[#9AA0A6] mx-auto opacity-50" />
-                    <p className="text-sm font-semibold text-[#1F1F1F] dark:text-[#E3E3E3]">
-                      Tiada mentee dipilih
+                    <Users className="w-10 h-10 text-slate-400 dark:text-slate-500 mx-auto opacity-50" />
+                    <p className="text-sm font-semibold text-slate-900 dark:text-[#F1F5F9]">
+                      Tiada belia dipilih
                     </p>
                   </div>
                 ) : (
                   <div>
                     <div className={`p-5 border-b flex items-start gap-3.5 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                       {activeMenteeVisuals && (
-                        <div className={`w-14 h-14 rounded-2xl overflow-hidden border shrink-0 bg-white dark:bg-[#1E1F20] ${mentorTheme.dividerClass}`}>
+                        <div className={`w-14 h-14 rounded-2xl overflow-hidden border shrink-0 bg-white dark:bg-slate-900 ${mentorTheme.dividerClass}`}>
                           <PortalImage
                             src={activeMenteeVisuals.businessUrl}
                             alt={activeMentee.businessName}
@@ -3155,37 +3121,52 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         </div>
                       )}
                       <div className="min-w-0 flex-1 space-y-1">
-                        <h4 className="text-base font-bold text-[#1F1F1F] dark:text-[#E3E3E3] truncate">
+                        <h4 className="font-display text-base font-bold text-slate-900 dark:text-[#F1F5F9] truncate">
                           {activeMentee.menteeName}
                         </h4>
                         <p className={`text-sm font-semibold truncate ${mentorTheme.accentTextClass}`}>
                           {activeMentee.businessName}
                         </p>
-                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-[#5F6368] dark:text-[#9AA0A6]">
+                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-xs text-slate-600 dark:text-slate-400">
                           <span>{activeMentee.district}</span>
                           <span>&middot;</span>
-                          <span>{activeMentee.ssmNumber ? `SSM: ${activeMentee.ssmNumber}` : 'Tiada SSM'}</span>
+                          <span>
+                            {activeMentee.ssmNumber ? (
+                              <>
+                                <span className="kbelia-acro">SSM</span>:{' '}
+                                <MiddleTruncate text={activeMentee.ssmNumber} startChars={9} endChars={5} />
+                              </>
+                            ) : (
+                              <>
+                                Tiada <span className="kbelia-acro">SSM</span>
+                              </>
+                            )}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className="p-5 space-y-4">
-                      {/* 4 Quick Metrics */}
-                      <div className={`grid grid-cols-2 gap-2.5`}>
+                      {/* Quick Metrics */}
+                      <div className="grid grid-cols-2 gap-2.5">
                         <div className={`p-3 rounded-xl border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
-                          <span className="text-[11px] font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
                             Sesi Selesai
                           </span>
-                          <span className="text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tabular-nums">
-                            {activeMentee.completedSessions} / {activeMentee.totalSessions}
+                          <span className="font-display text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tabular-nums">
+                            {activeMentee.completedSessions > 0 ? `${activeMentee.completedSessions} Sesi` : 'Belum Ada Sesi'}
                           </span>
                         </div>
                         <div className={`p-3 rounded-xl border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
-                          <span className="text-[11px] font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                          <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block">
                             Skor Kelayakan Geran
                           </span>
-                          <span className={`text-lg font-bold tabular-nums ${activeMenteeScore === 4 ? 'text-emerald-600 dark:text-emerald-400' : mentorTheme.accentTextClass}`}>
-                            {activeMenteeScore !== null ? `${activeMenteeScore}/4` : 'Belum Disemak'}
+                          <span className={`font-display text-lg font-bold tabular-nums ${activeMenteeScore === 4 ? 'text-emerald-600 dark:text-emerald-400' : mentorTheme.accentTextClass}`}>
+                            {activeMenteeScore !== null
+                              ? activeMenteeScore === 4
+                                ? 'Layak Penuh'
+                                : `${activeMenteeScore} Kriteria`
+                              : 'Belum Disemak'}
                           </span>
                         </div>
                       </div>
@@ -3193,7 +3174,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       {/* Recent Session Logbook History */}
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-semibold uppercase tracking-wider text-[#5F6368] dark:text-[#9AA0A6]">
+                          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                             Rekod Sesi Terkini ({activeMenteeLogs.length})
                           </span>
                           <button
@@ -3206,7 +3187,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         </div>
 
                         {activeMenteeLogs.length === 0 ? (
-                          <div className={`p-3.5 rounded-xl border text-xs text-[#5F6368] dark:text-[#9AA0A6] ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
+                          <div className={`p-3.5 rounded-xl border text-xs text-slate-500 dark:text-slate-400 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                             Belum ada minit rekod sesi bagi usahawan ini.
                           </div>
                         ) : (
@@ -3222,14 +3203,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                 className={`w-full text-left px-3.5 py-2.5 flex items-center justify-between gap-2 transition-colors cursor-pointer ${mentorTheme.rowHoverClass}`}
                               >
                                 <div className="min-w-0">
-                                  <p className="text-xs font-semibold text-[#1F1F1F] dark:text-[#E3E3E3] truncate">
+                                  <p className="text-xs font-semibold text-slate-900 dark:text-[#F1F5F9] truncate">
                                     {log.topic}
                                   </p>
-                                  <p className="text-[11px] font-mono text-[#5F6368] dark:text-[#9AA0A6] tabular-nums">
+                                  <p className="text-[11px] font-mono text-slate-500 dark:text-slate-400 tabular-nums">
                                     {log.sessionDate}
                                   </p>
                                 </div>
-                                <ArrowRight className="w-3.5 h-3.5 text-[#5F6368] shrink-0" />
+                                <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                               </button>
                             ))}
                           </div>
@@ -3359,7 +3340,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             key: 'attendedSession',
             title: '3. Pernah hadir sesi bimbingan',
             hint: activeCheckMentee
-              ? `${activeCheckMentee.completedSessions} sesi selesai · ${activeCheckMentee.totalLogs} catatan`
+              ? `${activeCheckMentee.completedSessions > 0 ? `${activeCheckMentee.completedSessions} sesi selesai` : 'Belum ada sesi'} · ${activeCheckMentee.totalLogs > 0 ? `${activeCheckMentee.totalLogs} catatan` : 'Tiada catatan'}`
               : 'Sekurang-kurangnya 1 sesi bimbingan disempurnakan.'
           },
           {
@@ -3380,15 +3361,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         const readinessPercent = Math.round((readyCount / 4) * 100);
 
         const readinessSegments = [
-          { name: 'Layak 4/4', value: readinessStats.ready, color: mentorTheme.chartPrimary, secondaryLabel: `${readinessStats.ready} mentee` },
-          { name: 'Dalam Semakan', value: readinessStats.inProgress, color: '#E37400', secondaryLabel: `${readinessStats.inProgress} mentee` },
-          { name: 'Sudah Disokong', value: readinessStats.endorsed, color: mentorTheme.chartSecondary, secondaryLabel: `${readinessStats.endorsed} mentee` },
-          { name: 'Belum Disemak', value: readinessStats.unreviewed, color: '#94A3B8', secondaryLabel: `${readinessStats.unreviewed} mentee` }
+          { name: 'Layak Penuh', value: readinessStats.ready, color: mentorTheme.chartPrimary, secondaryLabel: readinessStats.ready > 0 ? `${readinessStats.ready} belia` : 'Tiada' },
+          { name: 'Dalam Semakan', value: readinessStats.inProgress, color: '#D97706', secondaryLabel: readinessStats.inProgress > 0 ? `${readinessStats.inProgress} belia` : 'Tiada' },
+          { name: 'Sudah Disokong', value: readinessStats.endorsed, color: mentorTheme.chartSecondary, secondaryLabel: readinessStats.endorsed > 0 ? `${readinessStats.endorsed} belia` : 'Tiada' },
+          { name: 'Belum Disemak', value: readinessStats.unreviewed, color: '#94A3B8', secondaryLabel: readinessStats.unreviewed > 0 ? `${readinessStats.unreviewed} belia` : 'Tiada' }
         ];
 
         const filterTabs: { id: 'all' | 'ready' | 'incomplete' | 'endorsed'; label: string; count: number }[] = [
           { id: 'all', label: 'Semua', count: menteeDirectory.length },
-          { id: 'ready', label: 'Layak 4/4', count: readinessStats.ready },
+          { id: 'ready', label: 'Layak Penuh', count: readinessStats.ready },
           { id: 'incomplete', label: 'Belum Lengkap', count: readinessStats.inProgress + readinessStats.unreviewed },
           { id: 'endorsed', label: 'Sudah Disokong', count: readinessStats.endorsed }
         ];
@@ -3397,14 +3378,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           <div key="readiness" className="space-y-4 animate-dashboard-tab">
             {/* Top Summary Strip (55%) + Readiness Donut Chart (45%) */}
             <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,55fr)_minmax(0,45fr)] gap-4 items-stretch">
-              <div className={`rounded-2xl border p-5 flex flex-col justify-between gap-4 ${mentorTheme.surfaceClass}`}>
+              <div className={`rounded-2xl border backdrop-blur-xs p-5 flex flex-col justify-between gap-4 ${mentorTheme.surfaceClass}`}>
                 <div className="flex items-center gap-2.5">
                   <ClipboardCheck className={`w-5 h-5 shrink-0 ${mentorTheme.accentTextClass}`} />
                   <div>
-                    <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tracking-tight">
+                    <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                       Semak Kelayakan Asas Geran
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#5F6368] dark:text-[#9AA0A6]">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                       Penilaian 4 syarat teras sebelum pengeluaran Surat Sokongan Geran KBelia.
                     </p>
                   </div>
@@ -3412,26 +3393,26 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <div className={`p-3.5 rounded-xl border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
-                    <span className="text-xs font-medium text-[#5F6368] dark:text-[#9AA0A6] block">Jumlah Mentee</span>
-                    <span className="text-2xl font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tabular-nums mt-0.5 block">
+                    <span className="text-xs font-medium text-slate-600 dark:text-slate-400 block">Jumlah Belia</span>
+                    <span className="font-display text-2xl font-bold text-slate-900 dark:text-[#F1F5F9] tabular-nums mt-0.5 block">
                       {menteeDirectory.length}
                     </span>
                   </div>
                   <div className={`p-3.5 rounded-xl border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
-                    <span className="text-xs font-medium text-[#5F6368] dark:text-[#9AA0A6] block">Layak (4/4)</span>
-                    <span className={`text-2xl font-bold tabular-nums mt-0.5 block ${mentorTheme.accentTextClass}`}>
+                    <span className="text-xs font-medium text-slate-600 dark:text-slate-400 block">Layak Penuh</span>
+                    <span className={`font-display text-2xl font-bold tabular-nums mt-0.5 block ${mentorTheme.accentTextClass}`}>
                       {readinessStats.ready}
                     </span>
                   </div>
                   <div className={`p-3.5 rounded-xl border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
-                    <span className="text-xs font-medium text-[#5F6368] dark:text-[#9AA0A6] block">Belum Lengkap</span>
-                    <span className="text-2xl font-bold text-amber-600 dark:text-amber-400 tabular-nums mt-0.5 block">
+                    <span className="text-xs font-medium text-slate-600 dark:text-slate-400 block">Belum Lengkap</span>
+                    <span className="font-display text-2xl font-bold text-amber-600 dark:text-amber-400 tabular-nums mt-0.5 block">
                       {readinessStats.inProgress + readinessStats.unreviewed}
                     </span>
                   </div>
                   <div className={`p-3.5 rounded-xl border ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
-                    <span className="text-xs font-medium text-[#5F6368] dark:text-[#9AA0A6] block">Sudah Disokong</span>
-                    <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums mt-0.5 block">
+                    <span className="text-xs font-medium text-slate-600 dark:text-slate-400 block">Sudah Disokong</span>
+                    <span className="font-display text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular-nums mt-0.5 block">
                       {readinessStats.endorsed}
                     </span>
                   </div>
@@ -3445,23 +3426,23 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 icon={Award}
                 segments={readinessSegments}
                 centerValue={menteeDirectory.length}
-                centerLabel="Mentee"
+                centerLabel="Belia"
                 valueUnit="orang"
                 summaryPairs={[
-                  { label: 'Layak 4/4', value: `${readinessStats.ready} orang`, dotColor: mentorTheme.chartPrimary },
-                  { label: 'Disokong', value: `${readinessStats.endorsed} orang`, dotColor: mentorTheme.chartSecondary }
+                  { label: 'Layak Penuh', value: readinessStats.ready > 0 ? `${readinessStats.ready} Belia` : 'Tiada', dotColor: mentorTheme.chartPrimary },
+                  { label: 'Disokong', value: readinessStats.endorsed > 0 ? `${readinessStats.endorsed} Belia` : 'Tiada', dotColor: mentorTheme.chartSecondary }
                 ]}
                 emptyState={{
-                  title: 'Belum Ada Mentee',
-                  description: 'Senarai kelayakan akan dipaparkan apabila sesi mentee direkodkan.'
+                  title: 'Belum Ada Belia',
+                  description: 'Senarai kelayakan akan dipaparkan apabila sesi belia direkodkan.'
                 }}
               />
             </div>
 
             {menteeDirectory.length === 0 ? (
-              <div className={`rounded-2xl border p-8 text-center space-y-3 ${mentorTheme.surfaceClass}`}>
-                <p className="text-sm text-[#5F6368] dark:text-[#9AA0A6]">
-                  Belum ada rekod mentee untuk disemak.
+              <div className={`rounded-2xl border backdrop-blur-xs p-8 text-center space-y-3 ${mentorTheme.surfaceClass}`}>
+                <p className="text-sm text-slate-600 dark:text-slate-400">
+                  Belum ada rekod belia untuk disemak.
                 </p>
                 <button
                   type="button"
@@ -3474,7 +3455,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
                 {/* Senarai Mentee Kiri (50%) */}
-                <div className={`rounded-2xl border overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
+                <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
                   <div className={`px-3 pt-2 border-b flex items-center gap-3 overflow-x-auto ${mentorTheme.dividerClass}`}>
                     {filterTabs.map((tab) => {
                       const active = readinessFilterTab === tab.id;
@@ -3494,20 +3475,20 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   </div>
                   <div className={`p-3 border-b ${mentorTheme.dividerClass}`}>
                     <div className="relative">
-                      <Search className="w-4 h-4 text-[#5F6368] dark:text-[#9AA0A6] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
                         type="text"
                         value={readinessSearch}
                         onChange={(e) => setReadinessSearch(e.target.value)}
                         placeholder="Cari nama atau bisnes..."
-                        className={`w-full pl-9 pr-3 py-2 rounded-full text-sm ${mentorTheme.inputClass}`}
+                        className={`w-full pl-9 pr-3 py-2 rounded-xl text-sm ${mentorTheme.inputClass}`}
                       />
                     </div>
                   </div>
                   <div className={`divide-y max-h-[460px] overflow-y-auto ${mentorTheme.dividerClass}`}>
                     {filteredCheckList.length === 0 ? (
-                      <div className="py-8 px-4 text-center text-xs text-[#5F6368] dark:text-[#9AA0A6]">
-                        Tiada mentee dalam kategori ini.
+                      <div className="py-8 px-4 text-center text-xs text-slate-600 dark:text-slate-400">
+                        Tiada belia dalam kategori ini.
                       </div>
                     ) : (
                       filteredCheckList.map((m) => {
@@ -3525,15 +3506,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             onClick={() => setSelectedCheckMenteeKey(m.key)}
                             className={`w-full text-left px-4 py-3 flex items-center justify-between gap-2 transition-colors cursor-pointer ${
                               isSelected
-                                ? 'bg-[#D3E3FD]/60 dark:bg-[#004A77]/50 font-semibold'
+                                ? 'bg-[#1D4ED8]/10 dark:bg-[#3B82F6]/15 font-semibold'
                                 : mentorTheme.rowHoverClass
                             }`}
                           >
                             <div className="min-w-0">
-                              <p className={`text-sm font-semibold truncate ${isSelected ? mentorTheme.accentStrongTextClass : 'text-[#1F1F1F] dark:text-[#E3E3E3]'}`}>
+                              <p className={`text-sm font-semibold truncate ${isSelected ? mentorTheme.accentStrongTextClass : 'text-slate-900 dark:text-[#F1F5F9]'}`}>
                                 {m.menteeName}
                               </p>
-                              <p className="text-xs text-[#5F6368] dark:text-[#9AA0A6] truncate">
+                              <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
                                 {m.businessName}
                               </p>
                             </div>
@@ -3541,12 +3522,18 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               m.hasEndorsement
                                 ? 'text-emerald-700 dark:text-emerald-400'
                                 : score === 4
-                                ? 'text-[#1A73E8] dark:text-[#8AB4F8]'
+                                ? mentorTheme.accentTextClass
                                 : score !== null
                                 ? 'text-amber-700 dark:text-amber-400'
-                                : 'text-[#5F6368]'
+                                : 'text-slate-500 dark:text-slate-400'
                             }`}>
-                              {m.hasEndorsement ? 'Disokong' : score !== null ? `${score}/4` : 'Baru'}
+                              {m.hasEndorsement
+                                ? 'Disokong'
+                                : score !== null
+                                ? score === 4
+                                  ? 'Layak Penuh'
+                                  : `${score} Kriteria`
+                                : 'Baru'}
                             </span>
                           </button>
                         );
@@ -3557,14 +3544,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
                 {/* Borang 4 Tandaan Kanan (50%) */}
                 {activeCheckMentee && (
-                  <div className={`rounded-2xl border overflow-hidden ${mentorTheme.surfaceClass}`}>
+                  <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden ${mentorTheme.surfaceClass}`}>
                     <div className={`p-4 sm:p-5 border-b space-y-3 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                         <div>
-                          <h4 className="text-base font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                          <h4 className="font-display text-base font-bold text-slate-900 dark:text-[#F1F5F9]">
                             {activeCheckMentee.menteeName}
                           </h4>
-                          <p className="text-xs sm:text-sm text-[#5F6368] dark:text-[#9AA0A6]">
+                          <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                             {activeCheckMentee.businessName} &middot; {activeCheckMentee.district}
                           </p>
                         </div>
@@ -3573,16 +3560,16 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             ? 'text-emerald-700 dark:text-emerald-400'
                             : 'text-amber-700 dark:text-amber-400'
                         }`}>
-                          {readyCount} / 4 ({readinessPercent}%) &middot; {isFullyReady ? 'Layak Disokong' : 'Belum Lengkap'}
+                          {readinessPercent}% &middot; {isFullyReady ? 'Layak Disokong' : 'Belum Lengkap'}
                         </span>
                       </div>
 
                       {/* Linear Progress Bar */}
                       <div className="space-y-1.5">
-                        <div className="w-full h-2 rounded-full bg-[#E0E3E7] dark:bg-[#333537] overflow-hidden">
+                        <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700/70 overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-[width] duration-300 ${
-                              isFullyReady ? 'bg-emerald-600 dark:bg-emerald-400' : 'bg-[#1A73E8] dark:bg-[#8AB4F8]'
+                              isFullyReady ? 'bg-emerald-600 dark:bg-emerald-400' : mentorTheme.progressFillClass
                             }`}
                             style={{ width: `${readinessPercent}%` }}
                           />
@@ -3617,23 +3604,23 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
                           >
                             <div className="min-w-0 space-y-1">
-                              <p className="text-sm font-semibold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                              <p className="text-sm font-semibold text-slate-900 dark:text-[#F1F5F9]">
                                 {item.title}
                               </p>
-                              <p className="text-xs text-[#5F6368] dark:text-[#9AA0A6]">
+                              <p className="text-xs text-slate-600 dark:text-slate-400">
                                 {item.hint}
                               </p>
                             </div>
-                            <div className={`inline-flex items-center p-1 rounded-full border shrink-0 self-start sm:self-center ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
+                            <div className={`inline-flex items-center p-1 rounded-xl border shrink-0 self-start sm:self-center ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                               <button
                                 type="button"
                                 onClick={() =>
                                   setDraftGrantCheck((prev) => ({ ...prev, [item.key]: true }))
                                 }
-                                className={`px-3.5 py-1 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap transition-colors ${
+                                className={`px-3.5 py-1 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap transition-colors ${
                                   checked
-                                    ? mentorTheme.primaryButtonClass
-                                    : 'text-[#5F6368] dark:text-[#9AA0A6] hover:text-[#1F1F1F] dark:hover:text-[#E3E3E3]'
+                                    ? mentorTheme.segmentedActiveClass
+                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-[#F1F5F9]'
                                 }`}
                               >
                                 Ya
@@ -3643,10 +3630,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                 onClick={() =>
                                   setDraftGrantCheck((prev) => ({ ...prev, [item.key]: false }))
                                 }
-                                className={`px-3.5 py-1 rounded-full text-xs font-semibold cursor-pointer whitespace-nowrap transition-colors ${
+                                className={`px-3.5 py-1 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap transition-colors ${
                                   !checked
-                                    ? 'bg-[#1F1F1F] text-white dark:bg-[#E3E3E3] dark:text-[#1F1F1F]'
-                                    : 'text-[#5F6368] dark:text-[#9AA0A6] hover:text-[#1F1F1F] dark:hover:text-[#E3E3E3]'
+                                    ? 'bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 shadow-2xs'
+                                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-[#F1F5F9]'
                                 }`}
                               >
                                 Belum
@@ -3659,7 +3646,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
                     <div className={`p-4 sm:p-5 border-t space-y-4 ${mentorTheme.dividerClass}`}>
                       <div>
-                        <label className="block text-xs font-semibold text-[#1F1F1F] dark:text-[#E3E3E3] mb-1.5">
+                        <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200 mb-1.5">
                           Catatan Ringkas (Pilihan)
                         </label>
                         <input
@@ -3685,7 +3672,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           type="button"
                           onClick={() => {
                             saveMenteeGrantCheck(true);
-                            const summaryText = `Semakan Mentor (${readyCount}/4): ${
+                            const summaryText = `Semakan Mentor (${readinessPercent}%): ${
                               draftGrantCheck.hasSsm ? 'Ada SSM' : 'SSM belum lengkap'
                             }, ${
                               draftGrantCheck.hasSalesRecord ? 'ada rekod jualan' : 'rekod jualan belum lengkap'
@@ -3747,51 +3734,51 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         return (
           <div key="endorsements" className="space-y-4 animate-dashboard-tab">
             {/* Tier Summary KPI Strip */}
-            <div className={`grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x rounded-2xl border ${mentorTheme.surfaceClass} ${mentorTheme.dividerClass}`}>
+            <div className={`grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x rounded-2xl border backdrop-blur-xs ${mentorTheme.surfaceClass} ${mentorTheme.dividerClass}`}>
               <div className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
                   Surat Perakuan Aktif
                 </span>
-                <span className="text-2xl font-bold text-[#1F1F1F] dark:text-[#E3E3E3] mt-1 tabular-nums block">
+                <span className="font-display text-2xl font-bold text-slate-900 dark:text-[#F1F5F9] mt-1 tabular-nums block">
                   {activeEndorsements.length}
                 </span>
               </div>
               <div className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
                   Jumlah Nilai Disyor
                 </span>
-                <span className={`text-2xl font-bold mt-1 tabular-nums block ${mentorTheme.accentTextClass}`}>
+                <span className={`font-display text-2xl font-bold mt-1 tabular-nums block ${mentorTheme.accentTextClass}`}>
                   RM {totalRecommendedValue.toLocaleString('ms-MY')}
                 </span>
               </div>
               <div className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
                   Geran Permulaan (RM3,000)
                 </span>
-                <span className="text-2xl font-bold text-[#1F1F1F] dark:text-[#E3E3E3] mt-1 tabular-nums block">
+                <span className="font-display text-2xl font-bold text-slate-900 dark:text-[#F1F5F9] mt-1 tabular-nums block">
                   {count3k}
                 </span>
               </div>
               <div className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
                   Pemangkin &amp; Skala
                 </span>
-                <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums block">
+                <span className="font-display text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums block">
                   {count5k10k}
                 </span>
               </div>
             </div>
 
-            {/* Header + Gmail Tier Tabs + Add Button */}
-            <div className={`rounded-2xl border overflow-hidden ${mentorTheme.surfaceClass}`}>
+            {/* Header + Tier Tabs + Add Button */}
+            <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden ${mentorTheme.surfaceClass}`}>
               <div className="p-4 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <Award className={`w-5 h-5 shrink-0 ${mentorTheme.accentTextClass}`} />
                   <div>
-                    <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tracking-tight">
+                    <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                       Sokongan &amp; Perakuan Geran Usahawan
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#5F6368] dark:text-[#9AA0A6]">
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
                       Pilih rekod di kiri untuk menyemak surat rasmi berkod pengesahan secara langsung di kanan.
                     </p>
                   </div>
@@ -3829,13 +3816,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
 
                 <div className="relative py-2">
-                  <Search className="w-4 h-4 text-[#5F6368] dark:text-[#9AA0A6] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={endorsementsSearch}
                     onChange={(e) => setEndorsementsSearch(e.target.value)}
                     placeholder="Cari usahawan, kod atau daerah..."
-                    className={`pl-9 pr-3 py-1.5 rounded-full text-xs sm:text-sm w-52 sm:w-64 ${mentorTheme.inputClass}`}
+                    className={`pl-9 pr-3 py-1.5 rounded-xl text-xs sm:text-sm w-52 sm:w-64 ${mentorTheme.inputClass}`}
                   />
                 </div>
               </div>
@@ -3844,11 +3831,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Split-Pane Layout: Left List (45%) | Right Live Letter Preview (55%) */}
             <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-4 items-stretch">
               {/* Left Pane */}
-              <div className={`rounded-2xl border overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
+              <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
                 {filteredEndorsements.length === 0 ? (
                   <div className="py-12 px-4 text-center space-y-2">
-                    <FileCheck className="w-9 h-9 text-[#5F6368] dark:text-[#9AA0A6] mx-auto opacity-50" />
-                    <p className="text-sm font-semibold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                    <FileCheck className="w-9 h-9 text-slate-400 dark:text-slate-500 mx-auto opacity-50" />
+                    <p className="text-sm font-semibold text-slate-900 dark:text-[#F1F5F9]">
                       Tiada surat perakuan ditemui.
                     </p>
                   </div>
@@ -3864,7 +3851,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             onClick={() => setSelectedEndorsementId(item.id)}
                             className={`w-full text-left p-3.5 sm:px-4 flex items-start gap-3 transition-colors cursor-pointer ${
                               isSelected
-                                ? 'bg-[#D3E3FD]/60 dark:bg-[#004A77]/50'
+                                ? 'bg-[#1D4ED8]/10 dark:bg-[#3B82F6]/15'
                                 : mentorTheme.rowHoverClass
                             }`}
                           >
@@ -3873,18 +3860,18 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             </div>
                             <div className="min-w-0 flex-1 space-y-1">
                               <div className="flex items-center justify-between gap-2">
-                                <span className={`text-sm font-bold truncate ${isSelected ? mentorTheme.accentStrongTextClass : 'text-[#1F1F1F] dark:text-[#E3E3E3]'}`}>
+                                <span className={`text-sm font-bold truncate ${isSelected ? mentorTheme.accentStrongTextClass : 'text-slate-900 dark:text-[#F1F5F9]'}`}>
                                   {item.menteeName}
                                 </span>
-                                <span className={`px-2 py-0.5 rounded-full text-[11px] font-bold tabular-nums shrink-0 ${mentorTheme.activeNavClass}`}>
+                                <span className={`px-2 py-0.5 rounded-lg text-[11px] font-bold tabular-nums shrink-0 ${mentorTheme.activeNavClass}`}>
                                   {item.recommendedAmount}
                                 </span>
                               </div>
-                              <p className="text-xs font-medium text-[#5F6368] dark:text-[#9AA0A6] truncate">
+                              <p className="text-xs font-medium text-slate-600 dark:text-slate-400 truncate">
                                 {item.businessName} &middot; {item.district}
                               </p>
-                              <div className="flex items-center justify-between gap-2 text-[11px] font-mono text-[#5F6368] dark:text-[#9AA0A6]">
-                                <span className="truncate">{item.endorsementCode}</span>
+                              <div className="flex items-center justify-between gap-2 text-[11px] font-mono text-slate-500 dark:text-slate-400">
+                                <MiddleTruncate text={item.endorsementCode} startChars={11} endChars={5} className="truncate" />
                                 <span className="tabular-nums shrink-0">{item.issuedAt}</span>
                               </div>
                             </div>
@@ -3905,11 +3892,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </div>
 
               {/* Right Pane: Live Official Letter Preview */}
-              <div className={`rounded-2xl border overflow-hidden ${mentorTheme.surfaceClass}`}>
+              <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden ${mentorTheme.surfaceClass}`}>
                 {!activeEndorsement ? (
                   <div className="py-16 px-6 text-center space-y-2">
-                    <Award className="w-10 h-10 text-[#5F6368] dark:text-[#9AA0A6] mx-auto opacity-50" />
-                    <p className="text-sm font-semibold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                    <Award className="w-10 h-10 text-slate-400 dark:text-slate-500 mx-auto opacity-50" />
+                    <p className="text-sm font-semibold text-slate-900 dark:text-[#F1F5F9]">
                       Pilih surat perakuan di sebelah kiri untuk pratonton
                     </p>
                   </div>
@@ -3917,9 +3904,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <div>
                     {/* Preview Action Bar */}
                     <div className={`p-3.5 sm:px-5 border-b flex flex-wrap items-center justify-between gap-2 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
-                      <span className="text-xs font-mono font-semibold text-[#5F6368] dark:text-[#9AA0A6] truncate">
-                        {activeEndorsement.endorsementCode}
-                      </span>
+                      <MiddleTruncate
+                        text={activeEndorsement.endorsementCode}
+                        startChars={11}
+                        endChars={5}
+                        className="text-xs font-mono font-semibold text-slate-600 dark:text-slate-400 truncate"
+                      />
                       <div className="flex flex-wrap items-center gap-2">
                         <button
                           type="button"
@@ -3971,13 +3961,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     </div>
 
                     {/* Crisp Paper Letter Preview */}
-                    <div className="p-4 sm:p-5 bg-[#F8FAFD] dark:bg-[#131314]">
-                      <div className="max-w-xl mx-auto bg-white text-slate-900 rounded-xl border border-[#DADCE0] p-5 sm:p-6 space-y-4 shadow-2xs">
+                    <div className={`p-4 sm:p-5 ${mentorTheme.surfaceMutedClass}`}>
+                      <div className="max-w-xl mx-auto bg-white text-slate-900 rounded-xl border border-slate-200 p-5 sm:p-6 space-y-4 shadow-2xs">
                         <div className="text-center pb-3 border-b-2 border-slate-900 space-y-1">
-                          <p className="text-[11px] font-bold uppercase tracking-widest text-[#1A73E8]">
-                            HAB PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBELIA)
+                          <p className="text-[11px] font-bold uppercase tracking-widest text-[#1D4ED8]">
+                            HAB PEMBANGUNAN USAHAWAN BELIA KELANTAN (<span className="kbelia-acro">KBELIA</span>)
                           </p>
-                          <h4 className="text-sm sm:text-base font-black uppercase tracking-tight text-slate-900">
+                          <h4 className="font-display text-sm sm:text-base font-black uppercase tracking-tight text-slate-900">
                             SURAT PERAKUAN SOKONGAN MENTOR
                           </h4>
                           <p className="text-xs text-slate-600">
@@ -3986,15 +3976,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         </div>
 
                         <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono text-slate-700">
-                          <span>Ruj: <strong className="text-slate-900">{activeEndorsement.endorsementCode}</strong></span>
+                          <span>Ruj: <MiddleTruncate text={activeEndorsement.endorsementCode} startChars={11} endChars={5} className="font-bold text-slate-900" /></span>
                           <span>Tarikh: <strong className="text-slate-900">{activeEndorsement.issuedAt}</strong></span>
                         </div>
 
-                        <div className="p-3 rounded-lg bg-[#D3E3FD]/40 border border-[#1A73E8]/20 text-center">
-                          <p className="text-xs font-bold uppercase text-[#0B57D0]">
+                        <div className="p-3 rounded-lg bg-[#EFF6FF] border border-[#1D4ED8]/20 text-center">
+                          <p className="text-xs font-bold uppercase text-[#1D4ED8]">
                             {activeEndorsement.grantProgramTitle}
                           </p>
-                          <p className="text-base font-black text-slate-900 mt-0.5 tabular-nums">
+                          <p className="font-display text-base font-black text-slate-900 mt-0.5 tabular-nums">
                             {activeEndorsement.recommendedAmount}
                           </p>
                         </div>
@@ -4020,15 +4010,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
                         <div className="space-y-1 text-xs sm:text-sm">
                           <span className="font-bold text-slate-900 block">Ulasan Justifikasi Mentor:</span>
-                          <p className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 italic leading-relaxed">
-                            &ldquo;{activeEndorsement.justification}&rdquo;
+                          <p className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 italic leading-relaxed kbelia-prose">
+                            &ldquo;<AcronymText text={activeEndorsement.justification} />&rdquo;
                           </p>
                         </div>
 
                         <div className="space-y-1 text-xs sm:text-sm">
                           <span className="font-bold text-slate-900 block">Tahap Kesediaan Operasi:</span>
-                          <p className="text-slate-700 leading-relaxed">
-                            {activeEndorsement.businessReadinessRemark}
+                          <p className="text-slate-700 leading-relaxed kbelia-prose">
+                            <AcronymText text={activeEndorsement.businessReadinessRemark} />
                           </p>
                         </div>
 
@@ -4047,15 +4037,21 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             <span className="text-slate-500 block">{activeEndorsement.mentorAgency}</span>
                           </div>
 
-                          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-900">
-                            <QrCode className="w-8 h-8 shrink-0 text-emerald-800" />
+                          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-300 text-slate-900">
+                            <QrCodeGraphic
+                              value={buildVerificationQrPayload(activeEndorsement.endorsementCode)}
+                              size={74}
+                            />
                             <div>
-                              <span className="font-bold uppercase tracking-wide block text-[11px]">
+                              <span className="font-bold uppercase tracking-wide block text-[11px] text-[#1E3A8A]">
                                 SAH DIPERAKUKAN
                               </span>
-                              <span className="font-mono text-[10px] block">
-                                {activeEndorsement.endorsementCode}
-                              </span>
+                              <MiddleTruncate
+                                text={activeEndorsement.endorsementCode}
+                                startChars={11}
+                                endChars={5}
+                                className="font-mono text-[10.5px] block font-semibold"
+                              />
                             </div>
                           </div>
                         </div>
@@ -4107,44 +4103,44 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         return (
           <div key="logbook" className="space-y-4 animate-dashboard-tab">
             {/* 4-Metric KPI Strip */}
-            <div className={`grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x rounded-2xl border ${mentorTheme.surfaceClass} ${mentorTheme.dividerClass}`}>
+            <div className={`grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x rounded-2xl border backdrop-blur-xs ${mentorTheme.surfaceClass} ${mentorTheme.dividerClass}`}>
               <div className="p-4">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
                   Jumlah Rekod Sesi
                 </span>
-                <p className="text-2xl font-bold text-[#1F1F1F] dark:text-[#E3E3E3] mt-1 tabular-nums">
+                <p className="font-display text-2xl font-bold text-slate-900 dark:text-[#F1F5F9] mt-1 tabular-nums">
                   {mentorLogs.length}
                 </p>
               </div>
               <div className="p-4">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
                   Tugasan Selesai
                 </span>
-                <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
+                <p className="font-display text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1 tabular-nums">
                   {doneLogTasks}
                 </p>
               </div>
               <div className="p-4">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
                   Tugasan Tertunda
                 </span>
-                <p className="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1 tabular-nums">
+                <p className="font-display text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1 tabular-nums">
                   {pendingLogTasks}
                 </p>
               </div>
               <div className="p-4">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6]">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                     % Penyelesaian
                   </span>
-                  <span className={`text-sm font-bold tabular-nums ${mentorTheme.accentStrongTextClass}`}>
+                  <span className={`font-display text-sm font-bold tabular-nums ${mentorTheme.accentStrongTextClass}`}>
                     {taskCompletionPct}%
                   </span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-[#E0E3E7] dark:bg-[#333537] overflow-hidden mt-2.5">
+                <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700/70 overflow-hidden mt-2.5">
                   <div
                     className={`h-full rounded-full transition-[width] duration-500 ${
-                      taskCompletionPct === 100 ? 'bg-[#137333] dark:bg-[#81C995]' : mentorTheme.progressFillClass
+                      taskCompletionPct === 100 ? 'bg-emerald-600 dark:bg-emerald-400' : mentorTheme.progressFillClass
                     }`}
                     style={{ width: `${taskCompletionPct}%` }}
                   />
@@ -4153,9 +4149,9 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </div>
 
             {/* Quick Template Chips Bar */}
-            <div className={`p-3.5 sm:px-5 rounded-2xl border flex flex-wrap items-center justify-between gap-3 ${mentorTheme.surfaceClass}`}>
+            <div className={`p-3.5 sm:px-5 rounded-2xl border backdrop-blur-xs flex flex-wrap items-center justify-between gap-3 ${mentorTheme.surfaceClass}`}>
               <div className="flex flex-wrap items-center gap-2 min-w-0">
-                <span className="text-xs font-semibold uppercase tracking-wider text-[#5F6368] dark:text-[#9AA0A6] mr-1">
+                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1">
                   Templat Pantas:
                 </span>
                 {LOGBOOK_QUICK_TEMPLATES.map((tpl) => (
@@ -4184,7 +4180,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             {/* Split-Pane Master List (50%) & Document Preview (50%) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
               {/* Left List Pane */}
-              <div className={`rounded-2xl border overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
+              <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
                 {/* Gmail-style underline filter tabs */}
                 <div className={`flex items-center gap-1 px-3 pt-2 border-b overflow-x-auto ${mentorTheme.dividerClass}`}>
                   {logFilterTabs.map((tab) => {
@@ -4208,7 +4204,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 {/* Search + Sort Bar */}
                 <div className={`p-3 border-b flex flex-wrap sm:flex-nowrap items-center gap-2 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                   <div className="relative flex-1 min-w-[160px]">
-                    <Search className="w-4 h-4 text-[#5F6368] dark:text-[#9AA0A6] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       value={logsSearch}
@@ -4234,7 +4230,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
 
                 {filteredLogs.length === 0 ? (
-                  <div className="py-12 px-4 text-center text-sm text-[#5F6368] dark:text-[#9AA0A6]">
+                  <div className="py-12 px-4 text-center text-sm text-slate-600 dark:text-slate-400">
                     Tiada rekod sesi bimbingan untuk tapisan ini.
                   </div>
                 ) : (
@@ -4253,7 +4249,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           type="button"
                           onClick={() => setSelectedLogId(log.id)}
                           className={`w-full text-left p-3.5 flex items-start gap-3 transition-colors cursor-pointer ${
-                            isSelected ? 'bg-[#D3E3FD]/60 dark:bg-[#004A77]/50' : mentorTheme.rowHoverClass
+                            isSelected ? 'bg-[#1D4ED8]/10 dark:bg-[#3B82F6]/15' : mentorTheme.rowHoverClass
                           }`}
                         >
                           <div className={`w-10 h-10 rounded-xl overflow-hidden border bg-slate-100 dark:bg-slate-800 shrink-0 ${mentorTheme.dividerClass}`}>
@@ -4266,18 +4262,18 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           </div>
                           <div className="min-w-0 flex-1 space-y-1">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-sm font-semibold text-[#1F1F1F] dark:text-[#E3E3E3] truncate">
+                              <span className="text-sm font-semibold text-slate-900 dark:text-[#F1F5F9] truncate">
                                 {log.menteeName}
                               </span>
-                              <span className="text-[11px] font-mono tabular-nums text-[#5F6368] dark:text-[#9AA0A6] shrink-0">
+                              <span className="text-[11px] font-mono tabular-nums text-slate-500 dark:text-slate-400 shrink-0">
                                 {log.sessionDate}
                               </span>
                             </div>
-                            <p className="text-xs font-medium text-[#5F6368] dark:text-[#9AA0A6] line-clamp-2 leading-snug">
+                            <p className="text-xs font-medium text-slate-600 dark:text-slate-400 line-clamp-2 leading-snug">
                               {log.topic}
                             </p>
                             <div className="flex items-center justify-between gap-2 pt-0.5">
-                              <span className="text-[11px] text-[#5F6368] dark:text-[#9AA0A6] truncate">
+                              <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                                 {log.businessName}
                               </span>
                               <span
@@ -4287,7 +4283,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                     : mentorTheme.accentStrongTextClass
                                 }`}
                               >
-                                {totalTasks > 0 ? `${doneTasks}/${totalTasks} Tugasan` : 'Direkodkan'}
+                                {totalTasks > 0
+                                  ? doneTasks === totalTasks
+                                    ? `${totalTasks} Tugasan Selesai`
+                                    : doneTasks > 0
+                                    ? `${doneTasks} Selesai · ${totalTasks - doneTasks} Baki`
+                                    : `${totalTasks} Tugasan`
+                                  : 'Direkodkan'}
                               </span>
                             </div>
                           </div>
@@ -4309,11 +4311,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </div>
 
               {/* Right Side Document Preview & Interactive Checklist Panel */}
-              <div className={`rounded-2xl border overflow-hidden ${mentorTheme.surfaceClass}`}>
+              <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden ${mentorTheme.surfaceClass}`}>
                 {!activeLog ? (
                   <div className="p-10 text-center space-y-3">
                     <FileText className={`w-8 h-8 mx-auto ${mentorTheme.accentTextClass}`} />
-                    <p className="text-sm font-medium text-[#5F6368] dark:text-[#9AA0A6]">
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
                       Pilih mana-mana rekod di sebelah kiri atau cipta rekod baharu menggunakan templat pantas.
                     </p>
                     <button
@@ -4347,10 +4349,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               />
                             </div>
                             <div className="min-w-0">
-                              <h4 className="text-base font-bold text-[#1F1F1F] dark:text-[#E3E3E3] truncate">
+                              <h4 className="font-display text-base font-bold text-slate-900 dark:text-[#F1F5F9] truncate">
                                 {activeLog.menteeName}
                               </h4>
-                              <p className="text-xs text-[#5F6368] dark:text-[#9AA0A6] truncate">
+                              <p className="text-xs text-slate-600 dark:text-slate-400 truncate">
                                 {activeLog.businessName} &middot;{' '}
                                 <span className="font-mono tabular-nums">{activeLog.sessionDate}</span>
                               </p>
@@ -4424,7 +4426,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <span className={`text-xs font-semibold ${mentorTheme.accentTextClass} block`}>
                             Topik Bimbingan
                           </span>
-                          <p className="text-sm font-bold text-[#1F1F1F] dark:text-[#E3E3E3] mt-0.5">
+                          <p className="text-sm font-bold text-slate-900 dark:text-[#F1F5F9] mt-0.5">
                             {activeLog.topic}
                           </p>
                         </div>
@@ -4433,10 +4435,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       {/* Discussion Minutes */}
                       <div className="p-4 sm:p-5 space-y-5">
                         <div className="space-y-1.5">
-                          <span className="text-xs font-semibold uppercase tracking-wider text-[#5F6368] dark:text-[#9AA0A6] block">
+                          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 block">
                             Ringkasan Perbincangan Sesi
                           </span>
-                          <p className="text-[0.9375rem] text-[#1F1F1F] dark:text-[#E3E3E3] leading-relaxed font-sans whitespace-pre-line">
+                          <p className="text-[0.9375rem] text-slate-900 dark:text-[#F1F5F9] leading-relaxed font-sans whitespace-pre-line">
                             {activeLog.minutes}
                           </p>
                         </div>
@@ -4446,11 +4448,11 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           <div className="flex items-center justify-between gap-2 flex-wrap">
                             <div className="flex items-center gap-2">
                               <CheckSquare className={`w-4 h-4 ${mentorTheme.accentTextClass}`} />
-                              <span className="text-sm font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                              <span className="text-sm font-bold text-slate-900 dark:text-[#F1F5F9]">
                                 Senarai Semak Tugasan Susulan
                               </span>
-                              <span className="text-xs font-mono tabular-nums text-[#5F6368] dark:text-[#9AA0A6]">
-                                ({doneTasks}/{totalTasks})
+                              <span className="text-xs font-mono tabular-nums text-slate-500 dark:text-slate-400">
+                                {totalTasks === 0 ? '(Tiada tugasan)' : doneTasks === 0 ? '(Belum selesai)' : `(${doneTasks} selesai)`}
                               </span>
                             </div>
 
@@ -4467,7 +4469,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                           </div>
 
                           {(!activeLog.actionItems || activeLog.actionItems.length === 0) ? (
-                            <div className={`py-3 text-[0.8125rem] text-[#5F6368] dark:text-[#9AA0A6] flex items-center justify-between gap-2 flex-wrap border-t ${mentorTheme.dividerClass}`}>
+                            <div className={`py-3 text-[0.8125rem] text-slate-600 dark:text-slate-400 flex items-center justify-between gap-2 flex-wrap border-t ${mentorTheme.dividerClass}`}>
                               <span>Belum ada tugasan direkodkan untuk sesi ini.</span>
                               {!inlineNewTaskDrafts[activeLog.id]?.isOpen && (
                                 <button
@@ -4547,8 +4549,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                     key={task.id}
                                     className={`py-2.5 transition-colors flex flex-wrap items-center justify-between gap-3 ${
                                       task.completed
-                                        ? 'text-[#5F6368] dark:text-[#9AA0A6]'
-                                        : 'text-[#1F1F1F] dark:text-[#E3E3E3]'
+                                        ? 'text-slate-500 dark:text-slate-400'
+                                        : 'text-slate-900 dark:text-[#F1F5F9]'
                                     }`}
                                   >
                                     <button
@@ -4559,8 +4561,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                       <div
                                         className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 ${
                                           task.completed
-                                            ? 'bg-[#1A73E8] border-[#1A73E8] dark:bg-[#A8C7FA] dark:border-[#A8C7FA] text-white dark:text-[#041E49]'
-                                            : `border-[#E0E3E7] dark:border-[#444746] ${mentorTheme.surfaceClass}`
+                                            ? 'bg-[#1D4ED8] border-[#1D4ED8] dark:bg-[#3B82F6] dark:border-[#3B82F6] text-white'
+                                            : `border-slate-300 dark:border-slate-600 ${mentorTheme.surfaceClass}`
                                         }`}
                                       >
                                         {task.completed && <Check className="w-3.5 h-3.5" />}
@@ -4575,7 +4577,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                         className={`text-xs font-mono tabular-nums ${
                                           task.completed
                                             ? 'text-emerald-600 dark:text-emerald-400'
-                                            : 'text-[#5F6368] dark:text-[#9AA0A6]'
+                                            : 'text-slate-500 dark:text-slate-400'
                                         }`}
                                       >
                                         Sasaran: {task.dueDate}
@@ -4584,7 +4586,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                         type="button"
                                         onClick={() => handleStartInlineTaskEdit(activeLog.id, task)}
                                         aria-label={`Sunting tugasan ${task.task}`}
-                                        className={`p-1.5 rounded-xl text-[#5F6368] dark:text-[#9AA0A6] transition-colors cursor-pointer ${mentorTheme.rowHoverClass}`}
+                                        className={`p-1.5 rounded-xl text-slate-500 dark:text-slate-400 transition-colors cursor-pointer ${mentorTheme.rowHoverClass}`}
                                       >
                                         <Edit3 className="w-3.5 h-3.5" />
                                       </button>
@@ -4592,7 +4594,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                         type="button"
                                         onClick={() => handleDeleteInlineTask(activeLog.id, task.id)}
                                         aria-label={`Padam tugasan ${task.task}`}
-                                        className="p-1.5 rounded-xl text-[#5F6368] dark:text-[#9AA0A6] hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
+                                        className="p-1.5 rounded-xl text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/50 transition-colors cursor-pointer"
                                       >
                                         <Trash2 className="w-3.5 h-3.5" />
                                       </button>
@@ -4605,7 +4607,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
                           {inlineNewTaskDrafts[activeLog.id]?.isOpen && (
                             <div className={`pt-3 border-t space-y-2.5 ${mentorTheme.dividerClass}`}>
-                              <div className="text-xs font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                              <div className="text-xs font-bold text-slate-900 dark:text-[#F1F5F9]">
                                 Tambah Tugasan Baharu
                               </div>
                               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center">
@@ -4714,12 +4716,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           .map(([sector, count]) => ({ sector, count }))
           .sort((a, b) => b.count - a.count);
 
-        const SECTOR_PALETTE = ['#1A73E8', '#00897B', '#E37400', '#7C3AED', '#64748B'];
+        const SECTOR_PALETTE = ['#2563EB', '#0D9488', '#D97706', '#4F46E5', '#64748B'];
         const sectorSegments = sectorRows.slice(0, 5).map((row, idx) => ({
           name: row.sector,
           value: row.count,
           color: SECTOR_PALETTE[idx % SECTOR_PALETTE.length],
-          secondaryLabel: `${row.count} mentee`
+          secondaryLabel: `${row.count} belia`
         }));
 
         const chartDistrictData = districtRows.slice(0, 8).map((row) => ({
@@ -4770,15 +4772,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         return (
           <div key="impact" className="space-y-4 animate-dashboard-tab">
             {/* Header & Export Bar */}
-            <div className={`p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${mentorTheme.surfaceClass}`}>
+            <div className={`p-4 sm:p-5 rounded-2xl border backdrop-blur-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${mentorTheme.surfaceClass}`}>
               <div className="flex items-center gap-2.5">
                 <BarChart3 className={`w-5 h-5 shrink-0 ${mentorTheme.accentTextClass}`} />
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tracking-tight">
+                  <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                     Laporan Ringkas Bimbingan
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#5F6368] dark:text-[#9AA0A6] mt-0.5">
-                    Ringkasan jumlah mentee, sesi selesai, pecahan daerah, sektor dan eksport laporan.
+                  <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-0.5">
+                    Ringkasan jumlah belia, sesi selesai, pecahan daerah, sektor dan eksport laporan.
                   </p>
                 </div>
               </div>
@@ -4838,36 +4840,36 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </div>
 
             {/* 4 Angka Ringkas */}
-            <div className={`grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x rounded-2xl border ${mentorTheme.surfaceClass} ${mentorTheme.dividerClass}`}>
+            <div className={`grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x rounded-2xl border backdrop-blur-xs ${mentorTheme.surfaceClass} ${mentorTheme.dividerClass}`}>
               <div className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
-                  Jumlah Mentee
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
+                  Jumlah Belia
                 </span>
-                <p className="text-2xl font-bold text-[#1F1F1F] dark:text-[#E3E3E3] mt-1 tabular-nums">
+                <p className="font-display text-2xl font-bold text-slate-900 dark:text-[#F1F5F9] mt-1 tabular-nums">
                   {menteeDirectory.length}
                 </p>
               </div>
               <div className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
                   Sesi Selesai
                 </span>
-                <p className="text-2xl font-bold text-[#1F1F1F] dark:text-[#E3E3E3] mt-1 tabular-nums">
+                <p className="font-display text-2xl font-bold text-slate-900 dark:text-[#F1F5F9] mt-1 tabular-nums">
                   {completedSessionsCount}
                 </p>
               </div>
               <div className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
                   Nota Sesi
                 </span>
-                <p className="text-2xl font-bold text-[#1F1F1F] dark:text-[#E3E3E3] mt-1 tabular-nums">
+                <p className="font-display text-2xl font-bold text-slate-900 dark:text-[#F1F5F9] mt-1 tabular-nums">
                   {mentorLogs.length}
                 </p>
               </div>
               <div className="p-4 sm:p-5">
-                <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] block">
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 block">
                   Surat Sokongan
                 </span>
-                <p className={`text-2xl font-bold mt-1 tabular-nums ${mentorTheme.accentTextClass}`}>
+                <p className={`font-display text-2xl font-bold mt-1 tabular-nums ${mentorTheme.accentTextClass}`}>
                   {activeEndorsementCount}
                 </p>
               </div>
@@ -4875,23 +4877,24 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
             {/* Dual Visual Charts: District Bar Chart & Sector Composition Donut */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
-              <div className={`lg:col-span-7 rounded-2xl border p-4 sm:p-5 flex flex-col justify-between min-w-0 ${mentorTheme.surfaceClass}`}>
-                <div className={`flex flex-wrap items-center justify-between gap-2 pb-3 border-b mb-3 ${mentorTheme.dividerClass}`}>
-                  <h4 className="text-sm sm:text-base font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
-                    Prestasi Daerah (Mentee, Sesi &amp; Sokongan)
+              <div className={`lg:col-span-7 rounded-2xl border backdrop-blur-xs p-4 sm:p-5 flex flex-col min-w-0 ${mentorTheme.surfaceClass}`}>
+                <div className={`flex flex-wrap items-center justify-between gap-2 pb-3 border-b mb-3 shrink-0 ${mentorTheme.dividerClass}`}>
+                  <h4 className="font-display text-sm sm:text-base font-bold text-slate-900 dark:text-[#F1F5F9]">
+                    Prestasi Daerah (Belia, Sesi &amp; Sokongan)
                   </h4>
-                  <span className="text-xs font-medium text-[#5F6368] dark:text-[#9AA0A6]">
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                     {districtRows.length} daerah aktif
                   </span>
                 </div>
 
                 {chartDistrictData.length === 0 ? (
-                  <div className="h-[220px] flex items-center justify-center text-sm text-[#5F6368] dark:text-[#9AA0A6]">
+                  <div className="flex-1 min-h-[230px] flex items-center justify-center text-sm text-slate-600 dark:text-slate-400">
                     Tiada data daerah untuk dipaparkan.
                   </div>
                 ) : (
-                  <div className="h-[230px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-600 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-300">
-                    <ResponsiveContainer width="100%" height={230} minWidth={0} initialDimension={{ width: 600, height: 230 }}>
+                  <div className="relative flex-1 min-h-[230px] w-full min-w-0 [&_.recharts-cartesian-axis-tick_text]:fill-slate-600 dark:[&_.recharts-cartesian-axis-tick_text]:fill-slate-300">
+                    <div className="absolute inset-0">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} initialDimension={{ width: 600, height: 240 }}>
                       <BarChart
                         data={chartDistrictData}
                         barCategoryGap="18%"
@@ -4902,7 +4905,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         <XAxis dataKey="district" tick={{ fontSize: 12, fontWeight: 600 }} interval={0} axisLine={false} tickLine={false} />
                         <YAxis allowDecimals={false} tick={{ fontSize: 12, fontWeight: 500 }} axisLine={false} tickLine={false} />
                         <Tooltip
-                          cursor={{ fill: 'rgba(26, 115, 232, 0.10)' }}
+                          cursor={{ fill: 'rgba(37, 99, 235, 0.10)' }}
                           content={({ active, payload }) => {
                             if (active && payload && payload.length) {
                               const d = payload[0].payload as {
@@ -4914,7 +4917,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                               return (
                                 <div className={`px-3 py-2 rounded-xl text-xs font-mono shadow-xl border ${mentorTheme.tooltipBgClass}`}>
                                   <div className="font-bold mb-1">{d.fullName}</div>
-                                  <div>Mentee: {d.mentees}</div>
+                                  <div>Belia: {d.mentees}</div>
                                   <div>Sesi Selesai: {d.sessions}</div>
                                   <div>Sokongan Geran: {d.endorsements}</div>
                                 </div>
@@ -4923,11 +4926,12 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                             return null;
                           }}
                         />
-                        <Bar dataKey="mentees" name="Mentee" fill="#1A73E8" radius={[5, 5, 0, 0]} maxBarSize={24} />
-                        <Bar dataKey="sessions" name="Sesi" fill="#00897B" radius={[5, 5, 0, 0]} maxBarSize={24} />
-                        <Bar dataKey="endorsements" name="Sokongan" fill="#E37400" radius={[5, 5, 0, 0]} maxBarSize={24} />
+                        <Bar dataKey="mentees" name="Belia" fill="#2563EB" radius={[5, 5, 0, 0]} maxBarSize={24} />
+                        <Bar dataKey="sessions" name="Sesi" fill="#0D9488" radius={[5, 5, 0, 0]} maxBarSize={24} />
+                        <Bar dataKey="endorsements" name="Sokongan" fill="#D97706" radius={[5, 5, 0, 0]} maxBarSize={24} />
                       </BarChart>
                     </ResponsiveContainer>
+                    </div>
                   </div>
                 )}
               </div>
@@ -4939,46 +4943,46 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 icon={Sparkles}
                 segments={sectorSegments}
                 centerValue={menteeDirectory.length}
-                centerLabel="Mentee"
+                centerLabel="Belia"
                 valueUnit="usahawan"
                 summaryPairs={[
                   {
                     label: sectorRows[0]?.sector || 'Sektor Utama',
-                    value: `${sectorRows[0]?.count || 0} orang`,
+                    value: sectorRows[0]?.count ? `${sectorRows[0].count} Belia` : 'Tiada',
                     dotColor: SECTOR_PALETTE[0]
                   },
                   {
                     label: sectorRows[1]?.sector || 'Sektor Kedua',
-                    value: `${sectorRows[1]?.count || 0} orang`,
+                    value: sectorRows[1]?.count ? `${sectorRows[1].count} Belia` : 'Tiada',
                     dotColor: SECTOR_PALETTE[1]
                   }
                 ]}
                 emptyState={{
                   title: 'Tiada Data Sektor',
-                  description: 'Komposisi sektor akan dipaparkan apabila mentee didaftarkan.'
+                  description: 'Komposisi sektor akan dipaparkan apabila belia didaftarkan.'
                 }}
               />
             </div>
 
             {/* Pecahan Daerah & Sektor Terperinci */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-stretch">
-              <div className={`rounded-2xl border overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
+              <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
                 <div className={`px-4 py-3 border-b ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
-                  <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                  <h4 className="font-display text-sm font-bold text-slate-900 dark:text-[#F1F5F9]">
                     Pecahan Mengikut Daerah
                   </h4>
                 </div>
                 {districtRows.length === 0 ? (
-                  <p className="p-6 text-sm text-[#5F6368] dark:text-[#9AA0A6] text-center">
+                  <p className="p-6 text-sm text-slate-600 dark:text-slate-400 text-center">
                     Tiada rekod daerah lagi.
                   </p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className={`border-b text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] ${mentorTheme.dividerClass}`}>
+                        <tr className={`border-b text-xs font-semibold text-slate-600 dark:text-slate-400 ${mentorTheme.dividerClass}`}>
                           <th className="py-2.5 px-4">Daerah</th>
-                          <th className="py-2.5 px-3 text-right">Mentee</th>
+                          <th className="py-2.5 px-3 text-right">Belia</th>
                           <th className="py-2.5 px-3 text-right">Sesi</th>
                           <th className="py-2.5 px-4 text-right">Sokongan</th>
                         </tr>
@@ -4986,19 +4990,19 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       <tbody className={`divide-y text-sm ${mentorTheme.dividerClass}`}>
                         {districtRows.map((row) => (
                           <tr key={row.district} className={mentorTheme.rowHoverClass}>
-                            <td className="py-2.5 px-4 font-semibold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                            <td className="py-2.5 px-4 font-semibold text-slate-900 dark:text-[#F1F5F9]">
                               <div>{row.district}</div>
-                              <div className="w-24 h-1.5 rounded-full bg-[#E0E3E7] dark:bg-[#333537] overflow-hidden mt-1.5">
+                              <div className="w-24 h-1.5 rounded-full bg-slate-200 dark:bg-slate-700/70 overflow-hidden mt-1.5">
                                 <div
                                   className={`h-full rounded-full transition-[width] duration-500 ${mentorTheme.progressFillClass}`}
                                   style={{ width: `${Math.round((row.mentees / maxDistrictMentees) * 100)}%` }}
                                 />
                               </div>
                             </td>
-                            <td className="py-2.5 px-3 text-right tabular-nums text-[#5F6368] dark:text-[#C4C7C5]">
+                            <td className="py-2.5 px-3 text-right tabular-nums text-slate-600 dark:text-slate-300">
                               {row.mentees}
                             </td>
-                            <td className="py-2.5 px-3 text-right tabular-nums text-[#5F6368] dark:text-[#C4C7C5]">
+                            <td className="py-2.5 px-3 text-right tabular-nums text-slate-600 dark:text-slate-300">
                               {row.sessions}
                             </td>
                             <td className={`py-2.5 px-4 text-right tabular-nums font-semibold ${mentorTheme.accentTextClass}`}>
@@ -5012,14 +5016,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 )}
               </div>
 
-              <div className={`rounded-2xl border overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
+              <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden flex flex-col ${mentorTheme.surfaceClass}`}>
                 <div className={`px-4 py-3 border-b ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
-                  <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                  <h4 className="font-display text-sm font-bold text-slate-900 dark:text-[#F1F5F9]">
                     Pecahan Mengikut Sektor
                   </h4>
                 </div>
                 {sectorRows.length === 0 ? (
-                  <p className="p-6 text-sm text-[#5F6368] dark:text-[#9AA0A6] text-center">
+                  <p className="p-6 text-sm text-slate-600 dark:text-slate-400 text-center">
                     Tiada rekod sektor lagi.
                   </p>
                 ) : (
@@ -5027,14 +5031,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     {sectorRows.map((row) => (
                       <div key={row.sector} className="px-4 py-2.5 space-y-1.5">
                         <div className="flex items-center justify-between gap-3">
-                          <span className="text-sm font-medium text-[#1F1F1F] dark:text-[#E3E3E3] truncate">
+                          <span className="text-sm font-medium text-slate-900 dark:text-[#F1F5F9] truncate">
                             {row.sector}
                           </span>
-                          <span className="text-sm font-bold tabular-nums text-[#1F1F1F] dark:text-[#E3E3E3] shrink-0">
-                            {row.count} mentee
+                          <span className="text-sm font-bold tabular-nums text-slate-900 dark:text-[#F1F5F9] shrink-0">
+                            {row.count} belia
                           </span>
                         </div>
-                        <div className="w-full h-1.5 rounded-full bg-[#E0E3E7] dark:bg-[#333537] overflow-hidden">
+                        <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-700/70 overflow-hidden">
                           <div
                             className={`h-full rounded-full transition-[width] duration-500 ${mentorTheme.progressFillClass}`}
                             style={{ width: `${Math.round((row.count / maxSectorCount) * 100)}%` }}
@@ -5051,14 +5055,13 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       })()}
 
       {/* ===================================================================== */}
-      {/* TAB 4: PROFIL MENTOR (2-COLUMN GOOGLE ACCOUNT + LIVE MENTEE PREVIEW)  */}
+      {/* TAB 4: PROFIL MENTOR (2-COLUMN EDITORIAL + LIVE MENTEE PREVIEW)       */}
       {/* ===================================================================== */}
       {currentSubTab === 'profile' && (() => {
         const profileChecklist = [
           { label: 'Nama Penuh', done: Boolean(currentMentor.name?.trim()) },
           { label: 'Jawatan & Agensi', done: Boolean(currentMentor.title?.trim() && currentMentor.agency?.trim()) },
           { label: 'Telefon & Emel', done: Boolean(currentMentor.phone?.trim() && currentMentor.email?.trim()) },
-          { label: 'Jadual Bimbingan', done: Boolean(currentMentor.availableDays?.trim()) },
           { label: 'Bidang Kepakaran', done: Boolean(currentMentor.expertise && currentMentor.expertise.length > 0) },
           { label: 'Ringkasan Profil', done: Boolean(currentMentor.bio?.trim() && currentMentor.bio.trim().length >= 20) }
         ];
@@ -5067,14 +5070,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
         return (
           <div key="profile" className="grid grid-cols-1 lg:grid-cols-[minmax(0,55fr)_minmax(0,45fr)] gap-4 items-stretch animate-dashboard-tab">
-            {/* Left Column: Google Account Style Profile & Completeness */}
-            <div className={`rounded-2xl border p-5 sm:p-6 space-y-5 ${mentorTheme.surfaceClass}`}>
+            {/* Left Column: Editorial Profile & Completeness */}
+            <div className={`rounded-2xl border backdrop-blur-xs p-5 sm:p-6 space-y-5 ${mentorTheme.surfaceClass}`}>
               <div className={`pb-4 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${mentorTheme.dividerClass}`}>
                 <div>
-                  <h3 className="text-lg font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                  <h3 className="font-display text-lg font-bold text-slate-900 dark:text-[#F1F5F9]">
                     Profil &amp; Maklumat Mentor
                   </h3>
-                  <p className="text-sm text-[#5F6368] dark:text-[#9AA0A6] mt-0.5">
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-0.5">
                     Maklumat rasmi yang dipaparkan kepada usahawan belia untuk tempahan sesi.
                   </p>
                 </div>
@@ -5091,17 +5094,17 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               {/* Profile Completeness Bar */}
               <div className={`p-4 rounded-xl border space-y-3 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-sm font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                  <span className="text-sm font-bold text-slate-900 dark:text-[#F1F5F9]">
                     Tahap Kelengkapan Profil
                   </span>
-                  <span className={`text-sm font-bold tabular-nums ${profilePct === 100 ? 'text-emerald-600 dark:text-emerald-400' : mentorTheme.accentStrongTextClass}`}>
-                    {profilePct}% ({completedChecklistCount}/{profileChecklist.length})
+                  <span className={`font-display text-sm font-bold tabular-nums ${profilePct === 100 ? 'text-emerald-600 dark:text-emerald-400' : mentorTheme.accentStrongTextClass}`}>
+                    {profilePct}%
                   </span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-[#E0E3E7] dark:bg-[#333537] overflow-hidden">
+                <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700/70 overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-[width] duration-500 ${
-                      profilePct === 100 ? 'bg-[#137333] dark:bg-[#81C995]' : mentorTheme.progressFillClass
+                      profilePct === 100 ? 'bg-emerald-600 dark:bg-emerald-400' : mentorTheme.progressFillClass
                     }`}
                     style={{ width: `${profilePct}%` }}
                   />
@@ -5113,7 +5116,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                       className={`inline-flex items-center gap-1.5 text-xs font-medium ${
                         item.done
                           ? 'text-emerald-700 dark:text-emerald-400'
-                          : 'text-[#5F6368] dark:text-[#9AA0A6]'
+                          : 'text-slate-500 dark:text-slate-400'
                       }`}
                     >
                       <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
@@ -5126,34 +5129,34 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               {/* Structured Profile Fields */}
               <div className={`divide-y ${mentorTheme.dividerClass}`}>
                 <div className="py-3 first:pt-0 grid grid-cols-1 sm:grid-cols-[148px_1fr] gap-1 sm:gap-4 items-baseline">
-                  <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6]">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                     Nama Penuh
                   </span>
-                  <p className="text-sm font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                  <p className="text-sm font-bold text-slate-900 dark:text-[#F1F5F9]">
                     {currentMentor.name}
                   </p>
                 </div>
 
                 <div className="py-3 grid grid-cols-1 sm:grid-cols-[148px_1fr] gap-1 sm:gap-4 items-baseline">
-                  <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6]">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                     Jawatan &amp; Agensi
                   </span>
-                  <p className="text-sm font-medium text-[#1F1F1F] dark:text-[#E3E3E3]">
+                  <p className="text-sm font-medium text-slate-900 dark:text-[#F1F5F9]">
                     {currentMentor.title} &middot;{' '}
                     <span className={`font-semibold ${mentorTheme.accentTextClass}`}>{currentMentor.agency}</span>
                   </p>
                 </div>
 
                 <div className="py-3 grid grid-cols-1 sm:grid-cols-[148px_1fr] gap-1 sm:gap-4 items-baseline">
-                  <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6]">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                     Saluran Perhubungan
                   </span>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm text-[#1F1F1F] dark:text-[#E3E3E3]">
+                    <div className="flex items-center gap-2 text-sm text-slate-900 dark:text-[#F1F5F9]">
                       <Phone className={`w-4 h-4 shrink-0 ${mentorTheme.accentTextClass}`} />
                       <span className="font-mono tabular-nums">+{currentMentor.phone}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-[#1F1F1F] dark:text-[#E3E3E3]">
+                    <div className="flex items-center gap-2 text-sm text-slate-900 dark:text-[#F1F5F9]">
                       <Mail className={`w-4 h-4 shrink-0 ${mentorTheme.accentTextClass}`} />
                       <span>{currentMentor.email}</span>
                     </div>
@@ -5161,24 +5164,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
 
                 <div className="py-3 grid grid-cols-1 sm:grid-cols-[148px_1fr] gap-1 sm:gap-4 items-baseline">
-                  <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6]">
-                    Jadual Bimbingan
-                  </span>
-                  <div className="text-sm font-bold text-[#1F1F1F] dark:text-[#E3E3E3] flex items-center gap-2">
-                    <Clock className={`w-4 h-4 shrink-0 ${mentorTheme.accentTextClass}`} />
-                    <span>{currentMentor.availableDays}</span>
-                  </div>
-                </div>
-
-                <div className="py-3 grid grid-cols-1 sm:grid-cols-[148px_1fr] gap-1 sm:gap-4 items-baseline">
-                  <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6]">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                     Bidang Kepakaran
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {currentMentor.expertise.map((exp, idx) => (
                       <span
                         key={idx}
-                        className={`px-2.5 py-1 rounded-full text-xs font-semibold ${mentorTheme.activeNavClass}`}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${mentorTheme.activeNavClass}`}
                       >
                         {exp}
                       </span>
@@ -5187,10 +5180,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                 </div>
 
                 <div className="py-3 last:pb-0 grid grid-cols-1 sm:grid-cols-[148px_1fr] gap-1 sm:gap-4 items-baseline">
-                  <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6]">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                     Ringkasan Profil
                   </span>
-                  <p className="text-sm text-[#5F6368] dark:text-[#C4C7C5] leading-relaxed font-sans">
+                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-sans">
                     {currentMentor.bio}
                   </p>
                 </div>
@@ -5198,22 +5191,22 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </div>
 
             {/* Right Column: Live Public Mentee-View Card Preview */}
-            <div className={`rounded-2xl border p-5 space-y-4 ${mentorTheme.surfaceClass}`}>
+            <div className={`rounded-2xl border backdrop-blur-xs p-5 space-y-4 ${mentorTheme.surfaceClass}`}>
               <div className={`pb-3 border-b flex items-center justify-between gap-2 ${mentorTheme.dividerClass}`}>
                 <div className="flex items-center gap-2">
                   <Eye className={`w-4 h-4 shrink-0 ${mentorTheme.accentTextClass}`} />
-                  <h4 className="text-sm font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                  <h4 className="font-display text-sm font-bold text-slate-900 dark:text-[#F1F5F9]">
                     Pratonton Kad Pandangan Usahawan
                   </h4>
                 </div>
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#5F6368] dark:text-[#9AA0A6]">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   Paparan Awam
                 </span>
               </div>
 
               <div className={`p-5 rounded-2xl border space-y-4 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                 <div className="flex items-start gap-3.5">
-                  <div className={`w-14 h-14 rounded-full overflow-hidden border shrink-0 bg-white dark:bg-[#1E1F20] ${mentorTheme.dividerClass}`}>
+                  <div className={`w-14 h-14 rounded-full overflow-hidden border shrink-0 bg-white dark:bg-slate-900 ${mentorTheme.dividerClass}`}>
                     <PortalImage
                       src={currentMentor.avatarUrl}
                       alt={currentMentor.name}
@@ -5222,20 +5215,20 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     />
                   </div>
                   <div className="min-w-0 flex-1 space-y-1">
-                    <span className={`inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${mentorTheme.activeNavClass}`}>
+                    <span className={`inline-block px-2.5 py-0.5 rounded-lg text-[11px] font-semibold ${mentorTheme.activeNavClass}`}>
                       Aktif Membimbing
                     </span>
-                    <div className="text-base font-bold text-[#1F1F1F] dark:text-[#E3E3E3]">
+                    <div className="font-display text-base font-bold text-slate-900 dark:text-[#F1F5F9]">
                       {currentMentor.name}
                     </div>
-                    <div className="text-xs text-[#5F6368] dark:text-[#9AA0A6]">
+                    <div className="text-xs text-slate-600 dark:text-slate-400">
                       {currentMentor.title} &bull;{' '}
                       <span className={`font-semibold ${mentorTheme.accentTextClass}`}>{currentMentor.agency}</span>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-sm text-[#1F1F1F] dark:text-[#E3E3E3] leading-relaxed">
+                <p className="text-sm text-slate-900 dark:text-[#F1F5F9] leading-relaxed">
                   {currentMentor.bio}
                 </p>
 
@@ -5243,20 +5236,16 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   {currentMentor.expertise.map((exp, idx) => (
                     <span
                       key={idx}
-                      className={`px-2.5 py-1 rounded-full border text-xs font-medium bg-white dark:bg-[#1E1F20] text-[#1F1F1F] dark:text-[#E3E3E3] ${mentorTheme.dividerClass}`}
+                      className={`px-2.5 py-1 rounded-lg border text-xs font-medium bg-white dark:bg-slate-900 text-slate-900 dark:text-[#F1F5F9] ${mentorTheme.dividerClass}`}
                     >
                       {exp}
                     </span>
                   ))}
                 </div>
 
-                <div className={`pt-3 border-t flex flex-wrap items-center justify-between gap-2 text-xs text-[#5F6368] dark:text-[#9AA0A6] ${mentorTheme.dividerClass}`}>
-                  <span className="inline-flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>{currentMentor.availableDays}</span>
-                  </span>
+                <div className={`pt-3 border-t flex flex-wrap items-center justify-end gap-2 text-xs text-slate-500 dark:text-slate-400 ${mentorTheme.dividerClass}`}>
                   <span className={`font-semibold ${mentorTheme.accentTextClass}`}>
-                    {menteeDirectory.length} mentee aktif
+                    {menteeDirectory.length > 0 ? `${menteeDirectory.length} belia aktif` : 'Belum ada belia aktif'}
                   </span>
                 </div>
               </div>
@@ -5278,7 +5267,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <Award className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base text-slate-900 dark:text-[#F1F6FA]">
+                  <h3 className="font-display font-bold text-base text-slate-900 dark:text-[#F1F6FA]">
                     Borang Perakuan Rasmi Geran Belia
                   </h3>
                   <p className="text-[0.875rem] text-slate-600 dark:text-slate-300">
@@ -5299,7 +5288,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               {menteeDirectory.length > 0 && (
                 <div>
                   <label className="block text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">
-                    Pilih Mentee Sedia Ada (Isi Pantas)
+                    Pilih Belia Sedia Ada (Isi Pantas)
                   </label>
                   <select
                     defaultValue=""
@@ -5313,7 +5302,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     }}
                     className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer ${mentorTheme.inputClass}`}
                   >
-                    <option value="">-- Pilih usahawan seliaan atau taip di bawah --</option>
+                    <option value="">-- Pilih belia seliaan atau taip di bawah --</option>
                     {menteeDirectory.map((m) => (
                       <option key={m.key} value={m.key}>
                         {m.menteeName} — {m.businessName} ({m.district})
@@ -5495,7 +5484,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                     type="checkbox"
                     checked={isEndorsementConfirmed}
                     onChange={(e) => setIsEndorsementConfirmed(e.target.checked)}
-                    className="mt-0.5 rounded w-4 h-4 accent-[#1A73E8] dark:accent-[#A8C7FA] cursor-pointer"
+                    className="mt-0.5 rounded w-4 h-4 accent-[#1D4ED8] dark:accent-[#3B82F6] cursor-pointer"
                   />
                   <span className="leading-relaxed">
                     Saya mengesahkan bahawa saya telah menyemak dokumen perniagaan dan membimbing usahawan belia ini. Perakuan ini dibuat dengan penuh integriti untuk semakan pihak pentadbir.
@@ -5601,7 +5590,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[0.8125rem] gap-2 pt-1 font-mono">
               <div>
                 <span className="text-black/70 font-sans">Nombor Rujukan: </span>
-                <strong className="text-black">{selectedEndorsementForView.endorsementCode}</strong>
+                <MiddleTruncate text={selectedEndorsementForView.endorsementCode} startChars={11} endChars={5} className="font-bold text-black" />
               </div>
               <div>
                 <span className="text-black/70 font-sans">Tarikh Perakuan: </span>
@@ -5644,15 +5633,15 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
 
               <div className="space-y-1 font-sans">
                 <strong className="text-black">Ulasan Justifikasi Mentor:</strong>
-                <p className="p-3 bg-amber-50/50 rounded-xl border border-amber-200/60 italic text-black leading-relaxed">
-                  "{selectedEndorsementForView.justification}"
+                <p className="p-3 bg-amber-50/50 rounded-xl border border-amber-200/60 italic text-black leading-relaxed kbelia-prose">
+                  &ldquo;<AcronymText text={selectedEndorsementForView.justification} />&rdquo;
                 </p>
               </div>
 
               <div className="space-y-1 font-sans">
                 <strong className="text-black">Penilaian Tahap Kesediaan Operasi:</strong>
-                <p className="text-black">
-                  {selectedEndorsementForView.businessReadinessRemark}
+                <p className="text-black kbelia-prose">
+                  <AcronymText text={selectedEndorsementForView.businessReadinessRemark} />
                 </p>
               </div>
 
@@ -5682,15 +5671,14 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </div>
 
               <div className="text-center sm:text-right">
-                <div className="inline-block p-3 rounded-2xl bg-amber-50 border-2 border-amber-400 text-center">
-                  <ShieldCheck className="w-7 h-7 text-black mx-auto mb-1" />
-                  <span className="font-black text-[0.8125rem] text-black uppercase tracking-wider block">
-                    PENGESAHAN DIGITAL KBELIA
-                  </span>
-                  <span className="font-mono text-[0.8125rem] text-black/70 block">
-                    STATUS: SAH DIPERAKUKAN
-                  </span>
-                </div>
+                <QrCodeGraphic
+                  value={buildVerificationQrPayload(selectedEndorsementForView.endorsementCode)}
+                  size={96}
+                  caption="SAH DIPERAKUKAN"
+                  subcaption={selectedEndorsementForView.endorsementCode}
+                  showDownloadButton
+                  downloadFileName={`QR_Perakuan_${selectedEndorsementForView.endorsementCode}.png`}
+                />
               </div>
             </div>
 
@@ -5711,7 +5699,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base text-slate-900 dark:text-[#F1F6FA]">
+                  <h3 className="font-display font-bold text-base text-slate-900 dark:text-[#F1F6FA]">
                     {editingLogId ? 'Sunting Rekod Sesi Bimbingan' : 'Tambah Rekod Sesi Bimbingan'}
                   </h3>
                   <p className="text-[0.875rem] text-slate-600 dark:text-slate-300">
@@ -5737,7 +5725,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               {!editingLogId && (
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-xs font-semibold text-[#5F6368] dark:text-[#9AA0A6] mr-1">
+                    <span className="text-xs font-semibold text-slate-600 dark:text-slate-400 mr-1">
                       Templat:
                     </span>
                     {LOGBOOK_QUICK_TEMPLATES.map((tpl) => (
@@ -5766,7 +5754,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   {menteeDirectory.length > 0 && (
                     <div>
                       <label className="block text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">
-                        Pilih Mentee Sedia Ada (Isi Pantas)
+                        Pilih Belia Sedia Ada (Isi Pantas)
                       </label>
                       <select
                         defaultValue=""
@@ -5778,7 +5766,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                         }}
                         className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer ${mentorTheme.inputClass}`}
                       >
-                        <option value="">-- Pilih usahawan seliaan atau taip di bawah --</option>
+                        <option value="">-- Pilih belia seliaan atau taip di bawah --</option>
                         {menteeDirectory.map((m) => (
                           <option key={m.key} value={m.key}>
                             {m.menteeName} — {m.businessName}
@@ -5907,7 +5895,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                                 title={taskRow.completed ? 'Tandakan belum selesai' : 'Tandakan selesai'}
                                 className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
                                   taskRow.completed
-                                    ? 'bg-[#1A73E8] border-[#1A73E8] dark:bg-[#A8C7FA] dark:border-[#A8C7FA] text-white dark:text-[#041E49]'
+                                    ? 'bg-[#1D4ED8] border-[#1D4ED8] dark:bg-[#3B82F6] dark:border-[#3B82F6] text-white'
                                     : `border-slate-300 dark:border-slate-600 ${mentorTheme.surfaceClass}`
                                 }`}
                               >
@@ -5996,7 +5984,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-base text-slate-900 dark:text-[#F1F6FA]">
+                  <h3 className="font-display font-bold text-base text-slate-900 dark:text-[#F1F6FA]">
                     Nota Nasihat &amp; Tindakan Usahawan
                   </h3>
                   <p className="text-[0.875rem] text-slate-600 dark:text-slate-300">
@@ -6082,7 +6070,7 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
           <div className={`w-full max-w-md rounded-3xl shadow-2xl border backdrop-blur-md overflow-hidden ${mentorTheme.surfaceClass}`}>
             <div className={`px-6 pt-5 pb-4 flex items-center justify-between border-b ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
-              <h3 className="font-bold text-sm text-slate-900 dark:text-[#F1F6FA]">
+              <h3 className="font-display font-bold text-sm text-slate-900 dark:text-[#F1F6FA]">
                 Buka Slot Jadual Bimbingan Baharu
               </h3>
               <button onClick={() => setIsNewSlotModalOpen(false)} className={`p-1.5 rounded-xl text-slate-500 dark:text-slate-400 cursor-pointer ${mentorTheme.rowHoverClass}`}>

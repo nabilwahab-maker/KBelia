@@ -15,7 +15,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     email: 'wanazhar@kbelia.my',
     phone: '60199887711',
     bio: 'Berpengalaman lebih 15 tahun membimbing usahawan belia di Pantai Timur mencapai jualan 6 angka melalui saluran digital dan pengurusan hab keusahawanan.',
-    availableDays: 'Setiap Isnin & Rabu (10:00 AM - 1:00 PM)',
+    availableDays: '',
     activeMenteesCount: 3,
     updatedAt: '2026-03-01T08:00:00.000Z'
   },
@@ -33,7 +33,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     email: 'sitiaminah.mentor@kbelia.my',
     phone: '60129876543',
     bio: 'Pemenang Anugerah Usahawanita Inovatif Kelantan dan pakar industri berpengalaman yang telah membantu mengeksport produk kraf tempatan ke 8 negara.',
-    availableDays: 'Setiap Selasa & Khamis (2:30 PM - 5:00 PM)',
+    availableDays: '',
     activeMenteesCount: 2,
     updatedAt: '2026-03-01T08:00:00.000Z'
   },
@@ -51,7 +51,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     email: 'khairul.audit@kbelia.my',
     phone: '60139123456',
     bio: 'Akauntan berpengalaman membantu usahawan mikro menyediakan rekod tunai dan kertas kerja pembiayaan mikro serta geran perniagaan sehingga RM50,000.',
-    availableDays: 'Setiap Rabu & Sabtu (11:00 AM - 3:00 PM)',
+    availableDays: '',
     activeMenteesCount: 2,
     updatedAt: '2026-03-01T08:00:00.000Z'
   },
@@ -69,7 +69,7 @@ export const INITIAL_MENTOR_PROFILES: MentorProfile[] = [
     email: 'norazila.mentor@kbelia.my',
     phone: '60145556677',
     bio: 'Pakar pensijilan keselamatan makanan dan pembangunan produk asas tani membantu usahawan mikro luar bandar menembusi pasaran pasar raya.',
-    availableDays: 'Setiap Ahad & Khamis (9:30 AM - 12:30 PM)',
+    availableDays: '',
     activeMenteesCount: 1,
     updatedAt: '2026-03-01T08:00:00.000Z'
   }

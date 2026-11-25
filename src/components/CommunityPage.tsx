@@ -37,6 +37,7 @@ import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ToolbarSortOption } from '../utils/sortUtils';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { AcronymText } from './TypographyPrimitives';
 
 interface CommunityPageProps {
   posts: CommunityPost[];
@@ -451,7 +452,7 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
       {/* Page Header */}
       <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700">
         <div className="space-y-1 max-w-2xl">
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight text-balance">
+          <h1 className="font-display text-fluid-portal font-extrabold text-slate-900 dark:text-white tracking-tight text-balance kbelia-trim">
             Komuniti Usahawan Belia Kelantan
           </h1>
         </div>
@@ -496,11 +497,14 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
               </div>
 
               <div className="space-y-2 max-w-4xl">
-                <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight text-balance leading-snug">
-                  {featuredPost.title}
+                <h2
+                  title={featuredPost.title}
+                  className="font-display text-fluid-title font-black text-slate-900 dark:text-white tracking-tight text-balance kbelia-trim"
+                >
+                  <AcronymText text={featuredPost.title} />
                 </h2>
-                <p className="text-[0.9375rem] text-slate-600 dark:text-zinc-300 leading-relaxed line-clamp-3">
-                  {featuredPost.content}
+                <p className="text-[0.9375rem] text-slate-600 dark:text-zinc-300 leading-relaxed line-clamp-3 kbelia-prose">
+                  <AcronymText text={featuredPost.content} />
                 </p>
               </div>
 
@@ -573,12 +577,15 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
                             </span>
                           </div>
 
-                          <h3 className="text-base font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">
-                            {post.title}
+                          <h3
+                            title={post.title}
+                            className="text-base font-bold text-slate-900 dark:text-white leading-snug kbelia-clamp-2 kbelia-trim"
+                          >
+                            <AcronymText text={post.title} />
                           </h3>
 
-                          <p className="text-sm text-slate-600 dark:text-zinc-300 leading-relaxed line-clamp-2">
-                            {post.content}
+                          <p className="text-sm text-slate-600 dark:text-zinc-300 leading-relaxed kbelia-clamp-2 kbelia-prose">
+                            <AcronymText text={post.content} />
                           </p>
                         </div>
 
@@ -766,8 +773,11 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
 
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-center gap-2 min-w-0">
-                          <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white truncate">
-                            {post.title}
+                          <h2
+                            title={post.title}
+                            className="text-sm sm:text-base font-bold text-slate-900 dark:text-white kbelia-clamp-1 kbelia-trim"
+                          >
+                            <AcronymText text={post.title} />
                           </h2>
                           <span
                             className={`text-[0.8125rem] font-bold whitespace-nowrap shrink-0 ${
@@ -914,7 +924,7 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
                   <label className="font-bold text-black dark:text-white">
                     Tajuk Topik
                   </label>
-                  <span className="text-slate-400 tabular-nums">{formTitle.length}/200</span>
+                  <span className="text-slate-400 tabular-nums">{formTitle.length} aksara</span>
                 </div>
                 <input
                   type="text"
@@ -932,7 +942,7 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
                   <label className="font-bold text-black dark:text-white">
                     Keterangan Topik
                   </label>
-                  <span className="text-slate-400 tabular-nums">{formContent.length}/5000</span>
+                  <span className="text-slate-400 tabular-nums">{formContent.length} aksara</span>
                 </div>
                 <textarea
                   required
@@ -1007,8 +1017,8 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
               {/* Post Body */}
               <div className="space-y-4 pb-5 border-b border-slate-200 dark:border-zinc-800">
                 <div className="space-y-2">
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight text-balance leading-snug">
-                    {selectedPost.title}
+                  <h2 className="font-display text-fluid-title font-black text-slate-900 dark:text-white tracking-tight text-balance kbelia-trim">
+                    <AcronymText text={selectedPost.title} />
                   </h2>
                   <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500 dark:text-zinc-400 tabular-nums">
                     <span className="font-semibold text-slate-800 dark:text-zinc-200">
@@ -1021,10 +1031,10 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
                   </div>
                 </div>
 
-                <div className="space-y-3 text-sm text-slate-700 dark:text-zinc-300 leading-relaxed">
+                <div className="space-y-3 text-sm text-slate-700 dark:text-zinc-300 leading-relaxed kbelia-prose">
                   {selectedPost.content.split(/\n\s*\n/).map((para, idx) => (
                     <p key={idx} className="whitespace-pre-line">
-                      {para}
+                      <AcronymText text={para} />
                     </p>
                   ))}
                 </div>
@@ -1264,7 +1274,7 @@ export const CommunityPage: React.FC<CommunityPageProps> = ({
                     <label className="font-bold text-black dark:text-white">
                       Balasan Anda
                     </label>
-                    <span className="text-slate-400 tabular-nums">{replyDraft.length}/3000</span>
+                    <span className="text-slate-400 tabular-nums">{replyDraft.length} aksara</span>
                   </div>
                   <textarea
                     rows={3}

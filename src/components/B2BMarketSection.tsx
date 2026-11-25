@@ -31,6 +31,7 @@ import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { AcronymText } from './TypographyPrimitives';
 
 const ITEMS_PER_PAGE = 6;
 const SPOTLIGHT_ROTATE_MS = 6000;
@@ -212,13 +213,17 @@ export const B2BMarketSection: React.FC = () => {
     <div className="w-full space-y-5">
       {/* Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
+        <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight kbelia-trim">
           {isEn ? 'Supply Network & Commercial Ads' : 'Rangkaian Bekalan & Ruang Niaga'}
         </h1>
-        <p className="text-sm text-black/65 dark:text-white/70 mt-1 max-w-2xl">
-          {isEn
-            ? 'Connect directly with Kelantan youth wholesale suppliers, local product makers, and commercial kiosk partners.'
-            : 'Terokai tawaran pembekal borong, bahan mentah kiosk, dan permintaan rakan niaga usahawan belia di seluruh Kelantan.'}
+        <p className="text-sm text-black/65 dark:text-white/70 mt-1 max-w-2xl kbelia-prose">
+          <AcronymText
+            text={
+              isEn
+                ? 'Connect directly with Kelantan youth wholesale suppliers, local product makers, and commercial kiosk partners.'
+                : 'Terokai tawaran pembekal borong, bahan mentah kiosk, dan permintaan rakan niaga usahawan belia di seluruh Kelantan.'
+            }
+          />
         </p>
       </div>
 
@@ -274,13 +279,14 @@ export const B2BMarketSection: React.FC = () => {
 
                 <h2
                   onClick={() => setDetailListing(spotlightListing)}
-                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight leading-snug text-balance cursor-pointer hover:opacity-85 transition-opacity"
+                  title={spotlightListing.title}
+                  className="font-display text-fluid-title font-extrabold text-black dark:text-white tracking-tight text-balance kbelia-trim cursor-pointer hover:opacity-85 transition-opacity"
                 >
-                  {spotlightListing.title}
+                  <AcronymText text={spotlightListing.title} />
                 </h2>
 
-                <p className="text-sm sm:text-base text-black/70 dark:text-white/75 leading-relaxed line-clamp-3">
-                  {spotlightListing.description}
+                <p className="text-sm sm:text-base text-black/70 dark:text-white/75 leading-relaxed line-clamp-3 kbelia-prose">
+                  <AcronymText text={spotlightListing.description} />
                 </p>
               </div>
 
@@ -484,12 +490,15 @@ export const B2BMarketSection: React.FC = () => {
                         </span>
                       </div>
 
-                      <h3 className="text-base sm:text-lg font-bold text-black dark:text-white leading-snug line-clamp-2 mt-1.5 group-hover:opacity-85 transition-opacity">
-                        {item.title}
+                      <h3
+                        title={item.title}
+                        className="text-base sm:text-lg font-bold text-black dark:text-white leading-snug kbelia-clamp-2 kbelia-trim mt-1.5 group-hover:opacity-85 transition-opacity"
+                      >
+                        <AcronymText text={item.title} />
                       </h3>
 
-                      <p className="text-sm text-black/65 dark:text-white/70 leading-relaxed line-clamp-2 mt-1.5">
-                        {item.description}
+                      <p className="text-sm text-black/65 dark:text-white/70 leading-relaxed kbelia-clamp-2 kbelia-prose mt-1.5">
+                        <AcronymText text={item.description} />
                       </p>
 
                       <div className="mt-3 text-xs text-black/60 dark:text-white/65 truncate tabular-nums">
@@ -583,9 +592,9 @@ export const B2BMarketSection: React.FC = () => {
                 </div>
                 <h2
                   id="b2b-detail-modal-title"
-                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight mt-1.5 text-balance"
+                  className="font-display text-fluid-title font-extrabold text-black dark:text-white tracking-tight mt-1.5 text-balance kbelia-trim"
                 >
-                  {detailListing.title}
+                  <AcronymText text={detailListing.title} />
                 </h2>
               </div>
 

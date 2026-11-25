@@ -528,10 +528,10 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ myBusiness, onRefres
       {/* 1. Header Banner */}
       <div className={`p-4 sm:p-5 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${roleTheme.surfaceClass}`}>
         <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight">
+          <h1 className="font-display text-fluid-portal font-black text-black dark:text-white tracking-tight kbelia-trim">
             {t('settings_title')}
           </h1>
-          <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-2xl leading-relaxed">
+          <p className="text-[0.9375rem] text-black/75 dark:text-white/75 max-w-2xl leading-relaxed kbelia-prose">
             {t('settings_desc')}
           </p>
         </div>

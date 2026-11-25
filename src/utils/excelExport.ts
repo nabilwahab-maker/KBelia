@@ -105,7 +105,7 @@ export const exportMentorReportToExcel = (params: {
     { Perkara: 'Nama Mentor', Nilai: params.mentorName },
     { Perkara: 'Agensi / Institusi', Nilai: params.mentorAgency },
     { Perkara: 'Tarikh Laporan', Nilai: formatSheetDate(new Date().toISOString()) },
-    { Perkara: 'Jumlah Mentee Diselia', Nilai: params.totalMentees },
+    { Perkara: 'Jumlah Belia Diselia', Nilai: params.totalMentees },
     { Perkara: 'Sesi Bimbingan Selesai', Nilai: params.completedSessions },
     { Perkara: 'Rekod Nota Sesi', Nilai: params.totalLogs },
     { Perkara: 'Surat Sokongan Geran Aktif', Nilai: params.totalEndorsements }
@@ -117,7 +117,7 @@ export const exportMentorReportToExcel = (params: {
     params.districtRows.map((row, idx) => ({
       Bil: idx + 1,
       Daerah: row.district,
-      'Bilangan Mentee': row.mentees,
+      'Bilangan Belia': row.mentees,
       'Sesi Selesai': row.sessions,
       'Surat Sokongan': row.endorsements
     }))
@@ -129,7 +129,7 @@ export const exportMentorReportToExcel = (params: {
     params.sectorRows.map((row, idx) => ({
       Bil: idx + 1,
       'Sektor Perniagaan': row.sector,
-      'Bilangan Mentee': row.count
+      'Bilangan Belia': row.count
     }))
   );
   sectorSheet['!cols'] = [{ wch: 6 }, { wch: 36 }, { wch: 18 }];

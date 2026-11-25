@@ -44,7 +44,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
   const [phone, setPhone] = useState(mentor?.phone || '');
   const [email, setEmail] = useState(mentor?.email || '');
   const [avatarUrl, setAvatarUrl] = useState(mentor?.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg');
-  const [availableDays, setAvailableDays] = useState(mentor?.availableDays || 'Ahad & Selasa (9:00 PG - 1:00 PTG)');
+  const [availableDays, setAvailableDays] = useState(mentor?.availableDays || '');
   const [bio, setBio] = useState(mentor?.bio || '');
   const [expertise, setExpertise] = useState<string[]>(mentor?.expertise || []);
   const [newExpertiseInput, setNewExpertiseInput] = useState('');
@@ -63,7 +63,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
       setPhone(mentor?.phone || '');
       setEmail(mentor?.email || '');
       setAvatarUrl(mentor?.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg');
-      setAvailableDays(mentor?.availableDays || 'Ahad & Selasa (9:00 PG - 1:00 PTG)');
+      setAvailableDays(mentor?.availableDays || '');
       setBio(mentor?.bio || '');
       setExpertise(mentor?.expertise || []);
       setSuccessToast(null);
@@ -130,7 +130,7 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
                 {isCreating ? 'Tambah Mentor Baharu' : isAdminEditing ? 'Edit Profil Mentor' : 'Edit Profil Saya'}
               </h3>
               <p className="text-sm text-black/65 dark:text-white/70">
-                Maklumat bimbingan, jadual temu janji dan perhubungan
+                Maklumat bimbingan dan perhubungan rasmi mentor
               </p>
             </div>
           </div>
@@ -237,20 +237,6 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Masukkan alamat emel"
-              className={fieldClass}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
-              Jadual Bimbingan <span className={modalTheme.accentTextClass}>*</span>
-            </label>
-            <input
-              type="text"
-              required
-              value={availableDays}
-              onChange={(e) => setAvailableDays(e.target.value)}
-              placeholder="Masukkan jadual bimbingan"
               className={fieldClass}
             />
           </div>

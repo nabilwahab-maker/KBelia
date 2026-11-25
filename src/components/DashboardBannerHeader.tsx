@@ -69,13 +69,13 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
         <button
           type="button"
           onClick={onNavigateHome}
-          className="hover:text-slate-900 dark:hover:text-[#F5F3EE] transition-colors cursor-pointer flex items-center gap-1.5 shrink-0"
+          className="hover:text-slate-900 dark:hover:text-[#F5F3EE] transition-colors cursor-pointer flex items-center gap-1.5 shrink-0 kbelia-link kbelia-trim"
         >
           <Home className="w-3.5 h-3.5 inline" />
           <span>{isMs ? 'Utama' : 'Home'}</span>
         </button>
         <span className="opacity-40" aria-hidden="true">/</span>
-        <span className={`font-semibold tracking-tight truncate ${theme.accentTextClass}`}>
+        <span className={`font-semibold tracking-tight truncate kbelia-trim ${theme.accentTextClass}`}>
           {breadcrumbLabel}
         </span>
       </nav>

@@ -97,6 +97,7 @@ import { OfferLetterModal } from './components/OfferLetterModal';
 import { LoginModal } from './components/LoginModal';
 import { DigitalTenancyAgreementModal } from './components/DigitalTenancyAgreementModal';
 import { PublicVerificationModal } from './components/PublicVerificationModal';
+import { PrintFallbackModal } from './components/PrintFallbackModal';
 import { ApplicationStatusDocumentsModal } from './components/ApplicationStatusDocumentsModal';
 import { KioskCashflowModal } from './components/KioskCashflowModal';
 import { MicroLearningAcademyModal } from './components/MicroLearningAcademyModal';
@@ -196,6 +197,11 @@ function MainApp() {
     }
   }, [theme]);
 
+  // Sync HTML lang dynamically (ms | en) so browser CSS auto-hyphenation uses the right dictionary
+  useEffect(() => {
+    document.documentElement.lang = language === 'en' ? 'en' : 'ms';
+  }, [language]);
+
   // Reset scroll position whenever navigating tabs
   useEffect(() => {
     if (mainScrollRef.current) {
@@ -275,6 +281,20 @@ function MainApp() {
   const [selectedBookingForTenancy, setSelectedBookingForTenancy] = useState<CapsuleBooking | null>(null);
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
   const [verificationRefCode, setVerificationRefCode] = useState('');
+
+  // Auto-open Public Verification Modal when a user scans any official KBelia QR URL (/?verify=CODE)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const verifyCode = params.get('verify');
+      if (verifyCode && verifyCode.trim()) {
+        setVerificationRefCode(verifyCode.trim().toUpperCase());
+        setIsVerificationModalOpen(true);
+      }
+    } catch {
+      // ignore invalid URL search params
+    }
+  }, []);
   
   // Quick Counter Interactive Modals
   const [isStatusDocumentsModalOpen, setIsStatusDocumentsModalOpen] = useState(false);
@@ -1661,6 +1681,16 @@ function MainApp() {
           }}
         />
 
+        <PublicVerificationModal
+          isOpen={isVerificationModalOpen}
+          defaultRefCode={verificationRefCode}
+          bookings={bookings}
+          businesses={businesses}
+          grantApplications={grantApplications}
+          grantEndorsements={grantEndorsements}
+          onClose={() => setIsVerificationModalOpen(false)}
+        />
+
         <LoginModal />
       </div>
     );
@@ -2605,6 +2635,7 @@ export function App() {
             </div>
           )}
           <MainApp />
+          <PrintFallbackModal />
           <SessionTimeoutModal />
           <ToastContainer />
         </ConfirmDeleteProvider>

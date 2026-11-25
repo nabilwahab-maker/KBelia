@@ -38,7 +38,11 @@ import {
   SlidersHorizontal,
   ArrowUpDown,
   Plus,
-  Wallet
+  Wallet,
+  Printer,
+  Copy,
+  Pencil,
+  Trash2
 } from 'lucide-react';
 import { 
   BusinessListing, 
@@ -65,6 +69,7 @@ import {
 import { KioskCashflowTracker } from './KioskCashflowTracker';
 import { UserDocumentsVault } from './UserDocumentsVault';
 import { ImageDropzone } from './ImageDropzone';
+import { BusinessMediaProfileHeader } from './BusinessMediaProfileHeader';
 import { EditProductModal } from './EditProductModal';
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
@@ -87,13 +92,28 @@ import {
   LabelList
 } from 'recharts';
 import {
-  formatDisplayDate
+  formatDisplayDate,
+  openAndPrintDocument,
+  escapeHtml,
+  buildKbeliaCrestSvg,
+  buildDigitalSealHtml
 } from '../utils/printUtils';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { exportProductsToExcel } from '../utils/excelExport';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 import { usePrefersReducedMotion } from '../hooks/useMotion';
 import confetti from 'canvas-confetti';
+import { AcronymText, MiddleTruncate } from './TypographyPrimitives';
+import { QrCodeGraphic } from './QrCodeGraphic';
+import { buildBusinessQrPayload, computeIntegrityChecksum, generateQrSvgString } from '../utils/qrUtils';
+import {
+  GoogleWorkspaceSplitPane,
+  SidePreviewEmptyState,
+  SidePreviewHeader,
+  SidePreviewMetricsStrip,
+  WorkspaceHeaderCard,
+  getWorkspaceActiveRowClass
+} from './GoogleWorkspaceSplitPane';
 
 const DEFAULT_PRODUCT_IMAGE = '/assets/generated/product_kelantan_delights_1793924253401.jpg';
 
@@ -281,6 +301,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
     dir: 'asc' | 'desc';
   }>({ key: 'createdAt', dir: 'desc' });
   const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [mobileProductPreviewOpen, setMobileProductPreviewOpen] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -660,7 +682,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <span aria-hidden="true">·</span>
                   <span className="shrink-0">{districtLabel}</span>
                 </div>
-                <h1 className="font-display text-2xl sm:text-[1.85rem] font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight leading-tight">
+                <h1 className="font-display text-fluid-portal font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight kbelia-trim">
                   {currentHeader.prefix}
                   <span className={beliaTheme.accentTextClass}>{currentHeader.accent}</span>
                 </h1>
@@ -1673,6 +1695,15 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           </div>
 
           <form onSubmit={handleSaveBusiness} className="p-4 sm:p-5 space-y-4">
+            {/* Top Profile Media Header: Full-width Banner + Overlapping 1:1 Logo */}
+            <BusinessMediaProfileHeader
+              logoUrl={logoUrl}
+              onLogoChange={(val) => setLogoUrl(val)}
+              bannerUrl={bannerUrl}
+              onBannerChange={(val) => setBannerUrl(val)}
+              dividerClass={beliaTheme.dividerClass}
+            />
+
             {/* 2-Column Row 1: Nama Perniagaan + Slogan */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
@@ -1805,33 +1836,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   value={tiktok}
                   onChange={(e) => setTiktok(e.target.value)}
                   className={`w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
-                />
-              </div>
-            </div>
-
-            {/* 2-Column Row 5: Media Uploads */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-              <div>
-                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
-                  Logo Perniagaan
-                </label>
-                <ImageDropzone
-                  value={logoUrl}
-                  onChange={(val) => setLogoUrl(val)}
-                  label="Pilih gambar logo perniagaan"
-                  aspectRatio="1:1"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-800 dark:text-[#F4F1EA] mb-1.5">
-                  Banner Premis
-                </label>
-                <ImageDropzone
-                  value={bannerUrl}
-                  onChange={(val) => setBannerUrl(val)}
-                  label="Pilih gambar banner premis"
-                  aspectRatio="16:9"
                 />
               </div>
             </div>
@@ -2032,218 +2036,158 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
           )}
 
-          {/* Single-Elevation Hairline Product Table */}
-          <div className={`rounded-2xl border overflow-visible transition-colors ${beliaTheme.surfaceClass}`}>
-            {/* Search & Filter Toolbar */}
-            <div className={`p-3.5 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b ${beliaTheme.dividerClass}`}>
-              <div
-                style={{ ['--search-fit-w' as string]: getSearchInputWidth('Cari produk atau kategori...') }}
-                className="relative w-full sm:w-[var(--search-fit-w)] sm:max-w-full min-w-0"
-              >
-                <Search className="w-4 h-4 text-slate-400 dark:text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={prodSearch}
-                  onChange={(e) => setProdSearch(e.target.value)}
-                  placeholder="Cari produk atau kategori..."
-                  className={`w-full pl-9 pr-8 py-2 rounded-xl text-sm focus:outline-none transition-all ${beliaTheme.inputClass}`}
-                />
-                {prodSearch && (
-                  <button
-                    type="button"
-                    onClick={() => setProdSearch('')}
-                    aria-label="Kosongkan carian"
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-stone-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
+          {/* Google Workspace Header + Split-Pane Products List & Preview */}
+          {(() => {
+            const inStockCount = safeProducts.filter((p) => p.inStock !== false).length;
+            const outOfStockCount = safeProducts.filter((p) => p.inStock === false).length;
+            const activeProduct =
+              filteredSortedProducts.find((p) => p.id === selectedProductId) ||
+              productsPagination.paginatedItems[0] ||
+              filteredSortedProducts[0] ||
+              null;
 
-              <div className="flex flex-wrap items-center justify-end gap-2">
-                {selectedProductIds.length > 0 && (
-                  <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[0.8125rem] font-semibold ${beliaTheme.activeMiniBtnClass}`}>
-                    <span className="tabular-nums">{selectedProductIds.length} dipilih</span>
-                    <button
-                      type="button"
-                      onClick={() => setSelectedProductIds([])}
-                      className="underline cursor-pointer font-semibold"
-                    >
-                      Kosongkan
-                    </button>
-                  </div>
-                )}
-
-                <div className="relative flex flex-wrap items-center gap-2" data-prod-filter>
-                  <button
-                    type="button"
-                    onClick={() => setIsProdFilterOpen((prev) => !prev)}
-                    aria-expanded={isProdFilterOpen}
-                    className={`min-h-[38px] px-3.5 py-2 rounded-xl border text-sm font-semibold inline-flex items-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${
-                      activeFilterCount > 0
-                        ? beliaTheme.activeMiniBtnClass
-                        : beliaTheme.secondaryButtonClass
-                    }`}
-                  >
-                    <SlidersHorizontal className="w-4 h-4 shrink-0" />
-                    <span>
-                      Penapis{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleExportProducts}
-                    className={`min-h-[38px] px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${beliaTheme.secondaryButtonClass}`}
-                  >
-                    <Download className="w-4 h-4 shrink-0" />
-                    <span>
-                      {selectedProductIds.length > 0
-                        ? `Eksport (${selectedProductIds.length})`
-                        : 'Eksport'}
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setShowAddProduct(!showAddProduct)}
-                    className={`min-h-[38px] px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 ${beliaTheme.primaryButtonClass}`}
-                  >
-                    <Plus className="w-4 h-4 shrink-0" />
-                    <span>{showAddProduct ? 'Tutup' : 'Tambah'}</span>
-                  </button>
-
-                  {isProdFilterOpen && (
-                    <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#141D1A] border border-slate-200 dark:border-[#24342D] shadow-xl p-4 z-30 space-y-3.5">
-                      <div className={`pb-3 border-b ${beliaTheme.dividerClass}`}>
-                        <label className="block text-[0.8125rem] font-semibold text-slate-700 dark:text-stone-300 mb-1.5 flex items-center gap-1.5">
-                          <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${beliaTheme.accentTextClass}`} />
-                          <span>Susun Mengikut</span>
-                        </label>
-                        <select
-                          value={prodSortBy === 'table_column' ? '' : prodSortBy}
-                          onChange={(e) => {
-                            if (e.target.value) setProdSortBy(e.target.value);
-                          }}
-                          className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
-                        >
-                          {prodSortBy === 'table_column' && (
-                            <option value="">Ikut Lajur Jadual</option>
-                          )}
-                          {productSortOptions.map((opt) => (
-                            <option key={opt.value} value={opt.value}>
-                              {opt.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-600 dark:text-stone-400 mb-1.5">
-                          Kategori
-                        </label>
-                        <select
-                          value={prodCategoryFilter}
-                          onChange={(e) => setProdCategoryFilter(e.target.value)}
-                          className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
-                        >
-                          {productCategories.map((cat) => (
-                            <option key={cat} value={cat}>
-                              {cat}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-semibold text-slate-600 dark:text-stone-400 mb-1.5">
-                          Status Stok
-                        </label>
-                        <div className="grid grid-cols-3 gap-1.5">
-                          {(
-                            [
-                              { id: 'all', label: 'Semua' },
-                              { id: 'in_stock', label: 'Tersedia' },
-                              { id: 'out_of_stock', label: 'Habis' }
-                            ] as const
-                          ).map((opt) => (
-                            <button
-                              key={opt.id}
-                              type="button"
-                              onClick={() => setProdStockFilter(opt.id)}
-                              className={`px-2 py-1.5 rounded-xl text-[0.8125rem] font-semibold border transition-colors cursor-pointer whitespace-nowrap ${
-                                prodStockFilter === opt.id
-                                  ? beliaTheme.segmentedActiveClass
-                                  : beliaTheme.secondaryButtonClass
-                              }`}
-                            >
-                              {opt.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className={`pt-2 border-t flex items-center justify-between ${beliaTheme.dividerClass}`}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setProdCategoryFilter('Semua');
-                            setProdStockFilter('all');
-                            setProdSortBy(DEFAULT_SORT_VALUE);
-                          }}
-                          className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300 hover:underline cursor-pointer"
-                        >
-                          Set Semula
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setIsProdFilterOpen(false)}
-                          className={`px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${beliaTheme.primaryButtonClass}`}
-                        >
-                          Tutup
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {safeProducts.length === 0 ? (
-              <div className="p-10 text-center space-y-1.5">
-                <ShoppingBag className="w-9 h-9 text-slate-400 dark:text-stone-500 mx-auto mb-1" />
-                <h4 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA]">
-                  Belum Ada Produk Disenaraikan
-                </h4>
-                <p className="text-sm text-slate-600 dark:text-stone-400">
-                  Klik butang Tambah Produk di atas untuk mula menyenaraikan produk anda.
-                </p>
-              </div>
-            ) : filteredSortedProducts.length === 0 ? (
-              <div className="p-10 text-center space-y-2">
-                <Search className="w-8 h-8 text-slate-400 dark:text-stone-500 mx-auto" />
-                <h4 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA]">
-                  Tiada Produk Padan Dengan Carian
-                </h4>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProdSearch('');
-                    setProdCategoryFilter('Semua');
-                    setProdStockFilter('all');
-                  }}
-                  className={`text-sm font-semibold hover:underline cursor-pointer ${beliaTheme.accentTextClass}`}
-                >
-                  Set Semula
-                </button>
-              </div>
-            ) : (
+            return (
               <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left border-collapse">
-                    <thead>
-                      <tr className={`border-b text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-400 ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
-                        <th className="py-3 pl-5 pr-2 w-10">
+                <WorkspaceHeaderCard
+                  role="belia"
+                  icon={<ShoppingBag className="w-5 h-5" />}
+                  title="Katalog Produk & Perkhidmatan"
+                  subtitle="Pilih mana-mana produk di kiri untuk pratonton gambar, harga, penerangan, dan tindakan pantas."
+                  tabs={[
+                    { id: 'all', label: 'Semua', count: safeProducts.length },
+                    { id: 'in_stock', label: 'Tersedia', count: inStockCount },
+                    { id: 'out_of_stock', label: 'Habis Stok', count: outOfStockCount }
+                  ]}
+                  activeTab={prodStockFilter}
+                  onTabChange={(id) => setProdStockFilter(id as 'all' | 'in_stock' | 'out_of_stock')}
+                  searchValue={prodSearch}
+                  onSearchChange={setProdSearch}
+                  searchPlaceholder="Cari produk atau kategori..."
+                  rightActions={
+                    <>
+                      {selectedProductIds.length > 0 && (
+                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[0.8125rem] font-semibold ${beliaTheme.activeMiniBtnClass}`}>
+                          <span className="tabular-nums">{selectedProductIds.length} dipilih</span>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedProductIds([])}
+                            className="underline cursor-pointer font-semibold"
+                          >
+                            Kosongkan
+                          </button>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={handleExportProducts}
+                        className={`min-h-[38px] px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${beliaTheme.secondaryButtonClass}`}
+                      >
+                        <Download className="w-4 h-4 shrink-0" />
+                        <span>
+                          {selectedProductIds.length > 0
+                            ? `Eksport (${selectedProductIds.length})`
+                            : 'Eksport'}
+                        </span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setShowAddProduct(!showAddProduct)}
+                        className={`min-h-[38px] px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 ${beliaTheme.primaryButtonClass}`}
+                      >
+                        <Plus className="w-4 h-4 shrink-0" />
+                        <span>{showAddProduct ? 'Tutup' : 'Tambah'}</span>
+                      </button>
+                    </>
+                  }
+                  extraControls={
+                    <div className="relative flex items-center gap-2" data-prod-filter>
+                      <select
+                        value={prodCategoryFilter}
+                        onChange={(e) => setProdCategoryFilter(e.target.value)}
+                        aria-label="Tapis kategori produk"
+                        className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
+                      >
+                        {productCategories.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat === 'Semua' ? 'Semua Kategori' : cat}
+                          </option>
+                        ))}
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => setIsProdFilterOpen((prev) => !prev)}
+                        aria-expanded={isProdFilterOpen}
+                        aria-label="Susun produk"
+                        title="Susun produk"
+                        className={`min-h-[34px] w-[34px] rounded-xl border inline-flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
+                          activeFilterCount > 0
+                            ? beliaTheme.activeMiniBtnClass
+                            : beliaTheme.secondaryButtonClass
+                        }`}
+                      >
+                        <SlidersHorizontal className="w-4 h-4 shrink-0" />
+                      </button>
+
+                      {isProdFilterOpen && (
+                        <div className="animate-popover-enter absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#141D1A] border border-slate-200 dark:border-[#24342D] shadow-xl p-4 z-30 space-y-3.5">
+                          <div className={`pb-3 border-b ${beliaTheme.dividerClass}`}>
+                            <label className="block text-[0.8125rem] font-semibold text-slate-700 dark:text-stone-300 mb-1.5 flex items-center gap-1.5">
+                              <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${beliaTheme.accentTextClass}`} />
+                              <span>Susun Mengikut</span>
+                            </label>
+                            <select
+                              value={prodSortBy === 'table_column' ? '' : prodSortBy}
+                              onChange={(e) => {
+                                if (e.target.value) setProdSortBy(e.target.value);
+                              }}
+                              className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
+                            >
+                              {productSortOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setProdCategoryFilter('Semua');
+                                setProdStockFilter('all');
+                                setProdSortBy(DEFAULT_SORT_VALUE);
+                              }}
+                              className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300 hover:underline cursor-pointer"
+                            >
+                              Set Semula
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setIsProdFilterOpen(false)}
+                              className={`px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${beliaTheme.primaryButtonClass}`}
+                            >
+                              Tutup
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  }
+                />
+
+                <GoogleWorkspaceSplitPane
+                  role="belia"
+                  mobileOpen={mobileProductPreviewOpen}
+                  onMobileClose={() => setMobileProductPreviewOpen(false)}
+                  mobileTitle={activeProduct?.name || 'Produk'}
+                  leftHeader={
+                    filteredSortedProducts.length > 0 ? (
+                      <div className={`px-4 py-2.5 border-b flex items-center justify-between gap-2 text-xs font-semibold text-slate-600 dark:text-stone-400 ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
+                        <label className="inline-flex items-center gap-2.5 cursor-pointer select-none">
                           <input
                             type="checkbox"
                             checked={allPageSelected}
@@ -2251,81 +2195,74 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             aria-label="Pilih semua produk pada halaman ini"
                             className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
                           />
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleProductSort('name')}
-                            className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Produk</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleProductSort('category')}
-                            className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Kategori</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleProductSort('price')}
-                            className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Harga</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleProductSort('inStock')}
-                            className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Status</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleProductSort('createdAt')}
-                            className="inline-flex items-center gap-1.5 hover:text-slate-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Tarikh</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-60" />
-                          </button>
-                        </th>
-                        <th className="py-3 pl-2 pr-5 w-12 text-right">
-                          <span className="sr-only">Tindakan</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className={`divide-y ${beliaTheme.dividerClass}`}>
-                      {productsPagination.paginatedItems.map((prod) => {
+                          <span>Pilih Semua (Halaman Ini)</span>
+                        </label>
+                        <span className="tabular-nums">{filteredSortedProducts.length} produk</span>
+                      </div>
+                    ) : undefined
+                  }
+                  leftContent={
+                    safeProducts.length === 0 ? (
+                      <div className="p-10 text-center space-y-1.5">
+                        <ShoppingBag className="w-9 h-9 text-slate-400 dark:text-stone-500 mx-auto mb-1" />
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA]">
+                          Belum Ada Produk Disenaraikan
+                        </h4>
+                        <p className="text-xs text-slate-600 dark:text-stone-400">
+                          Klik butang Tambah di atas untuk mula menyenaraikan produk anda.
+                        </p>
+                      </div>
+                    ) : filteredSortedProducts.length === 0 ? (
+                      <div className="p-10 text-center space-y-2">
+                        <Search className="w-8 h-8 text-slate-400 dark:text-stone-500 mx-auto" />
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-[#F4F1EA]">
+                          Tiada Produk Padan Dengan Carian
+                        </h4>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProdSearch('');
+                            setProdCategoryFilter('Semua');
+                            setProdStockFilter('all');
+                          }}
+                          className={`text-xs font-semibold hover:underline cursor-pointer ${beliaTheme.accentTextClass}`}
+                        >
+                          Set Semula
+                        </button>
+                      </div>
+                    ) : (
+                      productsPagination.paginatedItems.map((prod) => {
                         const isAvailable = prod.inStock !== false;
                         const isChecked = selectedProductIds.includes(prod.id);
+                        const isSelected = activeProduct?.id === prod.id;
                         const formattedPrice = `RM ${Number(prod.price || 0).toFixed(2)}`;
                         const dateStr = formatDisplayDate(
                           (prod.updatedAt || prod.createdAt || '').slice(0, 10)
                         );
 
                         return (
-                          <tr
+                          <div
                             key={prod.id}
-                            className={`transition-colors ${
-                              isChecked
-                                ? 'bg-[#0B6E52]/6 dark:bg-[#10B981]/10'
+                            onClick={() => {
+                              setSelectedProductId(prod.id);
+                              setMobileProductPreviewOpen(true);
+                            }}
+                            role="button"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                setSelectedProductId(prod.id);
+                                setMobileProductPreviewOpen(true);
+                              }
+                            }}
+                            className={`w-full text-left p-3.5 sm:px-4 flex items-start gap-3 transition-colors cursor-pointer ${
+                              isSelected
+                                ? getWorkspaceActiveRowClass('belia')
                                 : beliaTheme.rowHoverClass
                             }`}
                           >
-                            <td className="py-3.5 pl-5 pr-2">
+                            <div className="pt-1 shrink-0" onClick={(e) => e.stopPropagation()}>
                               <input
                                 type="checkbox"
                                 checked={isChecked}
@@ -2333,85 +2270,168 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                                 aria-label={`Pilih ${prod.name}`}
                                 className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
                               />
-                            </td>
-                            <td className="py-3.5 px-3">
-                              <div className="flex items-center gap-3 min-w-[200px]">
-                                <ProductRowThumbnail src={prod.imageUrl} alt={prod.name} compact />
-                                <span className="font-semibold text-slate-900 dark:text-[#F4F1EA] truncate max-w-[260px]">
+                            </div>
+                            <ProductRowThumbnail src={prod.imageUrl} alt={prod.name} compact />
+                            <div className="min-w-0 flex-1 space-y-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className={`text-sm font-bold truncate kbelia-trim ${isSelected ? beliaTheme.accentTextClass : 'text-slate-900 dark:text-[#F4F1EA]'}`}>
                                   {prod.name}
                                 </span>
+                                <span
+                                  className={`text-[11px] font-semibold shrink-0 px-2 py-0.5 rounded-lg ${
+                                    isAvailable
+                                      ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                      : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'
+                                  }`}
+                                >
+                                  {isAvailable ? 'Tersedia' : 'Habis Stok'}
+                                </span>
                               </div>
-                            </td>
-                            <td className="py-3.5 px-3 text-slate-600 dark:text-stone-400 whitespace-nowrap">
-                              {prod.category || 'Umum'}
-                            </td>
-                            <td className="py-3.5 px-3 font-mono font-semibold text-slate-900 dark:text-[#F4F1EA] tabular-nums whitespace-nowrap">
-                              {formattedPrice}
-                            </td>
-                            <td className="py-3.5 px-3 whitespace-nowrap">
+                              <p className="text-xs font-medium text-slate-600 dark:text-stone-400 truncate">
+                                {prod.category || 'Umum'} &middot; <span className="font-mono font-semibold text-slate-900 dark:text-[#F4F1EA]">{formattedPrice}</span>
+                              </p>
+                              <p className="text-[11px] text-slate-500 dark:text-stone-400 tabular-nums">
+                                Dikemas kini: {dateStr || '-'}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )
+                  }
+                  leftFooter={
+                    filteredSortedProducts.length > 0 ? (
+                      <PaginationBar
+                        variant="compact"
+                        currentPage={productsPagination.currentPage}
+                        totalItems={productsPagination.totalItems}
+                        itemsPerPage={7}
+                        onPageChange={productsPagination.setCurrentPage}
+                        itemLabel="produk"
+                      />
+                    ) : undefined
+                  }
+                  rightContent={
+                    !activeProduct ? (
+                      <SidePreviewEmptyState
+                        icon={<ShoppingBag className="w-10 h-10 text-slate-400 dark:text-stone-500" />}
+                        title="Pilih produk daripada senarai di sebelah kiri"
+                        description="Gambar produk, harga jualan, status stok dan penerangan penuh akan dipaparkan di sini."
+                      />
+                    ) : (() => {
+                      const isAvailable = activeProduct.inStock !== false;
+                      const formattedPrice = `RM ${Number(activeProduct.price || 0).toFixed(2)}`;
+                      const dateStr = formatDisplayDate(
+                        (activeProduct.updatedAt || activeProduct.createdAt || '').slice(0, 10)
+                      );
+                      return (
+                        <div>
+                          <SidePreviewHeader
+                            role="belia"
+                            media={<ProductRowThumbnail src={activeProduct.imageUrl} alt={activeProduct.name} />}
+                            title={activeProduct.name}
+                            status={
                               <span
-                                className={`text-[0.8125rem] font-semibold ${
+                                className={`px-2.5 py-0.5 rounded-lg text-xs font-semibold ${
                                   isAvailable
-                                    ? 'text-[#0B6E52] dark:text-[#34D399]'
-                                    : 'text-rose-600 dark:text-rose-400'
+                                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                    : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'
                                 }`}
                               >
                                 {isAvailable ? 'Tersedia' : 'Habis Stok'}
                               </span>
-                            </td>
-                            <td className="py-3.5 px-3 text-slate-600 dark:text-stone-400 tabular-nums whitespace-nowrap">
-                              {dateStr || '-'}
-                            </td>
-                            <td className="py-3.5 pl-2 pr-5 text-right whitespace-nowrap">
-                              <RowActionMenu
-                                ariaLabel={`Tindakan untuk ${prod.name}`}
-                                items={[
-                                  {
-                                    label: 'Edit',
-                                    onClick: () => setEditingProduct(prod)
-                                  },
-                                  {
-                                    label: duplicatingProdId === prod.id ? 'Menduplikasi...' : 'Duplikasi',
-                                    disabled: duplicatingProdId === prod.id,
-                                    onClick: () => handleDuplicateProduct(prod)
-                                  },
-                                  {
-                                    label: isAvailable ? 'Habis Stok' : 'Stok Ada',
-                                    disabled: togglingStockId === prod.id,
-                                    onClick: () => handleToggleProductStock(prod)
-                                  },
-                                  {
-                                    label: 'Padam',
-                                    tone: 'danger',
-                                    dividerBefore: true,
-                                    onClick: () =>
-                                      confirmDelete({
-                                        itemName: prod.name,
-                                        itemType: 'Produk Katalog',
-                                        onConfirm: () => handleDeleteProd(prod.id)
-                                      })
+                            }
+                            subtitle={formattedPrice}
+                            meta={
+                              <>
+                                <span>{activeProduct.category || 'Umum'}</span>
+                                <span>&middot;</span>
+                                <span className="tabular-nums">Dikemas kini: {dateStr || '-'}</span>
+                              </>
+                            }
+                            actions={
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => setEditingProduct(activeProduct)}
+                                  className={`px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1.5 ${beliaTheme.secondaryButtonClass}`}
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                  <span>Edit</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={duplicatingProdId === activeProduct.id}
+                                  onClick={() => handleDuplicateProduct(activeProduct)}
+                                  className={`px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1.5 disabled:opacity-50 ${beliaTheme.secondaryButtonClass}`}
+                                >
+                                  <Copy className="w-3.5 h-3.5" />
+                                  <span>{duplicatingProdId === activeProduct.id ? 'Menduplikasi...' : 'Duplikasi'}</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={togglingStockId === activeProduct.id}
+                                  onClick={() => handleToggleProductStock(activeProduct)}
+                                  className={`px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1.5 disabled:opacity-50 ${beliaTheme.secondaryButtonClass}`}
+                                >
+                                  {isAvailable ? <XCircle className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                                  <span>{isAvailable ? 'Habis Stok' : 'Stok Ada'}</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    confirmDelete({
+                                      itemName: activeProduct.name,
+                                      itemType: 'Produk Katalog',
+                                      onConfirm: () => handleDeleteProd(activeProduct.id)
+                                    })
                                   }
-                                ]}
-                              />
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
+                                  className={`px-3 py-1.5 text-xs font-semibold inline-flex items-center gap-1.5 ${beliaTheme.dangerOutlineButtonClass}`}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>Padam</span>
+                                </button>
+                              </>
+                            }
+                          />
 
-                <PaginationBar
-                  variant="compact"
-                  currentPage={productsPagination.currentPage}
-                  totalItems={productsPagination.totalItems}
-                  itemsPerPage={7}
-                  onPageChange={productsPagination.setCurrentPage}
-                  itemLabel="produk"
+                          <div className="p-4 sm:p-5 space-y-4">
+                            {/* Product Image Showcase */}
+                            <div className={`rounded-xl overflow-hidden border bg-slate-50 dark:bg-zinc-900 max-h-60 flex items-center justify-center ${beliaTheme.dividerClass}`}>
+                              <img
+                                src={activeProduct.imageUrl || DEFAULT_PRODUCT_IMAGE}
+                                alt={activeProduct.name}
+                                referrerPolicy="no-referrer"
+                                className="w-full h-52 object-cover"
+                              />
+                            </div>
+
+                            <SidePreviewMetricsStrip
+                              role="belia"
+                              items={[
+                                { label: 'Harga Jualan', value: formattedPrice, mono: true, accent: true },
+                                { label: 'Kategori', value: activeProduct.category || 'Umum' },
+                                { label: 'Tarikh Kemas Kini', value: dateStr || '-', mono: true }
+                              ]}
+                            />
+
+                            <div className="space-y-1.5">
+                              <h5 className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-stone-400">
+                                Penerangan Produk
+                              </h5>
+                              <div className={`p-3.5 rounded-xl border text-sm text-slate-800 dark:text-stone-200 leading-relaxed whitespace-pre-line ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
+                                {activeProduct.description || 'Tiada penerangan terperinci dimasukkan untuk produk ini.'}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  }
                 />
               </>
-            )}
-          </div>
+            );
+          })()}
         </div>
         );
       })()}
@@ -2444,18 +2464,34 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
       )}
 
       {/* Tab 4: Digital Card & QR Promo */}
-      {activeTab === 'card' && (
+      {activeTab === 'card' && (() => {
+        const cardRef = myBusiness?.ssmNumber || userProfile?.ssmNumber || myBusiness?.id || user.uid;
+        const bizTitle = myBusiness?.businessName || 'Usaha Niaga Belia';
+        const qrPayload = buildBusinessQrPayload(cardRef, bizTitle);
+        const handlePrintBusinessCard = () => {
+          const qrSvg = generateQrSvgString(qrPayload, {
+            size: 112,
+            darkColor: '#0F172A',
+            includeMonogram: true,
+            monogramText: 'KB'
+          });
+          const checksum = computeIntegrityChecksum(cardRef);
+          const html = `<!DOCTYPE html><html lang="ms"><head><meta charset="utf-8" /><title>Kad Profil Perniagaan - ${escapeHtml(bizTitle)}</title><style>@page{size:A4 portrait;margin:14mm;}*{box-sizing:border-box;}body{font-family:system-ui,-apple-system,sans-serif;color:#0F172A;background:#FFF;margin:0;padding:18px;}.document-page{max-width:740px;margin:0 auto;border:3.5px solid #1E3A8A;padding:5px;}.inner{border:1.5px solid #B45309;padding:28px;position:relative;}.hdr{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #1E3A8A;padding-bottom:14px;margin-bottom:20px;}.tbl{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px;}.tbl th{background:#F8FAFC;border:1px solid #CBD5E1;padding:9px 12px;text-align:left;width:36%;}.tbl td{border:1px solid #CBD5E1;padding:9px 12px;}.digital-seal-stamp{width:82px;height:82px;border:2px solid #1E3A8A;border-radius:50%;padding:3px;display:flex;align-items:center;justify-content:center;transform:rotate(-6deg);}.digital-seal-inner{width:100%;height:100%;border:1px dashed #B45309;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}.seal-top{font-size:6.5px;font-weight:800;color:#1E3A8A;}.seal-mid{font-size:9px;font-weight:900;color:#B45309;margin:2px 0;}.seal-bot{font-size:6px;font-weight:700;color:#475569;}</style></head><body><div class="document-page"><div class="inner"><div class="hdr"><div style="display:flex;gap:12px;align-items:center;">${buildKbeliaCrestSvg(44)}<div><div style="font-size:10px;font-weight:800;color:#B45309;letter-spacing:1.2px;">KAD PROFIL DIGITAL USAHAWAN KBELIA</div><div style="font-size:19px;font-weight:900;color:#0F172A;margin-top:2px;">${escapeHtml(bizTitle)}</div><div style="font-size:12px;color:#475569;">${escapeHtml(myBusiness?.tagline || 'Komuniti Usahawan Belia Kelantan')}</div></div></div><div style="text-align:right;font-family:monospace;font-size:11px;"><strong>RUJUKAN</strong><br/>${escapeHtml(cardRef)}</div></div><table class="tbl"><tr><th>Pemilik Perniagaan</th><td><strong>${escapeHtml(userProfile?.fullName || user.displayName || 'Usahawan Belia')}</strong></td></tr><tr><th>Lokasi Operasi</th><td>${escapeHtml(myBusiness?.district || 'Kota Bharu')}, Negeri Kelantan</td></tr><tr><th>Kategori Sektor</th><td>${escapeHtml(myBusiness?.category || 'Makanan & Minuman')}</td></tr><tr><th>Nombor WhatsApp</th><td>${escapeHtml(myBusiness?.whatsapp || userProfile?.phone || '-')}</td></tr><tr><th>Nombor Pendaftaran SSM</th><td>${escapeHtml(myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Dalam Kemas Kini')}</td></tr></table><div style="display:flex;justify-content:space-between;align-items:center;border-top:2px solid #CBD5E1;padding-top:16px;margin-top:16px;"><div style="display:flex;align-items:center;gap:14px;"><div style="padding:4px;border:1px solid #CBD5E1;background:#FFF;">${qrSvg}</div><div style="font-size:11px;color:#475569;line-height:1.45;"><strong style="color:#1E3A8A;">IMBAS KOD QR PENGESAHAN</strong><br/>Sahkan profil perniagaan berdaftar di Portal KBelia.<br/><span style="font-family:monospace;color:#0F172A;">DIGEST: ${checksum}</span></div></div>${buildDigitalSealHtml('BERDAFTAR')}</div></div></div></body></html>`;
+          void openAndPrintDocument(html, `Kad_Profil_${bizTitle.replace(/\s+/g, '_')}`);
+        };
+
+        return (
         <div key="card" className="mt-4 animate-dashboard-tab">
           <div className={`relative overflow-hidden rounded-2xl border transition-colors ${beliaTheme.surfaceClass}`}>
             <div className={`grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x ${beliaTheme.dividerClass}`}>
-              <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between text-center space-y-5">
+              <div className="lg:col-span-5 p-6 sm:p-8 flex flex-col justify-between items-center text-center space-y-5">
                 <div className={`inline-flex items-center justify-center gap-1.5 text-xs font-semibold mx-auto ${beliaTheme.accentTextClass}`}>
                   <QrCode className="w-3.5 h-3.5" />
-                  <span>Kad Profil Perniagaan</span>
+                  <span>Kad Profil &amp; Kod QR Perniagaan</span>
                 </div>
 
                 <div className="space-y-3">
-                  <div className={`w-20 h-20 rounded-2xl mx-auto border overflow-hidden ${beliaTheme.dividerClass} ${beliaTheme.surfaceMutedClass}`}>
+                  <div className={`w-16 h-16 rounded-2xl mx-auto border overflow-hidden ${beliaTheme.dividerClass} ${beliaTheme.surfaceMutedClass}`}>
                     <PortalImage
                       src={myBusiness?.logoUrl || user.photoURL || ''}
                       alt={myBusiness?.businessName || 'Logo Perniagaan'}
@@ -2465,22 +2501,42 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
-                    {myBusiness?.businessName || 'Usaha Niaga Belia'}
+                    {bizTitle}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-stone-400 font-medium">
                     {myBusiness?.tagline || 'Komuniti Usahawan Belia Kelantan'}
                   </p>
                 </div>
 
-                <a
-                  href={`https://wa.me/?text=${encodeURIComponent(`Sokong perniagaan ${myBusiness?.businessName || 'Usahawan Belia'} di Portal KBelia Kelantan: ${window.location.origin}`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`w-full py-2.5 px-4 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors ${beliaTheme.primaryButtonClass}`}
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  <span>Kongsi WhatsApp</span>
-                </a>
+                <QrCodeGraphic
+                  value={qrPayload}
+                  size={136}
+                  caption="KOD QR PROFIL NIAGA"
+                  subcaption={cardRef}
+                  showDownloadButton
+                  downloadFileName={`QR_Profil_${bizTitle.replace(/\s+/g, '_')}.png`}
+                  downloadLabelBottom={bizTitle.toUpperCase()}
+                />
+
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={handlePrintBusinessCard}
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors cursor-pointer ${beliaTheme.secondaryButtonClass}`}
+                  >
+                    <Printer className="w-4 h-4" />
+                    <span>Cetak Kad</span>
+                  </button>
+                  <a
+                    href={`https://wa.me/?text=${encodeURIComponent(`Sokong perniagaan ${bizTitle} di Portal KBelia Kelantan: ${qrPayload}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`w-full py-2.5 px-3 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 transition-colors ${beliaTheme.primaryButtonClass}`}
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    <span>WhatsApp</span>
+                  </a>
+                </div>
               </div>
 
               <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between space-y-5">
@@ -2504,16 +2560,26 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       <span className="font-mono font-semibold text-slate-900 dark:text-[#F4F1EA] tabular-nums">{myBusiness?.whatsapp || userProfile?.phone || '-'}</span>
                     </div>
                     <div className="py-3 flex items-center justify-between gap-4">
-                      <span className="text-slate-600 dark:text-stone-400">Status Pendaftaran</span>
-                      <span className="font-mono font-semibold text-slate-900 dark:text-[#F4F1EA] tabular-nums">{myBusiness?.ssmNumber || userProfile?.ssmNumber || 'Sedang Dikemas Kini'}</span>
+                      <span className="text-slate-600 dark:text-stone-400">
+                        Status Pendaftaran <span className="kbelia-acro">SSM</span>
+                      </span>
+                      <span className="font-mono font-semibold text-slate-900 dark:text-[#F4F1EA] tabular-nums">
+                        {(myBusiness?.ssmNumber || userProfile?.ssmNumber) ? (
+                          <MiddleTruncate
+                            text={myBusiness?.ssmNumber || userProfile?.ssmNumber || ''}
+                            startChars={9}
+                            endChars={5}
+                          />
+                        ) : (
+                          'Sedang Dikemas Kini'
+                        )}
+                      </span>
                     </div>
                   </div>
                 </div>
 
-                <div className={`pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-slate-600 dark:text-stone-400`}>
-                  <span>
-                    Maklumat pada kad ini diselaraskan terus daripada profil perniagaan anda.
-                  </span>
+                <div className={`pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm text-slate-600 dark:text-stone-400 kbelia-prose`}>
+                  <AcronymText text="Maklumat pada kad ini diselaraskan terus daripada profil perniagaan anda." />
                   <button
                     type="button"
                     onClick={() => setActiveTab('profile')}
@@ -2526,7 +2592,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* Edit Product Modal */}
       <EditProductModal

@@ -76,10 +76,26 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
       });
       if (ok) {
         setIsSaved(true);
+        showToast({
+          type: 'success',
+          title: 'PDF Laporan Dimuat Turun',
+          message: 'Ringkasan kelulusan rasmi berbingkai diraja berjaya disimpan.'
+        });
         setTimeout(() => setIsSaved(false), 4000);
+      } else {
+        showToast({
+          type: 'error',
+          title: 'Gagal Menjana PDF',
+          message: 'Sila cuba pilihan Cetak A4 sebagai alternatif.'
+        });
       }
     } catch (err) {
       console.error('Ralat menjana fail PDF:', err);
+      showToast({
+        type: 'error',
+        title: 'Ralat PDF',
+        message: 'Tidak dapat mengeksport fail PDF buat masa ini.'
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -113,14 +129,21 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
     setIsProcessing(true);
     setShowMenu(false);
     try {
-      await downloadOfficialApprovalReportPdf({
+      const ok = await downloadOfficialApprovalReportPdf({
         bookings,
         grantApplications,
         reportRef,
         reportDate
       });
-      setIsSaved(true);
-      setTimeout(() => setIsSaved(false), 4000);
+      if (ok) {
+        setIsSaved(true);
+        showToast({
+          type: 'success',
+          title: 'PDF Rasmi Disimpan',
+          message: 'Fail PDF telah dimuat turun dan pratonton cetakan sedang dibuka.'
+        });
+        setTimeout(() => setIsSaved(false), 4000);
+      }
 
       const html = generateOfficialApprovalReportHtml({
         bookings,
@@ -235,14 +258,14 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
 
         {/* Modal Printable Document Body with Professional Royal Border */}
         <div className="p-3 sm:p-6 overflow-y-auto flex-1 bg-stone-100 dark:bg-[#121110] flex justify-center">
-          {/* Framed Official Document Sheet with Royal Kelantan Double Border & Gold Inset */}
+          {/* Framed Official Document Sheet with Royal Navy Double Border & Antique Gold Inset */}
           <div 
             ref={printAreaRef}
             id="official-approval-document"
             className="w-full max-w-3xl bg-white text-black shadow-xl relative"
             style={{
               padding: '6px',
-              border: '3.5px solid #065f46',
+              border: '3.5px solid #1E3A8A',
               boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
             }}
           >
@@ -250,18 +273,18 @@ export const OfficialApprovalReportModal: React.FC<OfficialApprovalReportModalPr
             <div 
               className="relative p-5 sm:p-8"
               style={{
-                border: '1.5px solid #d97706',
+                border: '1.5px solid #B45309',
                 backgroundColor: '#ffffff'
               }}
             >
               {/* 4 Corner Security Brackets */}
-              <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-emerald-800" />
-              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-emerald-800" />
-              <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-emerald-800" />
-              <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-emerald-800" />
+              <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#1E3A8A]" />
+              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#1E3A8A]" />
+              <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#1E3A8A]" />
+              <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#1E3A8A]" />
 
               {/* Letterhead */}
-              <div className="border-b-2 border-emerald-800 pb-4 mb-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div className="border-b-2 border-[#1E3A8A] pb-4 mb-5 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 text-[0.8125rem] font-extrabold uppercase tracking-widest text-black">
                     <ShieldCheck className="w-4 h-4 text-black shrink-0" />

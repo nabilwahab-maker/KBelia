@@ -26,6 +26,7 @@ import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { AcronymText } from './TypographyPrimitives';
 
 const MONTH_MAP: Record<string, number> = {
   januari: 0, january: 0, jan: 0,
@@ -291,7 +292,7 @@ export const EventsSection: React.FC = () => {
       {/* Section Header */}
       <div className="rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 border border-slate-200 dark:border-zinc-700">
         <div className="max-w-2xl">
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-black dark:text-white">
+          <h1 className="font-display text-fluid-portal font-extrabold tracking-tight text-black dark:text-white kbelia-trim">
             {isEn ? 'Youth Events & Carnivals' : 'Acara & Karnival Belia Kelantan'}
           </h1>
         </div>
@@ -363,12 +364,15 @@ export const EventsSection: React.FC = () => {
                       </span>
                     </div>
 
-                    <h2 className="text-xl sm:text-2xl font-black tracking-tight text-black dark:text-white leading-snug">
-                      {featuredEvent.title}
+                    <h2
+                      title={featuredEvent.title}
+                      className="font-display text-fluid-title font-black tracking-tight text-black dark:text-white kbelia-trim"
+                    >
+                      <AcronymText text={featuredEvent.title} />
                     </h2>
 
-                    <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed line-clamp-2">
-                      {featuredEvent.description}
+                    <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed kbelia-clamp-2 kbelia-prose">
+                      <AcronymText text={featuredEvent.description} />
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-2.5 pt-3 border-t border-slate-200 dark:border-zinc-700 text-sm">
@@ -528,8 +532,11 @@ export const EventsSection: React.FC = () => {
                               <span>{evt.date}</span>
                             </div>
 
-                            <h3 className="text-base font-bold text-black dark:text-white leading-snug line-clamp-2">
-                              {evt.title}
+                            <h3
+                              title={evt.title}
+                              className="text-base font-bold text-black dark:text-white leading-snug kbelia-clamp-2 kbelia-trim"
+                            >
+                              <AcronymText text={evt.title} />
                             </h3>
 
                             <div className="space-y-1.5 text-sm text-black/75 dark:text-white/75 tabular-nums pt-0.5">
@@ -745,8 +752,11 @@ export const EventsSection: React.FC = () => {
 
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-center gap-2 min-w-0">
-                          <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
-                            {evt.title}
+                          <h3
+                            title={evt.title}
+                            className="text-sm sm:text-base font-bold text-black dark:text-white kbelia-clamp-1 kbelia-trim"
+                          >
+                            <AcronymText text={evt.title} />
                           </h3>
                           {ended ? (
                             <span className="px-2 py-0.5 rounded-md text-[0.8125rem] font-bold border shrink-0 bg-slate-100 text-black/75 border-slate-300 dark:bg-zinc-800 dark:text-white/80 dark:border-zinc-600">

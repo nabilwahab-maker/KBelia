@@ -6,7 +6,8 @@ import {
   Save,
   Loader2,
   AlertCircle,
-  ArrowUpDown
+  Edit3,
+  Trash2
 } from 'lucide-react';
 import { KelantanDistrict, UserProfile, UserRole } from '../types';
 import {
@@ -18,9 +19,16 @@ import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { showToast } from './ToastNotification';
 import { PaginationBar, usePagination } from './PaginationBar';
-import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
 import { getRoleTheme } from '../utils/roleTheme';
+import {
+  GoogleWorkspaceSplitPane,
+  SidePreviewEmptyState,
+  SidePreviewHeader,
+  SidePreviewMetricsStrip,
+  WorkspaceHeaderCard,
+  getWorkspaceActiveRowClass
+} from './GoogleWorkspaceSplitPane';
 
 const adminTheme = getRoleTheme('admin');
 
@@ -56,10 +64,8 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
   const [districtFilter, setDistrictFilter] = useState<string>('Semua');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
-  const [sortConfig, setSortConfig] = useState<{ key: 'fullName' | 'role' | 'district'; dir: 'asc' | 'desc' }>({
-    key: 'fullName',
-    dir: 'asc'
-  });
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
 
   const [showUserModal, setShowUserModal] = useState(false);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
@@ -113,19 +119,6 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       );
     });
 
-    if (sortBy === 'table_column') {
-      const dirMult = sortConfig.dir === 'asc' ? 1 : -1;
-      return [...filtered].sort((a, b) => {
-        if (sortConfig.key === 'role') {
-          return (ROLE_LABELS[a.role] || '').localeCompare(ROLE_LABELS[b.role] || '') * dirMult;
-        }
-        if (sortConfig.key === 'district') {
-          return (a.district || 'Kota Bharu').localeCompare(b.district || 'Kota Bharu') * dirMult;
-        }
-        return (a.fullName || '').localeCompare(b.fullName || '') * dirMult;
-      });
-    }
-
     return sortRecords(filtered, {
       sortBy,
       getName: (u) => u.fullName || u.email || '',
@@ -135,29 +128,29 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
         return null;
       }
     });
-  }, [nonAdminUsers, roleFilter, districtFilter, searchQuery, sortBy, sortConfig]);
+  }, [nonAdminUsers, roleFilter, districtFilter, searchQuery, sortBy]);
 
   const pagination = usePagination(filteredUsers, 7, [
     roleFilter,
     districtFilter,
     searchQuery,
     sortBy,
-    sortConfig.key,
-    sortConfig.dir,
     filteredUsers.length
   ]);
+
+  const selectedUser = useMemo(
+    () =>
+      filteredUsers.find((u) => u.userId === selectedUserId) ||
+      pagination.paginatedItems[0] ||
+      filteredUsers[0] ||
+      null,
+    [filteredUsers, selectedUserId, pagination.paginatedItems]
+  );
 
   const activeFilterCount =
     (roleFilter !== 'all' ? 1 : 0) +
     (districtFilter !== 'Semua' ? 1 : 0) +
     (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
-
-  const toggleSort = (key: 'fullName' | 'role' | 'district') => {
-    setSortBy('table_column');
-    setSortConfig((prev) =>
-      prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
-    );
-  };
 
   const counts = useMemo(
     () => ({
@@ -266,240 +259,170 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
     }
   };
 
+  const hasActiveFilters = Boolean(searchQuery.trim() || activeFilterCount > 0);
+
+  const getUserOrgLabel = (u: UserProfile) =>
+    u.role === 'user'
+      ? u.businessName || 'Belum daftar perniagaan'
+      : u.role === 'mentor'
+      ? u.institution || 'Hab Usahawan / Rakan Industri'
+      : u.designation || 'Pentadbir Portal KBelia';
+
   return (
     <div className="space-y-4 animate-dashboard-tab">
-      {/* Header */}
-      <div className={`p-4 sm:p-5 rounded-2xl border backdrop-blur-xs transition-colors ${adminTheme.surfaceClass}`}>
-        <div className="space-y-1">
-          <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
-            Pengurusan Akaun &amp; Profil Pengguna Portal
-          </h3>
-        </div>
-      </div>
+      <WorkspaceHeaderCard
+        role="admin"
+        icon={<Users className="w-5 h-5" />}
+        title="Pengurusan Akaun & Profil Pengguna Portal"
+        subtitle="Semak profil usahawan belia, maklumat SSM, serta mentor bertauliah."
+        rightActions={
+          <button
+            type="button"
+            onClick={openCreateModal}
+            className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap shrink-0 transition-colors ${adminTheme.primaryButtonClass}`}
+          >
+            <Plus className="w-4 h-4" />
+            <span>Tambah</span>
+          </button>
+        }
+        tabs={[
+          { id: 'all', label: 'Semua', count: counts.all },
+          { id: 'user', label: 'Usahawan Belia', count: counts.user },
+          { id: 'mentor', label: 'Mentor', count: counts.mentor }
+        ]}
+        activeTab={roleFilter}
+        onTabChange={(id) => {
+          setRoleFilter(id as 'all' | UserRole);
+          setMobilePreviewOpen(false);
+        }}
+        searchValue={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder="Cari nama, emel atau perniagaan..."
+        extraControls={
+          <>
+            <select
+              value={districtFilter}
+              onChange={(e) => setDistrictFilter(e.target.value)}
+              aria-label="Tapis daerah pengguna"
+              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+            >
+              <option value="Semua">Semua Daerah</option>
+              {DISTRICTS.map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              aria-label="Susun pengguna"
+              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+            >
+              {userSortOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </>
+        }
+      />
 
-      {/* Reference-Style Users Table Card */}
-      <div className={`rounded-2xl border backdrop-blur-xs overflow-visible transition-colors ${adminTheme.surfaceClass}`}>
-        <ReferenceTableToolbar
-          accent="amber"
-          searchValue={searchQuery}
-          onSearchChange={setSearchQuery}
-          searchPlaceholder="Cari nama, emel atau perniagaan..."
-          filterCount={activeFilterCount}
-          onResetFilters={() => {
-            setRoleFilter('all');
-            setDistrictFilter('Semua');
-            setSortBy(DEFAULT_SORT_VALUE);
-          }}
-          sortOptions={
-            sortBy === 'table_column'
-              ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...userSortOptions]
-              : userSortOptions
-          }
-          sortValue={sortBy === 'table_column' ? '' : sortBy}
-          onSortChange={(val) => {
-            if (val) setSortBy(val);
-          }}
-          rightSlot={
+      {pagination.paginatedItems.length === 0 ? (
+        <div className={`rounded-2xl border backdrop-blur-xs p-10 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+          <Users className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
+          <p className="text-sm font-bold text-black dark:text-white kbelia-trim">
+            Tiada rekod akaun pengguna sepadan dengan tapisan semasa.
+          </p>
+          {hasActiveFilters && (
             <button
               type="button"
-              onClick={openCreateModal}
-              className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 shadow-xs cursor-pointer whitespace-nowrap shrink-0 transition-colors ${adminTheme.primaryButtonClass}`}
+              onClick={() => {
+                setSearchQuery('');
+                setRoleFilter('all');
+                setDistrictFilter('Semua');
+                setSortBy(DEFAULT_SORT_VALUE);
+              }}
+              className={`text-sm font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
             >
-              <Plus className="w-4 h-4" />
-              <span>Tambah</span>
+              Set Semula Carian &amp; Penapis
             </button>
+          )}
+        </div>
+      ) : (
+        <GoogleWorkspaceSplitPane
+          role="admin"
+          mobileOpen={mobilePreviewOpen && Boolean(selectedUser)}
+          onMobileClose={() => setMobilePreviewOpen(false)}
+          mobileTitle={selectedUser?.fullName}
+          leftHeader={
+            <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-black/65 dark:text-white/70 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+              <span>{filteredUsers.length} pengguna dipaparkan</span>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setRoleFilter('all');
+                    setDistrictFilter('Semua');
+                    setSortBy(DEFAULT_SORT_VALUE);
+                  }}
+                  className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                >
+                  Set Semula
+                </button>
+              )}
+            </div>
           }
-          filterContent={
-            <>
-              <div>
-                <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
-                  Peranan Akaun
-                </label>
-                <div className="grid grid-cols-1 gap-1.5">
-                  {([
-                    { id: 'all', label: `Semua (${counts.all})` },
-                    { id: 'user', label: `Usahawan Belia (${counts.user})` },
-                    { id: 'mentor', label: `Mentor (${counts.mentor})` }
-                  ] as const).map((tab) => (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setRoleFilter(tab.id)}
-                      className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-semibold border text-left transition-colors cursor-pointer ${
-                        roleFilter === tab.id
-                          ? `${adminTheme.segmentedActiveClass} border-transparent`
-                          : `${adminTheme.secondaryButtonClass}`
+          leftContent={pagination.paginatedItems.map((u) => {
+            const isSelected = selectedUser?.userId === u.userId;
+            const isSelf = isCurrentActiveUser(u);
+            return (
+              <div
+                key={u.userId}
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setSelectedUserId(u.userId);
+                  setMobilePreviewOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedUserId(u.userId);
+                    setMobilePreviewOpen(true);
+                  }
+                }}
+                className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                  isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                }`}
+              >
+                <img
+                  src={u.avatarUrl || '/assets/generated/avatar_youth_male_1793924250192.jpg'}
+                  alt={u.fullName}
+                  className={`w-11 h-11 rounded-xl object-cover border shrink-0 ${adminTheme.dividerClass}`}
+                />
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-bold text-black dark:text-white leading-snug truncate kbelia-trim">
+                      {u.fullName}
+                      {isSelf ? ' (Anda)' : ''}
+                    </p>
+                    <span
+                      className={`text-[11px] font-bold shrink-0 px-2 py-0.5 rounded-lg ${
+                        u.role === 'mentor'
+                          ? 'bg-[#0E7490]/12 text-[#0E7490] dark:text-[#22D3EE]'
+                          : 'bg-[#0B6E52]/12 text-[#0B6E52] dark:text-[#34D399]'
                       }`}
                     >
-                      {tab.label}
-                    </button>
-                  ))}
+                      {ROLE_LABELS[u.role] || 'Usahawan Belia'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-black/65 dark:text-white/65 truncate">
+                    {u.email} · {u.district || 'Kota Bharu'}
+                  </p>
                 </div>
               </div>
-
-              <div>
-                <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-black/65 dark:text-white/70 mb-1.5">
-                  Daerah
-                </label>
-                <select
-                  value={districtFilter}
-                  onChange={(e) => setDistrictFilter(e.target.value)}
-                  className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  <option value="Semua">Semua Daerah</option>
-                  {DISTRICTS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
-            </>
-          }
-        />
-
-        {pagination.paginatedItems.length === 0 ? (
-          <div className="p-10 text-center space-y-2">
-            <Users className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
-            <p className="text-sm font-bold text-black dark:text-white">
-              Tiada rekod akaun pengguna sepadan dengan tapisan semasa.
-            </p>
-              {(searchQuery || activeFilterCount > 0) && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery('');
-                  setRoleFilter('all');
-                  setDistrictFilter('Semua');
-                }}
-                className={`text-sm font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
-              >
-                Set Semula Carian &amp; Penapis
-              </button>
-            )}
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm text-left border-collapse">
-                <thead>
-                  <tr className={`${adminTheme.surfaceMutedClass} border-b ${adminTheme.dividerClass} text-[0.8125rem] font-semibold text-black/65 dark:text-white/70`}>
-                    <th className="py-3 pl-4 pr-3">
-                      <button
-                        type="button"
-                        onClick={() => toggleSort('fullName')}
-                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
-                      >
-                        <span>Pengguna</span>
-                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                      </button>
-                    </th>
-                    <th className="py-3 px-3">
-                      <button
-                        type="button"
-                        onClick={() => toggleSort('role')}
-                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
-                      >
-                        <span>Peranan</span>
-                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                      </button>
-                    </th>
-                    <th className="py-3 px-3">
-                      <button
-                        type="button"
-                        onClick={() => toggleSort('district')}
-                        className="inline-flex items-center gap-1.5 hover:text-black dark:hover:text-white cursor-pointer whitespace-nowrap"
-                      >
-                        <span>Daerah</span>
-                        <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                      </button>
-                    </th>
-                    <th className="py-3 px-3">Organisasi / Perniagaan</th>
-                    <th className="py-3 px-3">Hubungi</th>
-                    <th className="py-3 pl-2 pr-4 w-12 text-right">
-                      <span className="sr-only">Tindakan</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className={`divide-y ${adminTheme.dividerClass} text-black dark:text-white`}>
-                  {pagination.paginatedItems.map((u) => {
-                    const isSelf = isCurrentActiveUser(u);
-                    const orgLabel =
-                      u.role === 'user'
-                        ? u.businessName || 'Belum daftar perniagaan'
-                        : u.role === 'mentor'
-                        ? u.institution || 'Hab Usahawan / Rakan Industri'
-                        : u.designation || 'Pentadbir Portal KBelia';
-
-                    return (
-                      <tr key={u.userId} className={`transition-colors ${adminTheme.rowHoverClass}`}>
-                        <td className="py-3.5 pl-4 pr-3">
-                          <div className="flex items-center gap-3 min-w-[200px]">
-                            <img
-                              src={u.avatarUrl || '/assets/generated/avatar_youth_male_1793924250192.jpg'}
-                              alt={u.fullName}
-                              className={`w-14 h-14 rounded-xl object-cover border shrink-0 ${adminTheme.dividerClass}`}
-                            />
-                            <div className="min-w-0">
-                              <div className="font-semibold text-black dark:text-white truncate max-w-[220px]">
-                                {u.fullName}
-                                {isSelf ? ' (Anda)' : ''}
-                              </div>
-                              <div className="text-[0.8125rem] text-black/65 dark:text-white/70 truncate max-w-[220px]">
-                                {u.email}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="py-3.5 px-3 whitespace-nowrap">
-                          <span
-                            className={`text-[0.8125rem] font-semibold ${
-                              u.role === 'mentor'
-                                ? 'text-[#0E7490] dark:text-[#22D3EE]'
-                                : 'text-[#0B6E52] dark:text-[#34D399]'
-                            }`}
-                          >
-                            {ROLE_LABELS[u.role] || 'Usahawan Belia'}
-                          </span>
-                        </td>
-                        <td className="py-3.5 px-3 text-black/75 dark:text-white/80 whitespace-nowrap">
-                          {u.district || 'Kota Bharu'}
-                        </td>
-                        <td className="py-3.5 px-3 text-black/80 dark:text-white/85 max-w-[220px] truncate">
-                          {orgLabel}
-                        </td>
-                        <td className="py-3.5 px-3 text-black/70 dark:text-white/75 font-mono text-[0.8125rem] tabular-nums whitespace-nowrap">
-                          {u.phone || '-'}
-                        </td>
-                        <td className="py-3.5 pl-2 pr-4 text-right">
-                          <RowActionMenu
-                            ariaLabel={`Tindakan untuk ${u.fullName}`}
-                            items={[
-                              {
-                                label: 'Edit Profil',
-                                onClick: () => openEditModal(u)
-                              },
-                              {
-                                label: 'Padam Akaun',
-                                tone: 'danger',
-                                dividerBefore: true,
-                                disabled: isSelf,
-                                onClick: () =>
-                                  confirmDelete({
-                                    itemName: `${u.fullName} (${u.email})`,
-                                    itemType: 'Akaun Pengguna',
-                                    description: 'Akaun yang dipadam akan dikeluarkan daripada senarai pengguna aktif portal.',
-                                    onConfirm: () => handleDeleteUser(u)
-                                  })
-                              }
-                            ]}
-                          />
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
+            );
+          })}
+          leftFooter={
             <PaginationBar
               currentPage={pagination.currentPage}
               totalItems={pagination.totalItems}
@@ -508,9 +431,122 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
               itemLabel="akaun pengguna"
               accent="amber"
             />
-          </>
-        )}
-      </div>
+          }
+          rightContent={
+            selectedUser ? (
+              <div>
+                <SidePreviewHeader
+                  role="admin"
+                  media={
+                    <img
+                      src={selectedUser.avatarUrl || '/assets/generated/avatar_youth_male_1793924250192.jpg'}
+                      alt={selectedUser.fullName}
+                      className={`w-14 h-14 rounded-xl object-cover border ${adminTheme.dividerClass}`}
+                    />
+                  }
+                  title={`${selectedUser.fullName}${isCurrentActiveUser(selectedUser) ? ' (Anda)' : ''}`}
+                  status={
+                    <span
+                      className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                        selectedUser.role === 'mentor'
+                          ? 'bg-[#0E7490]/15 text-[#0E7490] dark:text-[#22D3EE]'
+                          : 'bg-[#0B6E52]/15 text-[#0B6E52] dark:text-[#34D399]'
+                      }`}
+                    >
+                      {ROLE_LABELS[selectedUser.role] || 'Usahawan Belia'}
+                    </span>
+                  }
+                  subtitle={getUserOrgLabel(selectedUser)}
+                  meta={<span>{selectedUser.email}</span>}
+                  actions={
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(selectedUser)}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit Profil</span>
+                      </button>
+                      <button
+                        type="button"
+                        disabled={isCurrentActiveUser(selectedUser)}
+                        onClick={() =>
+                          confirmDelete({
+                            itemName: `${selectedUser.fullName} (${selectedUser.email})`,
+                            itemType: 'Akaun Pengguna',
+                            description: 'Akaun yang dipadam akan dikeluarkan daripada senarai pengguna aktif portal.',
+                            onConfirm: () => handleDeleteUser(selectedUser)
+                          })
+                        }
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.dangerOutlineButtonClass}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Padam Akaun</span>
+                      </button>
+                    </>
+                  }
+                />
+
+                <div className="p-4 sm:p-5 space-y-4">
+                  <SidePreviewMetricsStrip
+                    role="admin"
+                    columns={3}
+                    items={[
+                      { label: 'Peranan Akaun', value: ROLE_LABELS[selectedUser.role] || 'Usahawan Belia' },
+                      { label: 'Daerah', value: selectedUser.district || 'Kota Bharu' },
+                      { label: 'Nombor Telefon', value: selectedUser.phone || '-', mono: true }
+                    ]}
+                  />
+
+                  <div className={`p-4 rounded-xl border space-y-2.5 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-stone-400 block">
+                      {selectedUser.role === 'mentor' ? 'Maklumat Mentor & Agensi' : 'Maklumat Perniagaan & SSM'}
+                    </span>
+                    {selectedUser.role === 'mentor' ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-xs text-slate-500 dark:text-stone-400 block">Institusi / Agensi</span>
+                          <span className="font-semibold text-black dark:text-white kbelia-trim">
+                            {selectedUser.institution || 'Hab Usahawan / Rakan Industri'}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-xs text-slate-500 dark:text-stone-400 block">ID Rujukan Mentor</span>
+                          <span className="font-mono font-semibold text-black dark:text-white">
+                            {selectedUser.mentorId || '-'}
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <span className="text-xs text-slate-500 dark:text-stone-400 block">Nama Perniagaan</span>
+                          <span className="font-semibold text-black dark:text-white kbelia-trim">
+                            {selectedUser.businessName || 'Belum didaftarkan'}
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-xs text-slate-500 dark:text-stone-400 block">Nombor Pendaftaran SSM</span>
+                          <span className="font-mono font-semibold text-black dark:text-white">
+                            {selectedUser.ssmNumber || '-'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <SidePreviewEmptyState
+                icon={<Users className="w-10 h-10" />}
+                title="Pilih akaun pengguna"
+                description="Klik mana-mana pengguna di sebelah kiri untuk melihat profil penuh dan pilihan suntingan."
+              />
+            )
+          }
+        />
+      )}
 
       {/* Add / Edit User Modal */}
       {showUserModal && (

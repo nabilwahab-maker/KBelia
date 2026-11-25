@@ -8,7 +8,8 @@ import {
   Printer,
   Download,
   CheckCircle2,
-  Store
+  Store,
+  Loader2
 } from 'lucide-react';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
@@ -29,6 +30,8 @@ import { openAndPrintDocument, generateCashflowStatementOfficialHtml } from '../
 import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { ModernDatePicker, addDaysIso, toLocalIsoDate } from './ModernDateTimePicker';
+import { QrCodeGraphic } from './QrCodeGraphic';
+import { buildBusinessQrPayload } from '../utils/qrUtils';
 
 interface KioskCashflowModalProps {
   isOpen: boolean;
@@ -61,6 +64,7 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
   const [showSuccess, setShowSuccess] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
   const [editingRecord, setEditingRecord] = useState<KioskDailySale | null>(null);
+  const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -198,29 +202,35 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
   };
 
   const handleDownloadPdf = async () => {
-    const html = generateCashflowStatementOfficialHtml({
-      kioskName,
-      businessName,
-      salesRecords,
-      totals: { totalCash, totalQr, totalRevenue, totalExpenses, netProfit },
-      mode: activeTab
-    });
-    const fileName = activeTab === 'qr'
-      ? `Standee_QR_${businessName.replace(/\s+/g, '_')}`
-      : `Penyata_Aliran_Tunai_${businessName.replace(/\s+/g, '_')}`;
-    const ok = await downloadHtmlAsPdf(html, fileName);
-    if (ok) {
-      showToast({
-        type: 'success',
-        title: 'PDF Berjaya Dimuat Turun',
-        message: activeTab === 'qr' ? 'Paparan QR DuitNow berjaya disimpan sebagai PDF.' : 'Penyata aliran tunai berjaya disimpan sebagai PDF.'
+    if (isDownloadingPdf) return;
+    setIsDownloadingPdf(true);
+    try {
+      const html = generateCashflowStatementOfficialHtml({
+        kioskName,
+        businessName,
+        salesRecords,
+        totals: { totalCash, totalQr, totalRevenue, totalExpenses, netProfit },
+        mode: activeTab
       });
-    } else {
-      showToast({
-        type: 'error',
-        title: 'Gagal Menjana PDF',
-        message: 'Sila cuba butang Cetak untuk simpan melalui pelayar.'
-      });
+      const fileName = activeTab === 'qr'
+        ? `Standee_QR_${businessName.replace(/\s+/g, '_')}`
+        : `Penyata_Aliran_Tunai_${businessName.replace(/\s+/g, '_')}`;
+      const ok = await downloadHtmlAsPdf(html, fileName);
+      if (ok) {
+        showToast({
+          type: 'success',
+          title: 'PDF Berjaya Dimuat Turun',
+          message: activeTab === 'qr' ? 'Paparan QR DuitNow berjaya disimpan sebagai PDF.' : 'Penyata aliran tunai berjaya disimpan sebagai PDF.'
+        });
+      } else {
+        showToast({
+          type: 'error',
+          title: 'Gagal Menjana PDF',
+          message: 'Sila cuba butang Cetak untuk simpan melalui pelayar.'
+        });
+      }
+    } finally {
+      setIsDownloadingPdf(false);
     }
   };
 
@@ -438,9 +448,11 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                     <button
                       type="button"
                       onClick={() => void handleDownloadPdf()}
+                      disabled={isDownloadingPdf}
                       className={roleTheme.compactSecondaryButtonClass}
                     >
-                      <Download className="w-3.5 h-3.5" /> Muat Turun PDF
+                      {isDownloadingPdf ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+                      <span>{isDownloadingPdf ? 'Menjana...' : 'Muat Turun PDF'}</span>
                     </button>
                   </div>
                 </div>
@@ -519,20 +531,23 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                   <span>DuitNow QR</span>
                 </div>
 
-                <div className="w-48 h-48 mx-auto bg-white border-2 border-slate-900 p-3 rounded-2xl flex items-center justify-center relative">
-                  <QrCode className="w-40 h-40 text-black" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-white p-1.5 rounded-lg border border-slate-400 shadow-xs">
-                      <Store className="w-6 h-6 text-black" />
-                    </div>
-                  </div>
+                <div className="flex justify-center">
+                  <QrCodeGraphic
+                    value={buildBusinessQrPayload(businessName, kioskName)}
+                    size={172}
+                    monogramText="QR"
+                    showDownloadButton
+                    downloadFileName={`QR_Standee_${businessName.replace(/\s+/g, '_')}.png`}
+                    downloadLabelBottom={businessName.toUpperCase()}
+                    subcaption={kioskName}
+                  />
                 </div>
 
                 <div>
                   <div className="font-extrabold text-sm text-black uppercase">{businessName}</div>
                   <div className="text-[0.8125rem] font-mono text-black font-semibold">{kioskName}</div>
                   <div className="text-[0.8125rem] text-black/70 mt-1">
-                    Imbas menggunakan mana-mana aplikasi perbankan atau e-dompet (Touch &apos;n Go, GrabPay, MAE, CIMB).
+                    Imbas kod QR untuk semakan dan pengesahan rasmi perniagaan kiosk di Portal KBelia.
                   </div>
                 </div>
               </div>
@@ -544,15 +559,16 @@ export const KioskCashflowModal: React.FC<KioskCashflowModalProps> = ({
                   className={`px-5 py-2.5 text-sm inline-flex items-center gap-2 shadow-sm ${roleTheme.primaryButtonClass}`}
                 >
                   <Printer className="w-4 h-4" />
-                  <span>Cetak QR</span>
+                  <span>Cetak Standee QR</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => void handleDownloadPdf()}
+                  disabled={isDownloadingPdf}
                   className={`px-5 py-2.5 text-sm inline-flex items-center gap-2 shadow-sm ${roleTheme.secondaryButtonClass}`}
                 >
-                  <Download className="w-4 h-4" />
-                  <span>Muat Turun PDF</span>
+                  {isDownloadingPdf ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                  <span>{isDownloadingPdf ? 'Menjana...' : 'Muat Turun PDF'}</span>
                 </button>
               </div>
             </div>

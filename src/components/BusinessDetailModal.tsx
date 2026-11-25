@@ -17,6 +17,7 @@ import { BusinessListing, ProductItem, formatBusinessCategory } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { showToast } from './ToastNotification';
+import { AcronymText } from './TypographyPrimitives';
 
 interface BusinessDetailModalProps {
   business: BusinessListing | null;
@@ -126,11 +127,11 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                   className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs object-cover bg-white dark:bg-slate-900 shrink-0"
                 />
                 <div>
-                  <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight leading-tight">
+                  <h2 className="font-display text-fluid-title font-black text-black dark:text-white tracking-tight leading-tight kbelia-trim">
                     {business.businessName}
                   </h2>
-                  <p className="text-[0.9375rem] font-medium text-black dark:text-white leading-relaxed mt-0.5">
-                    {business.tagline}
+                  <p className="text-[0.9375rem] font-medium text-black dark:text-white leading-relaxed mt-0.5 kbelia-prose">
+                    <AcronymText text={business.tagline} />
                   </p>
                 </div>
               </div>
@@ -139,7 +140,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                 {business.ssmNumber && (
                   <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[0.8125rem] font-bold bg-emerald-50 dark:bg-emerald-950/80 text-black dark:text-white border border-emerald-200 dark:border-emerald-800">
                     <ShieldCheck className="w-3.5 h-3.5 text-black dark:text-white/75" />
-                    SSM Berdaftar
+                    <span><span className="kbelia-acro">SSM</span> Berdaftar</span>
                   </span>
                 )}
                 {business.isFeatured && (
@@ -167,8 +168,8 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
             <h4 className="text-sm font-bold text-black dark:text-white uppercase tracking-wider mb-2">
               Tentang Perniagaan & Produk:
             </h4>
-            <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-300 dark:border-slate-600">
-              {business.description}
+            <p className="text-[0.9375rem] text-black dark:text-white leading-relaxed bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-300 dark:border-slate-600 kbelia-prose">
+              <AcronymText text={business.description} />
             </p>
           </div>
 

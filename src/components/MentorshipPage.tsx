@@ -17,7 +17,8 @@ import {
   ChevronRight,
   Users,
   X,
-  FileText
+  FileText,
+  Building2
 } from 'lucide-react';
 import { KelantanDistrict, MentorProfile, MentorshipRegistration, PublishedMentorSlot, normalizeMentorshipMode } from '../types';
 import { useLanguage } from '../context/LanguageContext';
@@ -27,6 +28,7 @@ import { ModernDatePicker, ModernTimePicker, toLocalIsoDate } from './ModernDate
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { AcronymText } from './TypographyPrimitives';
 
 interface MentorshipPageProps {
   mentors: MentorProfile[];
@@ -470,10 +472,10 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
     <div className="w-full space-y-5">
       {/* Page Intro Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight text-balance">
+        <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight text-balance kbelia-trim">
           {isEn ? 'Mentor Advisory & Appointments' : 'Bimbingan & Temu Janji Mentor'}
         </h1>
-        <p className="text-sm text-black/65 dark:text-white/70 mt-1 max-w-2xl">
+        <p className="text-sm text-black/65 dark:text-white/70 mt-1 max-w-2xl kbelia-prose">
           {isEn
             ? 'Book one-on-one business coaching with Kelantan industry practitioners and university entrepreneurship advisors.'
             : 'Tempah sesi bimbingan perniagaan satu-ke-satu bersama pakar industri dan penasihat keusahawanan Kelantan.'}
@@ -498,7 +500,12 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                     : roleTheme.tabIdleUnderlineClass
                 }`}
               >
-                <span>{isEn ? 'Active Appointment' : 'Temu Janji Aktif'}</span>
+                <span
+                  className="kbelia-reserved-bold kbelia-trim"
+                  data-reserved-text={isEn ? 'Active Appointment' : 'Temu Janji Aktif'}
+                >
+                  {isEn ? 'Active Appointment' : 'Temu Janji Aktif'}
+                </span>
                 <span className="text-xs tabular-nums opacity-75">
                   {activeSession ? '1' : '0'}
                 </span>
@@ -516,7 +523,12 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                 }`}
               >
                 <History className="w-3.5 h-3.5 shrink-0" />
-                <span>{isEn ? 'Session History' : 'Sejarah Sesi'}</span>
+                <span
+                  className="kbelia-reserved-bold kbelia-trim"
+                  data-reserved-text={isEn ? 'Session History' : 'Sejarah Sesi'}
+                >
+                  {isEn ? 'Session History' : 'Sejarah Sesi'}
+                </span>
                 <span className="text-xs tabular-nums opacity-75">
                   {sessionHistory.length}
                 </span>
@@ -547,7 +559,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                       {activeSession.mentorName}
                     </h2>
                     <p className="text-sm text-black/70 dark:text-white/75 truncate">
-                      {activeSession.topic}
+                      <AcronymText text={activeSession.topic} />
                     </p>
                   </div>
 
@@ -843,10 +855,10 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   <div className="pt-2.5 border-t border-slate-100 dark:border-zinc-800 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm text-black/70 dark:text-white/75 tabular-nums">
                     <span>{spotlightMentor.expertise.slice(0, 3).join(' · ')}</span>
                     <span className="text-black/30 dark:text-white/30">·</span>
-                    <span>{spotlightMentor.availableDays}</span>
-                    <span className="text-black/30 dark:text-white/30">·</span>
                     <span>
-                      {spotlightMentor.activeMenteesCount ?? 0} {isEn ? 'mentees' : 'usahawan'}
+                      {(spotlightMentor.activeMenteesCount ?? 0) > 0
+                        ? `${spotlightMentor.activeMenteesCount} ${isEn ? 'youth' : 'belia'}`
+                        : (isEn ? 'No youth yet' : 'Belum Ada Belia')}
                     </span>
                   </div>
                 </div>
@@ -966,7 +978,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   {isEn ? `Book Session with ${selectedMentor.name}` : `Borang Temu Janji: ${selectedMentor.name}`}
                 </h2>
                 <p className="text-[0.9375rem] text-black/75 dark:text-white/75">
-                  {selectedMentor.agency} &middot; {selectedMentor.availableDays}
+                  {selectedMentor.agency}
                 </p>
               </div>
             </div>
@@ -1298,7 +1310,9 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                           >
                             {isCurrentBookedMentor
                               ? (isEn ? 'Active' : 'Aktif')
-                              : `${mentor.activeMenteesCount ?? 0} ${isEn ? 'mentees' : 'usahawan'}`}
+                              : (mentor.activeMenteesCount ?? 0) > 0
+                              ? `${mentor.activeMenteesCount} ${isEn ? 'youth' : 'belia'}`
+                              : (isEn ? 'No youth yet' : 'Belum Ada Belia')}
                           </span>
                         </div>
 
@@ -1315,7 +1329,7 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                         </p>
 
                         <div className="mt-3 text-xs text-black/60 dark:text-white/65 truncate tabular-nums">
-                          {mentor.availableDays} · {mentor.expertise.slice(0, 2).join(', ')}
+                          {mentor.expertise.slice(0, 2).join(' · ')}
                         </div>
                       </div>
                     </div>
@@ -1431,7 +1445,9 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   </span>
                   <span className="text-black/30 dark:text-white/30">·</span>
                   <span className="text-black/60 dark:text-white/65 tabular-nums">
-                    {detailMentor.activeMenteesCount ?? 0} {isEn ? 'mentees guided' : 'usahawan dibimbing'}
+                    {(detailMentor.activeMenteesCount ?? 0) > 0
+                      ? `${detailMentor.activeMenteesCount} ${isEn ? 'youth guided' : 'belia dibimbing'}`
+                      : (isEn ? 'No youth guided yet' : 'Belum Ada Belia')}
                   </span>
                 </div>
                 <h2
@@ -1448,13 +1464,13 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               {/* Structured Facts Strip */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 border-y border-slate-200 dark:border-zinc-700 py-4 text-sm">
                 <div className="flex items-start gap-2.5">
-                  <Calendar className="w-4 h-4 text-black/55 dark:text-white/60 shrink-0 mt-0.5" />
+                  <Building2 className="w-4 h-4 text-black/55 dark:text-white/60 shrink-0 mt-0.5" />
                   <div>
                     <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
-                      {isEn ? 'Available Days' : 'Hari Tersedia'}
+                      {isEn ? 'Agency' : 'Agensi'}
                     </span>
-                    <span className="font-semibold text-black dark:text-white tabular-nums">
-                      {detailMentor.availableDays}
+                    <span className="font-semibold text-black dark:text-white">
+                      {detailMentor.agency}
                     </span>
                   </div>
                 </div>
@@ -1463,10 +1479,12 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
                   <Users className="w-4 h-4 text-black/55 dark:text-white/60 shrink-0 mt-0.5" />
                   <div>
                     <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
-                      {isEn ? 'Active Mentees' : 'Usahawan Dibimbing'}
+                      {isEn ? 'Active Youth' : 'Belia Dibimbing'}
                     </span>
                     <span className="font-semibold text-black dark:text-white tabular-nums">
-                      {detailMentor.activeMenteesCount ?? 0} {isEn ? 'entrepreneurs' : 'usahawan belia'}
+                      {(detailMentor.activeMenteesCount ?? 0) > 0
+                        ? `${detailMentor.activeMenteesCount} ${isEn ? 'youth entrepreneurs' : 'usahawan belia'}`
+                        : (isEn ? 'No youth yet' : 'Belum Ada Belia')}
                     </span>
                   </div>
                 </div>

@@ -25,6 +25,7 @@ import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { resolveSlotImage } from '../utils/visualAssets';
+import { AcronymText, MiddleTruncate } from './TypographyPrimitives';
 
 interface CapsuleTenantDetailModalProps {
   slot: CapsuleSlot | null;
@@ -222,7 +223,7 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
                   </h4>
                   {tenantBusiness?.tagline && (
                     <p className="text-[0.9375rem] text-black dark:text-white italic">
-                      "{tenantBusiness.tagline}"
+                      &ldquo;{tenantBusiness.tagline}&rdquo;
                     </p>
                   )}
                 </div>
@@ -244,8 +245,17 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
 
               <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-1">
                 <span className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold">Kategori Perniagaan:</span>
-                <div className="font-bold text-black dark:text-white">{tenantBusiness?.category || 'Makanan & Minuman / Agrotek'}</div>
-                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono">SSM: {tenantBusiness?.ssmNumber || 'Berdaftar / Dalam Pengesahan'}</div>
+                <div className="font-bold text-black dark:text-white">
+                  <AcronymText text={tenantBusiness?.category || 'Makanan & Minuman / Agrotek'} />
+                </div>
+                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 font-mono">
+                  <span className="kbelia-acro font-sans">SSM</span>:{' '}
+                  {tenantBusiness?.ssmNumber ? (
+                    <MiddleTruncate text={tenantBusiness.ssmNumber} startChars={9} endChars={5} />
+                  ) : (
+                    'Berdaftar / Dalam Pengesahan'
+                  )}
+                </div>
               </div>
 
               <div className="p-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 space-y-1">
@@ -266,9 +276,13 @@ export const CapsuleTenantDetailModal: React.FC<CapsuleTenantDetailModalProps> =
               <span className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-semibold block mb-1">
                 Skop Produk & Servis di Kiosk Ini:
               </span>
-              <p className="text-black dark:text-white leading-relaxed">
-                {tenantBusiness?.description || 
-                  'Perusahaan belia tempatan yang mengusahakan produk berkualiti di premis pod pintar ini. Menawarkan produk makanan, minuman dan hasil kraf tempatan sedia beli dengan pembayaran tanpa tunai DuitNow QR.'}
+              <p className="text-black dark:text-white leading-relaxed kbelia-prose">
+                <AcronymText
+                  text={
+                    tenantBusiness?.description ||
+                    'Perusahaan belia tempatan yang mengusahakan produk berkualiti di premis pod pintar ini. Menawarkan produk makanan, minuman dan hasil kraf tempatan sedia beli dengan pembayaran tanpa tunai DuitNow QR.'
+                  }
+                />
               </p>
             </div>
 

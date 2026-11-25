@@ -1613,7 +1613,7 @@ export const ManageBusinessProductsModal: React.FC<ManageBusinessProductsModalPr
             </form>
           ) : businessProducts.length === 0 ? (
             <div className={`p-8 text-center rounded-2xl border border-dashed text-sm text-stone-600 dark:text-stone-300 ${adminTheme.dividerClass}`}>
-              Tiada produk didaftarkan bagi perniagaan ini. Klik &quot;Tambah Produk&quot; untuk memulakan katalog.
+              Tiada produk didaftarkan bagi perniagaan ini. Klik &ldquo;Tambah Produk&rdquo; untuk memulakan katalog.
             </div>
           ) : (
             <div className={`divide-y rounded-2xl border overflow-hidden ${adminTheme.dividerClass} ${adminTheme.surfaceClass}`}>

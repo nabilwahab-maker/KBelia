@@ -51,6 +51,7 @@ import { KBeliaLogo } from './KBeliaLogo';
 import { showToast } from './ToastNotification';
 import { DashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { CapsuleSlot, BusinessListing, YouthProgram, MerchantSubTab, AdminSubTab, MentorSubTab, formatBusinessCategory } from '../types';
+import { AcronymText, MiddleTruncate } from './TypographyPrimitives';
 
 export type UMKTab = 
   | 'home' 
@@ -155,7 +156,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
       const mentorQuickLinks = [
         { id: 'overview' as MentorSubTab, label: 'Dashboard', desc: 'KPI, carta daerah & temujanji terdekat' },
         { id: 'sessions' as MentorSubTab, label: 'Sesi Bimbingan', desc: 'Senarai permohonan, jadual & pelan bimbingan' },
-        { id: 'mentees' as MentorSubTab, label: 'Senarai Mentee', desc: 'Senarai usahawan bimbingan, bisnes & nombor WhatsApp' },
+        { id: 'mentees' as MentorSubTab, label: 'Senarai Belia', desc: 'Senarai usahawan belia bimbingan, bisnes & nombor WhatsApp' },
         { id: 'logbook' as MentorSubTab, label: 'Rekod Sesi', desc: 'Nota bimbingan & senarai semak tugasan' },
         { id: 'schedule' as MentorSubTab, label: 'Jadual', desc: 'Paparan kalendar temu janji & slot bimbingan' },
         { id: 'readiness' as MentorSubTab, label: 'Semak Geran', desc: 'Senarai semak 4 perkara asas sebelum sokongan geran' },
@@ -365,7 +366,9 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 title="Berita & Pengumuman Rasmi"
               >
                 <Newspaper className="w-4 h-4 shrink-0 opacity-85" />
-                <span>News</span>
+                <span data-reserved-text="News" className="kbelia-reserved-bold kbelia-trim">
+                  News
+                </span>
               </button>
 
               <button
@@ -381,7 +384,9 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 title="Komuniti: Forum & Soal Jawab Usahawan"
               >
                 <MessagesSquare className="w-4 h-4 shrink-0 opacity-85" />
-                <span>Komuniti</span>
+                <span data-reserved-text="Komuniti" className="kbelia-reserved-bold kbelia-trim">
+                  Komuniti
+                </span>
               </button>
             </nav>
           ) : (
@@ -436,7 +441,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                       <div className="py-5 px-3 text-center">
                         <Search className="w-6 h-6 text-black/35 dark:text-white/35 mx-auto mb-1.5" />
                         <p className="text-sm font-semibold text-black dark:text-white">
-                          {t('search_no_results')} "{globalSearch}"
+                          {t('search_no_results')} &ldquo;{globalSearch}&rdquo;
                         </p>
                       </div>
                     ) : (
@@ -545,7 +550,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                                     </span>
                                   </div>
                                   <span className="text-[0.8125rem] font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950/80 text-black dark:text-white">
-                                    SSM Disahkan
+                                    <span className="kbelia-acro">SSM</span> Disahkan
                                   </span>
                                 </button>
                               ))}
@@ -879,7 +884,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Users className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>{language === 'en' ? 'Mentee List' : 'Senarai Mentee'}</span>
+                          <span>{language === 'en' ? 'Youth List' : 'Senarai Belia'}</span>
                         </button>
                         <button
                           type="button"
@@ -1049,7 +1054,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                 title={`${displayName} - ${roleLabel}`}
                 className="relative inline-flex items-center justify-center w-10 h-10 p-0.5 sm:w-auto sm:h-10 sm:pl-3 sm:pr-0.5 sm:py-0.5 sm:gap-2.5 rounded-xl bg-white dark:bg-slate-800 hover:border-blue-500 dark:hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all border border-slate-300 dark:border-slate-600 cursor-pointer shadow-2xs shrink-0 overflow-hidden group"
               >
-                <span className="hidden sm:inline-block text-sm font-semibold text-black dark:text-white max-w-[140px] lg:max-w-[180px] truncate leading-none">
+                <span className="hidden sm:inline-block text-sm font-semibold text-black dark:text-white max-w-[140px] lg:max-w-[180px] truncate leading-snug py-0.5">
                   {displayName}
                 </span>
                 <img
@@ -1108,8 +1113,16 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                             {row.icon === 'shield' && <ShieldCheck className="w-3.5 h-3.5" />}
                           </span>
                           <div className="min-w-0 flex-1 leading-snug">
-                            <span className="text-black/65 dark:text-white/70 font-medium">{row.label}: </span>
-                            <span className="text-black dark:text-white font-semibold break-words">{row.value}</span>
+                            <span className="text-black/65 dark:text-white/70 font-medium">
+                              <AcronymText text={row.label} />:{' '}
+                            </span>
+                            <span className="text-black dark:text-white font-semibold break-words">
+                              {row.icon === 'file' && /\d{4,}/.test(row.value) ? (
+                                <MiddleTruncate text={row.value} startChars={10} endChars={5} />
+                              ) : (
+                                <AcronymText text={row.value} />
+                              )}
+                            </span>
                           </div>
                         </div>
                       ))}

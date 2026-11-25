@@ -22,6 +22,7 @@ import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 import { useAuth } from '../context/AuthContext';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
+import { MiddleTruncate } from './TypographyPrimitives';
 
 interface DigitalTenancyAgreementModalProps {
   isOpen: boolean;
@@ -178,25 +179,25 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
         <div className="p-6 sm:p-8 pt-5 overflow-y-auto flex-1">
 
         {/* Agreement Document Content */}
-        <div ref={agreementRef} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-sm text-black dark:text-white space-y-4 max-h-64 overflow-y-auto font-serif leading-relaxed">
+        <div ref={agreementRef} className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-sm text-black dark:text-white space-y-4 max-h-64 overflow-y-auto font-serif leading-relaxed kbelia-prose">
           <div className="text-center pb-2 border-b border-slate-300 dark:border-slate-600">
-            <h4 className="font-bold text-sm text-black dark:text-white uppercase font-sans">
+            <h4 className="font-bold text-sm text-black dark:text-white uppercase font-sans kbelia-trim">
               PERJANJIAN PENYEWAAN KIOSK KAPSUL USAHAWAN BELIA
             </h4>
             <span className="text-[0.8125rem] text-black/70 dark:text-white/75 font-sans">
-              Nombor Rujukan Perjanjian: {agreementRefCode}
+              Nombor Rujukan Perjanjian: <MiddleTruncate text={agreementRefCode} startChars={9} endChars={4} className="font-mono font-semibold" />
             </span>
           </div>
 
           <p>
-            Perjanjian ini dimeterai antara <strong>HAB PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBELIA)</strong> (Pemberi Sewa) dan <strong>{booking.applicantName}</strong> bagi pihak <strong>{booking.businessName}</strong> (Penyewa Kiosk).
+            Perjanjian ini dimeterai antara <strong>HAB PEMBANGUNAN USAHAWAN BELIA KELANTAN (<span className="kbelia-acro">KBELIA</span>)</strong> (Pemberi Sewa) dan <strong>{booking.applicantName}</strong> bagi pihak <strong>{booking.businessName}</strong> (Penyewa Kiosk).
           </p>
 
           <ol className="list-decimal pl-4 space-y-2 text-[0.8125rem]">
             <li><strong>Premis:</strong> Kiosk Kapsul bertanda kod <strong>{booking.slotCode}</strong> bertempat di <strong>{booking.hubLocation}</strong>.</li>
             <li><strong>Kadar Sewa Bersubsidi:</strong> Kadar sewa bulanan adalah sebanyak <strong>RM {monthlyRate.toFixed(2)} sebulan</strong> (selepas penolakan subsidi tajaan dana usahawan belia negeri).</li>
-            <li><strong>Tempoh Penyewaan & Operasi:</strong> Tempoh penyewaan adalah selama <strong>{booking.durationMonths} bulan</strong> bermula dari tarikh mula operasi <strong>{formatDisplayDate(booking.startDate)}</strong> sehingga tarikh akhir beroperasi pada <strong>{calculateOperationEndDate(booking.startDate, booking.durationMonths)}</strong>.</li>
-            <li><strong>Kebersihan & Tatatertib:</strong> Penyewa wajib menjaga kebersihan ruang kiosk, mematuhi standard pensijilan Halal dan arahan pihak berkuasa tempatan (PBT).</li>
+            <li><strong>Tempoh Penyewaan &amp; Operasi:</strong> Tempoh penyewaan adalah selama <strong>{booking.durationMonths} bulan</strong> bermula dari tarikh mula operasi <strong>{formatDisplayDate(booking.startDate)}</strong> sehingga tarikh akhir beroperasi pada <strong>{calculateOperationEndDate(booking.startDate, booking.durationMonths)}</strong>.</li>
+            <li><strong>Kebersihan &amp; Tatatertib:</strong> Penyewa wajib menjaga kebersihan ruang kiosk, mematuhi standard pensijilan Halal dan arahan pihak berkuasa tempatan (<span className="kbelia-acro">PBT</span>).</li>
             <li><strong>Hak Eksklusif:</strong> Kiosk ini tidak boleh disewakan kepada pihak ketiga (dilarang sewa atas sewa).</li>
           </ol>
         </div>
@@ -276,7 +277,18 @@ export const DigitalTenancyAgreementModal: React.FC<DigitalTenancyAgreementModal
                       const ok = await downloadHtmlAsPdf(html, `Perjanjian_Sewa_Kiosk_${booking.slotCode}_${agreementRefCode}.pdf`);
                       if (ok) {
                         setIsDownloaded(true);
+                        showToast({
+                          type: 'success',
+                          title: 'PDF Perjanjian Disimpan',
+                          message: `Perjanjian sewa rasmi ${booking.slotCode} berjaya dimuat turun.`
+                        });
                         setTimeout(() => setIsDownloaded(false), 2500);
+                      } else {
+                        showToast({
+                          type: 'error',
+                          title: 'Gagal Menjana PDF',
+                          message: 'Sila cuba butang Cetak sebagai alternatif.'
+                        });
                       }
                     } finally {
                       setIsDownloadingPdf(false);

@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { useAnimatedMetric } from '../hooks/useMotion';
 import { DashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { AcronymText } from './TypographyPrimitives';
 
 export interface EditorialMetricItem {
   id: string;
@@ -46,8 +47,11 @@ const MetricCell: React.FC<{
       }`}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300/90 leading-snug truncate">
-          {item.label}
+        <span
+          title={item.label}
+          className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300/90 leading-snug truncate kbelia-trim"
+        >
+          <AcronymText text={item.label} />
         </span>
         {item.onClick && (
           <ArrowUpRight className="w-3.5 h-3.5 text-slate-400 dark:text-stone-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
@@ -55,13 +59,13 @@ const MetricCell: React.FC<{
       </div>
 
       <div
-        className={`font-display text-2xl sm:text-[1.75rem] font-bold tracking-tight tabular-nums leading-none break-words ${valueColorClass}`}
+        className={`font-display text-2xl sm:text-[1.75rem] font-bold tracking-tight tabular-nums leading-none break-words kbelia-trim ${valueColorClass}`}
       >
         {animatedValue}
       </div>
 
-      <p className="text-[0.8125rem] text-slate-500 dark:text-stone-400 leading-snug line-clamp-2">
-        {item.summary}
+      <p className="text-[0.8125rem] text-slate-500 dark:text-stone-400 leading-snug kbelia-clamp-2 kbelia-prose">
+        <AcronymText text={item.summary} />
       </p>
     </Tag>
   );

@@ -17,7 +17,8 @@ import {
   MapPin,
   Calendar,
   AlertCircle,
-  XCircle
+  XCircle,
+  Loader2
 } from 'lucide-react';
 import { CapsuleBooking, GrantApplication, MentorshipRegistration, normalizeMentorshipMode } from '../types';
 import { showToast } from './ToastNotification';
@@ -32,6 +33,9 @@ import { downloadOfferLetterPdf, downloadHtmlAsPdf } from '../utils/pdfGenerator
 import { loadLocalPortalSettings } from '../services/dataService';
 import { useAuth } from '../context/AuthContext';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { MiddleTruncate } from './TypographyPrimitives';
+import { QrCodeGraphic } from './QrCodeGraphic';
+import { buildVerificationQrPayload } from '../utils/qrUtils';
 
 interface ApplicationStatusDocumentsModalProps {
   isOpen: boolean;
@@ -62,6 +66,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
   const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const [activeTab, setActiveTab] = useState<'status' | 'offerLetter' | 'tenancy' | 'verify'>('status');
   const [isCancelConfirmOpen, setIsCancelConfirmOpen] = useState(false);
+  const [busyAction, setBusyAction] = useState<'print' | 'pdf' | null>(null);
 
   if (!isOpen) return null;
 
@@ -87,7 +92,8 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
   const userMentorship = mentorshipRegistrations[0] || null;
 
   const handlePrint = async (docType: 'offerLetter' | 'tenancy' = activeTab === 'tenancy' ? 'tenancy' : 'offerLetter') => {
-    if (!userBooking) return;
+    if (!userBooking || busyAction) return;
+    setBusyAction('print');
     try {
       const html =
         docType === 'tenancy'
@@ -101,16 +107,37 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
       );
     } catch {
       showToast({ type: 'error', title: 'Ralat Cetakan', message: 'Gagal membuka pratonton cetakan rasmi.' });
+    } finally {
+      setTimeout(() => setBusyAction(null), 500);
     }
   };
 
   const handleDownloadPdf = async (docType: 'offerLetter' | 'tenancy') => {
-    if (!userBooking) return;
-    if (docType === 'tenancy') {
-      const html = generateTenancyAgreementOfficialHtml(userBooking, tenancyRef, formattedIssueDate, subsidyRate);
-      await downloadHtmlAsPdf(html, `Perjanjian_Sewa_Kiosk_${slotCode}_${tenancyRef}.pdf`);
-    } else {
-      await downloadOfferLetterPdf(userBooking, bookingRef, formattedIssueDate, `Surat_Tawaran_Kiosk_${slotCode}_${bookingRef}.pdf`, subsidyRate);
+    if (!userBooking || busyAction) return;
+    setBusyAction('pdf');
+    try {
+      let ok = false;
+      if (docType === 'tenancy') {
+        const html = generateTenancyAgreementOfficialHtml(userBooking, tenancyRef, formattedIssueDate, subsidyRate);
+        ok = await downloadHtmlAsPdf(html, `Perjanjian_Sewa_Kiosk_${slotCode}_${tenancyRef}.pdf`);
+      } else {
+        ok = await downloadOfferLetterPdf(userBooking, bookingRef, formattedIssueDate, `Surat_Tawaran_Kiosk_${slotCode}_${bookingRef}.pdf`, subsidyRate);
+      }
+      if (ok) {
+        showToast({
+          type: 'success',
+          title: 'PDF Rasmi Dimuat Turun',
+          message: docType === 'tenancy' ? 'Perjanjian sewa rasmi A4 berjaya disimpan.' : 'Surat tawaran rasmi A4 berjaya disimpan.'
+        });
+      } else {
+        showToast({
+          type: 'error',
+          title: 'Gagal Menjana PDF',
+          message: 'Sila cuba butang Cetak sebagai alternatif.'
+        });
+      }
+    } finally {
+      setBusyAction(null);
     }
   };
 
@@ -157,7 +184,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 : roleTheme.tabIdleUnderlineClass
             }`}
           >
-            Status Permohonan
+            <span className="kbelia-reserved-bold kbelia-trim" data-reserved-text="Status Permohonan">Status Permohonan</span>
           </button>
 
           <button
@@ -169,7 +196,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>Surat Tawaran</span>
+            <span className="kbelia-reserved-bold kbelia-trim" data-reserved-text="Surat Tawaran">Surat Tawaran</span>
           </button>
 
           <button
@@ -181,7 +208,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             }`}
           >
             <Award className="w-3.5 h-3.5" />
-            <span>Perjanjian Sewa</span>
+            <span className="kbelia-reserved-bold kbelia-trim" data-reserved-text="Perjanjian Sewa">Perjanjian Sewa</span>
           </button>
 
           <button
@@ -193,7 +220,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
             }`}
           >
             <QrCode className="w-3.5 h-3.5" />
-            <span>Sahkan Kod</span>
+            <span className="kbelia-reserved-bold kbelia-trim" data-reserved-text="Sahkan Kod">Sahkan Kod</span>
           </button>
         </div>
 
@@ -247,7 +274,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
 
                   <div className="pt-3.5 flex flex-wrap items-center justify-between gap-3 text-sm">
                     <div className="text-black dark:text-white text-[0.8125rem]">
-                      Nombor Rujukan Rasmi: <span className="font-mono font-bold text-black dark:text-white">{bookingRef}</span>
+                      Nombor Rujukan Rasmi: <MiddleTruncate text={bookingRef} startChars={10} endChars={6} className="font-mono font-bold text-black dark:text-white" />
                     </div>
                     {userBooking.status === 'approved' && (
                       <div className="flex items-center gap-2">
@@ -516,19 +543,21 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <div className="flex items-center gap-2 shrink-0">
                   <button
                     type="button"
-                    onClick={() => handleDownloadPdf('offerLetter')}
+                    onClick={() => void handleDownloadPdf('offerLetter')}
+                    disabled={Boolean(busyAction)}
                     className={roleTheme.compactSecondaryButtonClass}
                   >
-                    <Download className="w-3.5 h-3.5" />
-                    <span>Muat Turun PDF</span>
+                    {busyAction === 'pdf' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+                    <span>{busyAction === 'pdf' ? 'Menjana...' : 'Muat Turun PDF'}</span>
                   </button>
                   <button
                     type="button"
-                    onClick={() => handlePrint('offerLetter')}
+                    onClick={() => void handlePrint('offerLetter')}
+                    disabled={Boolean(busyAction)}
                     className={roleTheme.compactPrimaryButtonClass}
                   >
-                    <Printer className="w-3.5 h-3.5" />
-                    <span>Cetak</span>
+                    {busyAction === 'print' ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Printer className="w-3.5 h-3.5" />}
+                    <span>{busyAction === 'print' ? 'Membuka...' : 'Cetak'}</span>
                   </button>
                 </div>
               </div>
@@ -618,10 +647,13 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     <div className="text-[0.8125rem] text-black/70 mt-1">Dokumen ditandatangani secara digital mengikut Akta Tandatangan Digital 1997.</div>
                   </div>
 
-                  <div className="min-w-[6.5rem] rounded-xl border border-emerald-200 bg-emerald-50/80 px-2.5 py-2 flex flex-col items-center justify-center text-center shrink-0">
-                    <QrCode className="w-8 h-8 text-black mb-1" />
-                    <span className="text-[0.8125rem] font-mono font-bold text-black">VERIFIED</span>
-                    <span className="text-[0.8125rem] text-black/75 font-mono">HASH: {slotCode}</span>
+                  <div className="rounded-xl border border-slate-300 bg-slate-50 px-2.5 py-2 flex flex-col items-center justify-center text-center shrink-0">
+                    <QrCodeGraphic
+                      value={buildVerificationQrPayload(bookingRef)}
+                      size={74}
+                      caption="DISAHKAN"
+                      subcaption={slotCode}
+                    />
                   </div>
                 </div>
 
@@ -713,40 +745,42 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
           )}
 
           {/* TAB 4: PENGESAHAN KOD DIGITAL (VERIFICATION) */}
-          {activeTab === 'verify' && (
-            <div className="space-y-4 animate-in fade-in duration-200 text-center py-4">
-              <div className="w-16 h-16 rounded-3xl bg-[#0B6E52]/10 dark:bg-[#10B981]/20 text-[#0B6E52] dark:text-[#34D399] flex items-center justify-center mx-auto border border-[#0B6E52]/25 dark:border-[#34D399]/35">
-                <QrCode className="w-8 h-8" />
-              </div>
-              <h4 className="font-bold text-base text-black dark:text-white">
-                Pengesah Ketulenan Dokumen & Kiosk KBelia
-              </h4>
-              <p className="text-[0.9375rem] text-black dark:text-white/75 max-w-md mx-auto">
-                Kod rujukan dokumen anda dilindungi dengan jejak digital rasmi untuk mengelakkan pemalsuan lesen atau surat penempatan di pihak berkuasa tempatan.
-              </p>
-
-              <div className="bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border border-slate-300 dark:border-slate-600 max-w-sm mx-auto font-mono text-[0.8125rem]">
-                <div className="text-[0.8125rem] text-black/70 dark:text-white/75 uppercase font-bold">Kod Hash Rujukan:</div>
-                <div className="font-bold text-black dark:text-white/75 text-sm mt-0.5">{bookingRef || `REG-${currentYear}-BELIA`}</div>
-                <div className="text-[0.8125rem] text-black dark:text-white/75 mt-1 flex items-center justify-center gap-1">
-                  <ShieldCheck className="w-3.5 h-3.5" /> SEMAKAN DALAM PANGKALAN DATA NEGERI
+          {activeTab === 'verify' && (() => {
+            const verifyCode = bookingRef || `REG-${currentYear}-BELIA`;
+            return (
+              <div className="space-y-4 animate-in fade-in duration-200 text-center py-4">
+                <div className="flex justify-center">
+                  <QrCodeGraphic
+                    value={buildVerificationQrPayload(verifyCode)}
+                    size={148}
+                    caption="KOD QR KETULENAN"
+                    subcaption={verifyCode}
+                    showDownloadButton
+                    downloadFileName={`QR_Pengesahan_${verifyCode}.png`}
+                  />
                 </div>
-              </div>
+                <h4 className="font-bold text-base text-black dark:text-white">
+                  Pengesah Ketulenan Dokumen &amp; Kiosk KBelia
+                </h4>
+                <p className="text-[0.9375rem] text-black dark:text-white/75 max-w-md mx-auto">
+                  Imbas kod QR di atas atau gunakan nombor rujukan rasmi untuk menyemak ketulenan dokumen di pihak berkuasa tempatan.
+                </p>
 
-              {onOpenVerification && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onOpenVerification(bookingRef || `REG-${currentYear}-BELIA`);
-                  }}
-                  className={`px-5 py-2 text-sm shadow-sm ${roleTheme.primaryButtonClass}`}
-                >
-                  Sahkan QR
-                </button>
-              )}
-            </div>
-          )}
+                {onOpenVerification && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenVerification(verifyCode);
+                    }}
+                    className={`px-5 py-2 text-sm shadow-sm ${roleTheme.primaryButtonClass}`}
+                  >
+                    Buka Portal Pengesahan QR
+                  </button>
+                )}
+              </div>
+            );
+          })()}
 
         </div>
 

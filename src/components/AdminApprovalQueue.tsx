@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
-import { 
-  CheckCircle2, 
-  XCircle, 
-  AlertCircle, 
-  Download, 
-  FileText, 
-  Store, 
-  Coins, 
-  MessageSquare,
+import React, { useMemo, useState } from 'react';
+import {
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  FileText,
+  Store,
+  Coins,
   ShieldCheck,
   Wrench,
-  Database,
   TrendingUp,
   MapPin,
   Building2,
@@ -21,10 +18,9 @@ import {
   Edit3,
   Trash2,
   Plus,
-  ArrowUpDown
+  Clock
 } from 'lucide-react';
 import { CapsuleBooking, GrantApplication, CapsuleSlot, KelantanDistrict, YouthProgram, MaintenanceTicket, BookingStatus } from '../types';
-import { maskMyKad } from '../utils/securityUtils';
 import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
 import { OfficialApprovalReportModal } from './OfficialApprovalReportModal';
 import {
@@ -45,7 +41,6 @@ import { ModernDatePicker } from './ModernDateTimePicker';
 import { PortalImage } from './PortalImage';
 import { resolveBookingKioskImage, resolveSlotImage } from '../utils/visualAssets';
 import { PaginationBar, usePagination } from './PaginationBar';
-import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import {
   DEFAULT_SORT_VALUE,
   ToolbarSortOption,
@@ -58,6 +53,15 @@ import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { EditSlotModal } from './EditSlotModal';
 import { EditBookingModal, EditGrantModal, EditMaintenanceTicketModal } from './AdminEditModals';
 import { getRoleTheme } from '../utils/roleTheme';
+import { AcronymText, MiddleTruncate } from './TypographyPrimitives';
+import {
+  GoogleWorkspaceSplitPane,
+  SidePreviewEmptyState,
+  SidePreviewHeader,
+  SidePreviewMetricsStrip,
+  WorkspaceHeaderCard,
+  getWorkspaceActiveRowClass
+} from './GoogleWorkspaceSplitPane';
 
 const adminTheme = getRoleTheme('admin');
 
@@ -113,72 +117,29 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
     slotOrProgram?: string;
   } | null>(null);
 
-  const [expandedKioskIds, setExpandedKioskIds] = useState<string[]>([]);
-  const [expandedGrantIds, setExpandedGrantIds] = useState<string[]>([]);
-  const [expandedTicketIds, setExpandedTicketIds] = useState<string[]>([]);
+  // Selection states for Google Workspace Split-Pane previews
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [mobileBookingOpen, setMobileBookingOpen] = useState(false);
 
-  const toggleExpandedId = (
-    setter: React.Dispatch<React.SetStateAction<string[]>>,
-    id: string
-  ) => {
-    setter((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
-  };
+  const [selectedGrantId, setSelectedGrantId] = useState<string | null>(null);
+  const [mobileGrantOpen, setMobileGrantOpen] = useState(false);
 
-  const [bookingSort, setBookingSort] = useState<{
-    key: 'businessName' | 'hubLocation' | 'category' | 'status';
-    dir: 'asc' | 'desc';
-  }>({ key: 'status', dir: 'asc' });
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
+  const [mobileSlotOpen, setMobileSlotOpen] = useState(false);
+
+  const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
+  const [mobileTicketOpen, setMobileTicketOpen] = useState(false);
+
   const [bookingSortPreset, setBookingSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
-
-  const [grantSort, setGrantSort] = useState<{
-    key: 'businessName' | 'programTitle' | 'grantAmount' | 'status';
-    dir: 'asc' | 'desc';
-  }>({ key: 'status', dir: 'asc' });
   const [grantSortPreset, setGrantSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [slotSearch, setSlotSearch] = useState('');
   const [slotStatusFilter, setSlotStatusFilter] = useState<'all' | 'available' | 'occupied' | 'maintenance'>('all');
-  const [slotSort, setSlotSort] = useState<{
-    key: 'name' | 'district' | 'monthlyRate' | 'status';
-    dir: 'asc' | 'desc';
-  }>({ key: 'name', dir: 'asc' });
   const [slotSortPreset, setSlotSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
 
   const [ticketSearch, setTicketSearch] = useState('');
   const [ticketStatusFilter, setTicketStatusFilter] = useState<'all' | 'received' | 'in_progress' | 'resolved'>('all');
-  const [ticketSort, setTicketSort] = useState<{
-    key: 'slotCode' | 'issueCategory' | 'status';
-    dir: 'asc' | 'desc';
-  }>({ key: 'status', dir: 'asc' });
   const [ticketSortPreset, setTicketSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
-
-  const toggleBookingSort = (key: 'businessName' | 'hubLocation' | 'category' | 'status') => {
-    setBookingSortPreset('table_column');
-    setBookingSort((prev) =>
-      prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
-    );
-  };
-
-  const toggleGrantSort = (key: 'businessName' | 'programTitle' | 'grantAmount' | 'status') => {
-    setGrantSortPreset('table_column');
-    setGrantSort((prev) =>
-      prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
-    );
-  };
-
-  const toggleSlotSort = (key: 'name' | 'district' | 'monthlyRate' | 'status') => {
-    setSlotSortPreset('table_column');
-    setSlotSort((prev) =>
-      prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
-    );
-  };
-
-  const toggleTicketSort = (key: 'slotCode' | 'issueCategory' | 'status') => {
-    setTicketSortPreset('table_column');
-    setTicketSort((prev) =>
-      prev.key === key ? { key, dir: prev.dir === 'asc' ? 'desc' : 'asc' } : { key, dir: 'asc' }
-    );
-  };
 
   const bookingSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
     { value: 'status_pending', label: 'Status (Menunggu Dahulu)' },
@@ -227,59 +188,27 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   });
 
   const statusOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2, cancelled: 3 };
-  const sortedBookings =
-    bookingSortPreset === 'table_column'
-      ? [...filteredBookings].sort((a, b) => {
-          const dirMult = bookingSort.dir === 'asc' ? 1 : -1;
-          if (bookingSort.key === 'businessName') {
-            return `${a.slotCode} ${a.businessName}`.localeCompare(`${b.slotCode} ${b.businessName}`) * dirMult;
-          }
-          if (bookingSort.key === 'hubLocation') {
-            return (a.hubLocation || '').localeCompare(b.hubLocation || '') * dirMult;
-          }
-          if (bookingSort.key === 'category') {
-            return (a.businessCategory || '').localeCompare(b.businessCategory || '') * dirMult;
-          }
-          return ((statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3)) * dirMult;
-        })
-      : sortRecords(filteredBookings, {
-          sortBy: bookingSortPreset,
-          getName: (b) => b.businessName || b.applicantName || b.slotCode || '',
-          customCompare: (a, b, mode) => {
-            if (mode === 'status_pending') return (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3);
-            if (mode === 'hub_asc') return compareText(a.hubLocation, b.hubLocation);
-            if (mode === 'category_asc') return compareText(a.businessCategory, b.businessCategory);
-            return null;
-          }
-        });
+  const sortedBookings = sortRecords(filteredBookings, {
+    sortBy: bookingSortPreset,
+    getName: (b) => b.businessName || b.applicantName || b.slotCode || '',
+    customCompare: (a, b, mode) => {
+      if (mode === 'status_pending') return (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3);
+      if (mode === 'hub_asc') return compareText(a.hubLocation, b.hubLocation);
+      if (mode === 'category_asc') return compareText(a.businessCategory, b.businessCategory);
+      return null;
+    }
+  });
 
-  const sortedGrants =
-    grantSortPreset === 'table_column'
-      ? [...filteredGrants].sort((a, b) => {
-          const dirMult = grantSort.dir === 'asc' ? 1 : -1;
-          if (grantSort.key === 'businessName') {
-            return (a.businessName || '').localeCompare(b.businessName || '') * dirMult;
-          }
-          if (grantSort.key === 'programTitle') {
-            return (a.programTitle || '').localeCompare(b.programTitle || '') * dirMult;
-          }
-          if (grantSort.key === 'grantAmount') {
-            const numA = Number(String(a.grantAmount || '0').replace(/[^0-9.]/g, '')) || 0;
-            const numB = Number(String(b.grantAmount || '0').replace(/[^0-9.]/g, '')) || 0;
-            return (numA - numB) * dirMult;
-          }
-          return ((statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3)) * dirMult;
-        })
-      : sortRecords(filteredGrants, {
-          sortBy: grantSortPreset,
-          getName: (g) => g.businessName || g.applicantName || g.programTitle || '',
-          customCompare: (a, b, mode) => {
-            if (mode === 'status_pending') return (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3);
-            if (mode === 'amount_desc') return parseNumericAmount(b.grantAmount) - parseNumericAmount(a.grantAmount);
-            if (mode === 'program_asc') return compareText(a.programTitle, b.programTitle);
-            return null;
-          }
-        });
+  const sortedGrants = sortRecords(filteredGrants, {
+    sortBy: grantSortPreset,
+    getName: (g) => g.businessName || g.applicantName || g.programTitle || '',
+    customCompare: (a, b, mode) => {
+      if (mode === 'status_pending') return (statusOrder[a.status] ?? 3) - (statusOrder[b.status] ?? 3);
+      if (mode === 'amount_desc') return parseNumericAmount(b.grantAmount) - parseNumericAmount(a.grantAmount);
+      if (mode === 'program_asc') return compareText(a.programTitle, b.programTitle);
+      return null;
+    }
+  });
 
   const baseFacilitySlots = slots.filter((s) => {
     if (slotStatusFilter !== 'all' && s.status !== slotStatusFilter) return false;
@@ -294,32 +223,17 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   });
 
   const slotStatusOrder: Record<string, number> = { available: 0, occupied: 1, maintenance: 2 };
-  const filteredFacilitySlots =
-    slotSortPreset === 'table_column'
-      ? [...baseFacilitySlots].sort((a, b) => {
-          const dirMult = slotSort.dir === 'asc' ? 1 : -1;
-          if (slotSort.key === 'district') {
-            return (a.district || '').localeCompare(b.district || '') * dirMult;
-          }
-          if (slotSort.key === 'monthlyRate') {
-            return ((Number(a.monthlyRate) || 0) - (Number(b.monthlyRate) || 0)) * dirMult;
-          }
-          if (slotSort.key === 'status') {
-            return (a.status || '').localeCompare(b.status || '') * dirMult;
-          }
-          return `${a.code} ${a.name}`.localeCompare(`${b.code} ${b.name}`) * dirMult;
-        })
-      : sortRecords(baseFacilitySlots, {
-          sortBy: slotSortPreset,
-          getName: (s) => `${s.code || ''} ${s.name || ''}`.trim(),
-          customCompare: (a, b, mode) => {
-            if (mode === 'rate_asc') return (Number(a.monthlyRate) || 0) - (Number(b.monthlyRate) || 0);
-            if (mode === 'rate_desc') return (Number(b.monthlyRate) || 0) - (Number(a.monthlyRate) || 0);
-            if (mode === 'district_asc') return compareText(a.district, b.district);
-            if (mode === 'status_available') return (slotStatusOrder[a.status] ?? 3) - (slotStatusOrder[b.status] ?? 3);
-            return null;
-          }
-        });
+  const filteredFacilitySlots = sortRecords(baseFacilitySlots, {
+    sortBy: slotSortPreset,
+    getName: (s) => `${s.code || ''} ${s.name || ''}`.trim(),
+    customCompare: (a, b, mode) => {
+      if (mode === 'rate_asc') return (Number(a.monthlyRate) || 0) - (Number(b.monthlyRate) || 0);
+      if (mode === 'rate_desc') return (Number(b.monthlyRate) || 0) - (Number(a.monthlyRate) || 0);
+      if (mode === 'district_asc') return compareText(a.district, b.district);
+      if (mode === 'status_available') return (slotStatusOrder[a.status] ?? 3) - (slotStatusOrder[b.status] ?? 3);
+      return null;
+    }
+  });
 
   const ticketOrder: Record<string, number> = { received: 0, in_progress: 1, resolved: 2 };
   const baseFilteredTickets = maintenanceTickets.filter((t) => {
@@ -335,61 +249,117 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
     );
   });
 
-  const sortedTickets =
-    ticketSortPreset === 'table_column'
-      ? [...baseFilteredTickets].sort((a, b) => {
-          const dirMult = ticketSort.dir === 'asc' ? 1 : -1;
-          if (ticketSort.key === 'slotCode') {
-            return (a.slotCode || '').localeCompare(b.slotCode || '') * dirMult;
-          }
-          if (ticketSort.key === 'issueCategory') {
-            return (a.issueCategory || '').localeCompare(b.issueCategory || '') * dirMult;
-          }
-          return ((ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3)) * dirMult;
-        })
-      : sortRecords(baseFilteredTickets, {
-          sortBy: ticketSortPreset,
-          getName: (t) => `${t.slotCode || ''} ${t.kioskName || ''} ${t.reporterName || ''}`.trim(),
-          customCompare: (a, b, mode) => {
-            if (mode === 'status_received') return (ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3);
-            if (mode === 'slot_asc') return compareText(a.slotCode, b.slotCode);
-            if (mode === 'category_asc') return compareText(a.issueCategory, b.issueCategory);
-            return null;
-          }
-        });
+  const sortedTickets = sortRecords(baseFilteredTickets, {
+    sortBy: ticketSortPreset,
+    getName: (t) => `${t.slotCode || ''} ${t.kioskName || ''} ${t.reporterName || ''}`.trim(),
+    customCompare: (a, b, mode) => {
+      if (mode === 'status_received') return (ticketOrder[a.status] ?? 3) - (ticketOrder[b.status] ?? 3);
+      if (mode === 'slot_asc') return compareText(a.slotCode, b.slotCode);
+      if (mode === 'category_asc') return compareText(a.issueCategory, b.issueCategory);
+      return null;
+    }
+  });
 
   const bookingsPagination = usePagination(sortedBookings, 7, [
     statusFilter,
     searchQuery,
     bookingSortPreset,
-    bookingSort.key,
-    bookingSort.dir,
     sortedBookings.length
   ]);
   const grantsPagination = usePagination(sortedGrants, 7, [
     statusFilter,
     searchQuery,
     grantSortPreset,
-    grantSort.key,
-    grantSort.dir,
     sortedGrants.length
   ]);
   const facilitySlotsPagination = usePagination(filteredFacilitySlots, 7, [
     slotSearch,
     slotStatusFilter,
     slotSortPreset,
-    slotSort.key,
-    slotSort.dir,
     filteredFacilitySlots.length
   ]);
   const ticketsPagination = usePagination(sortedTickets, 7, [
     ticketSearch,
     ticketStatusFilter,
     ticketSortPreset,
-    ticketSort.key,
-    ticketSort.dir,
     sortedTickets.length
   ]);
+
+  const bookingCounts = useMemo(
+    () => ({
+      all: bookings.length,
+      pending: bookings.filter((b) => b.status === 'pending').length,
+      approved: bookings.filter((b) => b.status === 'approved').length,
+      rejected: bookings.filter((b) => b.status === 'rejected').length
+    }),
+    [bookings]
+  );
+
+  const grantCounts = useMemo(
+    () => ({
+      all: grantApplications.length,
+      pending: grantApplications.filter((g) => g.status === 'pending').length,
+      approved: grantApplications.filter((g) => g.status === 'approved').length,
+      rejected: grantApplications.filter((g) => g.status === 'rejected').length
+    }),
+    [grantApplications]
+  );
+
+  const slotCounts = useMemo(
+    () => ({
+      all: slots.length,
+      available: slots.filter((s) => s.status === 'available').length,
+      occupied: slots.filter((s) => s.status === 'occupied').length,
+      maintenance: slots.filter((s) => s.status === 'maintenance').length
+    }),
+    [slots]
+  );
+
+  const ticketCounts = useMemo(
+    () => ({
+      all: maintenanceTickets.length,
+      received: maintenanceTickets.filter((t) => t.status === 'received').length,
+      in_progress: maintenanceTickets.filter((t) => t.status === 'in_progress').length,
+      resolved: maintenanceTickets.filter((t) => t.status === 'resolved').length
+    }),
+    [maintenanceTickets]
+  );
+
+  const selectedBooking = useMemo(
+    () =>
+      sortedBookings.find((b) => b.id === selectedBookingId) ||
+      bookingsPagination.paginatedItems[0] ||
+      sortedBookings[0] ||
+      null,
+    [sortedBookings, selectedBookingId, bookingsPagination.paginatedItems]
+  );
+
+  const selectedGrant = useMemo(
+    () =>
+      sortedGrants.find((g) => g.id === selectedGrantId) ||
+      grantsPagination.paginatedItems[0] ||
+      sortedGrants[0] ||
+      null,
+    [sortedGrants, selectedGrantId, grantsPagination.paginatedItems]
+  );
+
+  const selectedSlot = useMemo(
+    () =>
+      filteredFacilitySlots.find((s) => s.id === selectedSlotId) ||
+      facilitySlotsPagination.paginatedItems[0] ||
+      filteredFacilitySlots[0] ||
+      null,
+    [filteredFacilitySlots, selectedSlotId, facilitySlotsPagination.paginatedItems]
+  );
+
+  const selectedTicket = useMemo(
+    () =>
+      sortedTickets.find((t) => t.id === selectedTicketId) ||
+      ticketsPagination.paginatedItems[0] ||
+      sortedTickets[0] ||
+      null,
+    [sortedTickets, selectedTicketId, ticketsPagination.paginatedItems]
+  );
 
   const handleApproveBooking = async (id: string) => {
     setActionLoading(id);
@@ -997,324 +967,163 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
         </div>
       )}
 
-      {/* TAB 1: KIOSK BOOKINGS */}
+      {/* TAB 1: KIOSK BOOKINGS (Google Workspace Split-Pane) */}
       {activeTab === 'kiosks' && (
         <div key="kiosks" className="space-y-4 animate-dashboard-tab">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h4 className="text-lg sm:text-xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
-                Senarai Permohonan Sewaan Kiosk
-              </h4>
+          <WorkspaceHeaderCard
+            role="admin"
+            icon={<Store className="w-5 h-5" />}
+            title="Senarai Permohonan Sewaan Kiosk"
+            subtitle="Semak cadangan perniagaan, tempoh sewaan, dan catatan kelulusan kiosk."
+            rightActions={
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingBooking(null);
+                  setShowCreateBooking(true);
+                }}
+                className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${adminTheme.primaryButtonClass}`}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah</span>
+              </button>
+            }
+            tabs={[
+              { id: 'all', label: 'Semua', count: bookingCounts.all },
+              { id: 'pending', label: 'Menunggu', count: bookingCounts.pending },
+              { id: 'approved', label: 'Lulus', count: bookingCounts.approved },
+              { id: 'rejected', label: 'Ditolak', count: bookingCounts.rejected }
+            ]}
+            activeTab={statusFilter}
+            onTabChange={(id) => {
+              setStatusFilter(id as 'all' | 'pending' | 'approved' | 'rejected');
+              setMobileBookingOpen(false);
+            }}
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Cari pemohon, syarikat atau kod..."
+            extraControls={
+              <select
+                value={bookingSortPreset}
+                onChange={(e) => setBookingSortPreset(e.target.value)}
+                aria-label="Susun permohonan kiosk"
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+              >
+                {bookingSortOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            }
+          />
+
+          {sortedBookings.length === 0 ? (
+            <div className={`rounded-2xl border py-12 px-6 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+              <Store className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
+              <p className="text-sm font-bold text-black dark:text-white kbelia-trim">
+                Tiada rekod permohonan kiosk sepadan dengan tapisan semasa.
+              </p>
+              {(searchQuery || statusFilter !== 'all' || bookingSortPreset !== DEFAULT_SORT_VALUE) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setStatusFilter('all');
+                    setBookingSortPreset(DEFAULT_SORT_VALUE);
+                  }}
+                  className={`mt-1 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                >
+                  Set Semula
+                </button>
+              )}
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setEditingBooking(null);
-                setShowCreateBooking(true);
-              }}
-              className={`px-4 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto transition-colors ${adminTheme.primaryButtonClass}`}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Tambah</span>
-            </button>
-          </div>
-
-          <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
-            <ReferenceTableToolbar
-              accent="amber"
-              searchValue={searchQuery}
-              onSearchChange={setSearchQuery}
-              searchPlaceholder="Cari pemohon, syarikat atau kod..."
-              filterCount={(statusFilter !== 'all' ? 1 : 0) + (bookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
-              onResetFilters={() => {
-                setStatusFilter('all');
-                setBookingSortPreset(DEFAULT_SORT_VALUE);
-              }}
-              sortOptions={
-                bookingSortPreset === 'table_column'
-                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...bookingSortOptions]
-                  : bookingSortOptions
-              }
-              sortValue={bookingSortPreset === 'table_column' ? '' : bookingSortPreset}
-              onSortChange={(val) => {
-                if (val) setBookingSortPreset(val);
-              }}
-              filterContent={
-                <div>
-                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                    Status Permohonan
-                  </label>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {([
-                      { id: 'all', label: 'Semua' },
-                      { id: 'pending', label: 'Menunggu' },
-                      { id: 'approved', label: 'Lulus' },
-                      { id: 'rejected', label: 'Ditolak' }
-                    ] as const).map((opt) => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => setStatusFilter(opt.id)}
-                        className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
-                          statusFilter === opt.id
-                            ? adminTheme.segmentedActiveClass
-                            : adminTheme.secondaryButtonClass
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
+          ) : (
+            <GoogleWorkspaceSplitPane
+              role="admin"
+              mobileOpen={mobileBookingOpen && Boolean(selectedBooking)}
+              onMobileClose={() => setMobileBookingOpen(false)}
+              mobileTitle={selectedBooking ? `${selectedBooking.slotCode} · ${selectedBooking.businessName}` : undefined}
+              leftHeader={
+                <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                  <span>{sortedBookings.length} permohonan dipaparkan</span>
+                  {(searchQuery || statusFilter !== 'all' || bookingSortPreset !== DEFAULT_SORT_VALUE) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setStatusFilter('all');
+                        setBookingSortPreset(DEFAULT_SORT_VALUE);
+                      }}
+                      className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                    >
+                      Set Semula
+                    </button>
+                  )}
                 </div>
               }
-            />
-
-            {sortedBookings.length === 0 ? (
-              <div className="py-12 px-6 text-center space-y-2">
-                <Store className="w-9 h-9 text-black/30 dark:text-white/30 mx-auto" />
-                <p className="text-sm font-bold text-black dark:text-white">
-                  Tiada rekod permohonan kiosk sepadan dengan tapisan semasa.
-                </p>
-                {(searchQuery || statusFilter !== 'all') && (
-                  <button
-                    type="button"
+              leftContent={bookingsPagination.paginatedItems.map((booking) => {
+                const isSelected = selectedBooking?.id === booking.id;
+                return (
+                  <div
+                    key={booking.id}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => {
-                      setSearchQuery('');
-                      setStatusFilter('all');
-                      setBookingSortPreset(DEFAULT_SORT_VALUE);
+                      setSelectedBookingId(booking.id);
+                      setMobileBookingOpen(true);
                     }}
-                    className={`mt-1 px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedBookingId(booking.id);
+                        setMobileBookingOpen(true);
+                      }
+                    }}
+                    className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                      isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                    }`}
                   >
-                    Set Semula
-                  </button>
-                )}
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left border-collapse">
-                    <thead>
-                      <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                        <th className="py-3 pl-5 pr-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleBookingSort('businessName')}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Kiosk &amp; Perniagaan</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleBookingSort('category')}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Kategori</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleBookingSort('hubLocation')}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Lokasi &amp; Tempoh</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleBookingSort('status')}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Status</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 pl-2 pr-5 w-12 text-right">
-                          <span className="sr-only">Tindakan</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className={`divide-y ${adminTheme.dividerClass}`}>
-                      {bookingsPagination.paginatedItems.map((booking) => {
-                        const isActioning = actionLoading === booking.id;
-                        const isExpanded = expandedKioskIds.includes(booking.id);
-                        return (
-                          <React.Fragment key={booking.id}>
-                            <tr className={`kbelia-table-row transition-colors ${adminTheme.rowHoverClass}`}>
-                              <td className="py-3.5 pl-5 pr-3">
-                                <div className="flex items-center gap-3 min-w-[210px]">
-                                  <div className={`w-14 h-14 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                                    <PortalImage
-                                      src={resolveBookingKioskImage(booking, slots)}
-                                      alt={`Reka bentuk kiosk ${booking.slotName}`}
-                                      fallbackType="kiosk"
-                                      fallbackLabel={booking.slotCode}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
-                                  <div className="min-w-0">
-                                    <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
-                                      {booking.slotCode} · {booking.businessName}
-                                    </p>
-                                    <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[240px]">
-                                      {booking.applicantName}
-                                    </p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="py-3.5 px-3 text-stone-700 dark:text-stone-300 whitespace-nowrap">
-                                {booking.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : booking.businessCategory}
-                              </td>
-                              <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
-                                <p className="font-medium text-stone-900 dark:text-[#F5F2EC]">{booking.hubLocation}</p>
-                                <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400">
-                                  {booking.durationMonths} bulan · Mula {formatDisplayDate(booking.startDate)}
-                                </p>
-                              </td>
-                              <td className="py-3.5 px-3 whitespace-nowrap">
-                                <span
-                                  className={`text-[0.8125rem] font-semibold ${
-                                    booking.status === 'approved'
-                                      ? 'text-emerald-700 dark:text-emerald-400'
-                                      : booking.status === 'rejected'
-                                      ? 'text-rose-700 dark:text-rose-400'
-                                      : booking.status === 'cancelled'
-                                      ? 'text-stone-500 dark:text-stone-400'
-                                      : 'text-amber-700 dark:text-amber-300'
-                                  }`}
-                                >
-                                  {booking.status === 'approved'
-                                    ? 'Diluluskan'
-                                    : booking.status === 'rejected'
-                                    ? 'Ditolak'
-                                    : booking.status === 'cancelled'
-                                    ? 'Dibatalkan'
-                                    : 'Menunggu Semakan'}
-                                </span>
-                              </td>
-                              <td className="py-3.5 pl-2 pr-5 text-right">
-                                <RowActionMenu
-                                  ariaLabel={`Tindakan untuk ${booking.businessName}`}
-                                  items={[
-                                    {
-                                      label: isExpanded ? 'Tutup' : 'Lihat Butiran',
-                                      onClick: () => toggleExpandedId(setExpandedKioskIds, booking.id)
-                                    },
-                                    {
-                                      label: 'Lulus',
-                                      tone: 'accent',
-                                      disabled: isActioning || booking.status === 'approved',
-                                      onClick: () => handleApproveBooking(booking.id)
-                                    },
-                                    {
-                                      label: 'Tolak',
-                                      disabled: isActioning || booking.status === 'rejected',
-                                      onClick: () =>
-                                        setRejectModalData({
-                                          type: 'kiosk',
-                                          id: booking.id,
-                                          name: booking.applicantName,
-                                          business: booking.businessName,
-                                          slotOrProgram: `${booking.slotCode} (${booking.hubLocation})`
-                                        })
-                                    },
-                                    ...(booking.status !== 'pending'
-                                      ? [
-                                          {
-                                            label: 'Set Menunggu',
-                                            disabled: isActioning,
-                                            onClick: () => handleDirectBookingStatus(booking, 'pending')
-                                          }
-                                        ]
-                                      : []),
-                                    {
-                                      label: 'Sunting',
-                                      dividerBefore: true,
-                                      onClick: () => setEditingBooking(booking)
-                                    },
-                                    {
-                                      label: 'Padam',
-                                      tone: 'danger',
-                                      onClick: () =>
-                                        confirmDelete({
-                                          itemName: `${booking.businessName} (${booking.slotCode})`,
-                                          itemType: 'Permohonan Kiosk',
-                                          onConfirm: () => handleDeleteBookingRecord(booking)
-                                        })
-                                    }
-                                  ]}
-                                />
-                              </td>
-                            </tr>
-
-                            {isExpanded && (
-                              <tr className={adminTheme.surfaceMutedClass}>
-                                <td colSpan={5} className="px-5 py-4 space-y-3">
-                                  <div className="text-sm text-stone-700 dark:text-stone-300 tabular-nums">
-                                    Tempoh Operasi: <strong className="text-stone-900 dark:text-[#F5F2EC]">{booking.durationMonths} Bulan</strong> · Mula: <strong className="text-stone-900 dark:text-[#F5F2EC]">{formatDisplayDate(booking.startDate)}</strong> · Akhir: <strong className="text-stone-900 dark:text-[#F5F2EC]">{calculateOperationEndDate(booking.startDate, booking.durationMonths)}</strong>
-                                  </div>
-
-                                  {booking.pitchNotes && (
-                                    <div className={`p-3 rounded-xl border text-sm text-stone-900 dark:text-[#F5F2EC] ${adminTheme.surfaceClass}`}>
-                                      <span className="font-semibold block mb-0.5">
-                                        Penerangan Perniagaan &amp; Cadangan Jualan:
-                                      </span>
-                                      {booking.pitchNotes}
-                                    </div>
-                                  )}
-
-                                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
-                                    <input
-                                      type="text"
-                                      placeholder="Masukkan catatan pegawai"
-                                      value={adminNoteInput[booking.id] ?? (booking.adminNotes || '')}
-                                      onChange={(e) => setAdminNoteInput({ ...adminNoteInput, [booking.id]: e.target.value })}
-                                      className={`flex-1 px-3 py-1.5 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
-                                    />
-                                    <div className="flex items-center gap-2">
-                                      <button
-                                        type="button"
-                                        disabled={isActioning}
-                                        onClick={() => handleApproveBooking(booking.id)}
-                                        className={`py-1.5 px-3 rounded-xl text-sm font-bold flex items-center gap-1 ${adminTheme.primaryButtonClass}`}
-                                      >
-                                        <CheckCircle2 className="w-3.5 h-3.5" />
-                                        <span>Lulus</span>
-                                      </button>
-                                      <button
-                                        type="button"
-                                        disabled={isActioning}
-                                        onClick={() =>
-                                          setRejectModalData({
-                                            type: 'kiosk',
-                                            id: booking.id,
-                                            name: booking.applicantName,
-                                            business: booking.businessName,
-                                            slotOrProgram: `${booking.slotCode} (${booking.hubLocation})`
-                                          })
-                                        }
-                                        className={`py-1.5 px-3 rounded-xl text-sm font-bold ${adminTheme.dangerOutlineButtonClass}`}
-                                      >
-                                        Tolak
-                                      </button>
-                                    </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
+                    <div className={`w-12 h-12 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                      <PortalImage
+                        src={resolveBookingKioskImage(booking, slots)}
+                        alt={`Reka bentuk kiosk ${booking.slotName}`}
+                        fallbackType="kiosk"
+                        fallbackLabel={booking.slotCode}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] leading-snug truncate kbelia-trim">
+                          {booking.slotCode} · {booking.businessName}
+                        </p>
+                        <span
+                          className={`text-[11px] font-bold shrink-0 px-2 py-0.5 rounded-lg ${
+                            booking.status === 'approved'
+                              ? 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300'
+                              : booking.status === 'rejected'
+                              ? 'bg-rose-500/12 text-rose-700 dark:text-rose-300'
+                              : booking.status === 'cancelled'
+                              ? 'bg-stone-500/12 text-stone-600 dark:text-stone-400'
+                              : 'bg-amber-500/12 text-amber-700 dark:text-amber-300'
+                          }`}
+                        >
+                          {booking.status === 'approved'
+                            ? 'Diluluskan'
+                            : booking.status === 'rejected'
+                            ? 'Ditolak'
+                            : booking.status === 'cancelled'
+                            ? 'Dibatalkan'
+                            : 'Menunggu'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
+                        {booking.applicantName} · {booking.hubLocation}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              leftFooter={
                 <PaginationBar
                   currentPage={bookingsPagination.currentPage}
                   totalItems={bookingsPagination.totalItems}
@@ -1323,326 +1132,347 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   itemLabel="permohonan kiosk"
                   accent="amber"
                 />
-              </>
-            )}
-          </div>
+              }
+              rightContent={
+                selectedBooking ? (
+                  <div>
+                    <SidePreviewHeader
+                      role="admin"
+                      media={
+                        <div className={`w-14 h-14 rounded-xl overflow-hidden border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <PortalImage
+                            src={resolveBookingKioskImage(selectedBooking, slots)}
+                            alt={selectedBooking.slotName}
+                            fallbackType="kiosk"
+                            fallbackLabel={selectedBooking.slotCode}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      }
+                      title={`${selectedBooking.slotCode} · ${selectedBooking.businessName}`}
+                      status={
+                        <span
+                          className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                            selectedBooking.status === 'approved'
+                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                              : selectedBooking.status === 'rejected'
+                              ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300'
+                              : selectedBooking.status === 'cancelled'
+                              ? 'bg-stone-500/15 text-stone-600 dark:text-stone-300'
+                              : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                          }`}
+                        >
+                          {selectedBooking.status === 'approved'
+                            ? 'Diluluskan'
+                            : selectedBooking.status === 'rejected'
+                            ? 'Ditolak'
+                            : selectedBooking.status === 'cancelled'
+                            ? 'Dibatalkan'
+                            : 'Menunggu Semakan'}
+                        </span>
+                      }
+                      subtitle={selectedBooking.applicantName}
+                      meta={
+                        <>
+                          <span>{selectedBooking.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : selectedBooking.businessCategory}</span>
+                          <span>·</span>
+                          <span>{selectedBooking.hubLocation}</span>
+                        </>
+                      }
+                      actions={
+                        <>
+                          <button
+                            type="button"
+                            disabled={actionLoading === selectedBooking.id || selectedBooking.status === 'approved'}
+                            onClick={() => handleApproveBooking(selectedBooking.id)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.primaryButtonClass}`}
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Lulus</span>
+                          </button>
+                          <button
+                            type="button"
+                            disabled={actionLoading === selectedBooking.id || selectedBooking.status === 'rejected'}
+                            onClick={() =>
+                              setRejectModalData({
+                                type: 'kiosk',
+                                id: selectedBooking.id,
+                                name: selectedBooking.applicantName,
+                                business: selectedBooking.businessName,
+                                slotOrProgram: `${selectedBooking.slotCode} (${selectedBooking.hubLocation})`
+                              })
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.dangerOutlineButtonClass}`}
+                          >
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>Tolak</span>
+                          </button>
+                          {selectedBooking.status !== 'pending' && (
+                            <button
+                              type="button"
+                              disabled={actionLoading === selectedBooking.id}
+                              onClick={() => handleDirectBookingStatus(selectedBooking, 'pending')}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 cursor-pointer disabled:opacity-45 ${adminTheme.secondaryButtonClass}`}
+                            >
+                              <Clock className="w-3.5 h-3.5" />
+                              <span>Set Menunggu</span>
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setEditingBooking(selectedBooking)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Sunting</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              confirmDelete({
+                                itemName: `${selectedBooking.businessName} (${selectedBooking.slotCode})`,
+                                itemType: 'Permohonan Kiosk',
+                                onConfirm: () => handleDeleteBookingRecord(selectedBooking)
+                              })
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Padam</span>
+                          </button>
+                        </>
+                      }
+                    />
+
+                    <div className="p-4 sm:p-5 space-y-4">
+                      <SidePreviewMetricsStrip
+                        role="admin"
+                        columns={3}
+                        items={[
+                          { label: 'Tempoh Operasi', value: `${selectedBooking.durationMonths} Bulan`, accent: true },
+                          { label: 'Tarikh Mula', value: formatDisplayDate(selectedBooking.startDate) },
+                          { label: 'Tarikh Akhir', value: calculateOperationEndDate(selectedBooking.startDate, selectedBooking.durationMonths) }
+                        ]}
+                      />
+
+                      {selectedBooking.pitchNotes && (
+                        <div className={`p-3.5 rounded-xl border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 block mb-1">
+                            Penerangan Perniagaan &amp; Cadangan Jualan
+                          </span>
+                          <p className="text-sm text-stone-900 dark:text-[#F5F2EC] leading-relaxed kbelia-prose">
+                            {selectedBooking.pitchNotes}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className={`p-3.5 rounded-xl border space-y-2.5 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                        <label className="text-[11px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 block">
+                          Catatan Pegawai
+                        </label>
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                          <input
+                            type="text"
+                            placeholder="Masukkan catatan pegawai"
+                            value={adminNoteInput[selectedBooking.id] ?? (selectedBooking.adminNotes || '')}
+                            onChange={(e) => setAdminNoteInput({ ...adminNoteInput, [selectedBooking.id]: e.target.value })}
+                            className={`flex-1 px-3 py-2 rounded-xl text-sm focus:outline-none ${adminTheme.inputClass}`}
+                          />
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              disabled={actionLoading === selectedBooking.id}
+                              onClick={() => handleApproveBooking(selectedBooking.id)}
+                              className={`py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Lulus</span>
+                            </button>
+                            <button
+                              type="button"
+                              disabled={actionLoading === selectedBooking.id}
+                              onClick={() =>
+                                setRejectModalData({
+                                  type: 'kiosk',
+                                  id: selectedBooking.id,
+                                  name: selectedBooking.applicantName,
+                                  business: selectedBooking.businessName,
+                                  slotOrProgram: `${selectedBooking.slotCode} (${selectedBooking.hubLocation})`
+                                })
+                              }
+                              className={`py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                            >
+                              Tolak
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <SidePreviewEmptyState
+                    icon={<Store className="w-10 h-10" />}
+                    title="Pilih permohonan kiosk"
+                    description="Klik mana-mana permohonan di senarai kiri untuk melihat cadangan perniagaan serta meluluskan atau menolak permohonan."
+                  />
+                )
+              }
+            />
+          )}
         </div>
       )}
 
-      {/* TAB 2: GRANT APPLICATIONS */}
+      {/* TAB 2: GRANT APPLICATIONS (Google Workspace Split-Pane) */}
       {activeTab === 'grants' && (
         <div key="grants" className="space-y-4 animate-dashboard-tab">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h4 className="text-lg sm:text-xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
-                Senarai Permohonan Geran &amp; Pembiayaan Belia
-              </h4>
+          <WorkspaceHeaderCard
+            role="admin"
+            icon={<Coins className="w-5 h-5" />}
+            title="Senarai Permohonan Geran & Pembiayaan Belia"
+            subtitle="Semak kelayakan pemohon, maklumat akaun bank, dan cadangan penggunaan dana geran."
+            rightActions={
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingGrant(null);
+                  setShowCreateGrant(true);
+                }}
+                className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer transition-colors ${adminTheme.primaryButtonClass}`}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah</span>
+              </button>
+            }
+            tabs={[
+              { id: 'all', label: 'Semua', count: grantCounts.all },
+              { id: 'pending', label: 'Menunggu', count: grantCounts.pending },
+              { id: 'approved', label: 'Lulus', count: grantCounts.approved },
+              { id: 'rejected', label: 'Ditolak', count: grantCounts.rejected }
+            ]}
+            activeTab={statusFilter}
+            onTabChange={(id) => {
+              setStatusFilter(id as 'all' | 'pending' | 'approved' | 'rejected');
+              setMobileGrantOpen(false);
+            }}
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            searchPlaceholder="Cari pemohon, syarikat atau geran..."
+            extraControls={
+              <select
+                value={grantSortPreset}
+                onChange={(e) => setGrantSortPreset(e.target.value)}
+                aria-label="Susun permohonan geran"
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+              >
+                {grantSortOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            }
+          />
+
+          {sortedGrants.length === 0 ? (
+            <div className={`rounded-2xl border py-12 px-6 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+              <Coins className="w-9 h-9 text-stone-400 dark:text-stone-500 mx-auto" />
+              <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] kbelia-trim">
+                Tiada rekod permohonan dana geran sepadan dengan tapisan semasa.
+              </p>
+              {(searchQuery || statusFilter !== 'all' || grantSortPreset !== DEFAULT_SORT_VALUE) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setStatusFilter('all');
+                    setGrantSortPreset(DEFAULT_SORT_VALUE);
+                  }}
+                  className={`mt-1 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                >
+                  Set Semula
+                </button>
+              )}
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setEditingGrant(null);
-                setShowCreateGrant(true);
-              }}
-              className={`px-4 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto transition-colors ${adminTheme.primaryButtonClass}`}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Tambah</span>
-            </button>
-          </div>
-
-          <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
-            <ReferenceTableToolbar
-              accent="amber"
-              searchValue={searchQuery}
-              onSearchChange={setSearchQuery}
-              searchPlaceholder="Cari pemohon, syarikat atau geran..."
-              filterCount={(statusFilter !== 'all' ? 1 : 0) + (grantSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
-              onResetFilters={() => {
-                setStatusFilter('all');
-                setGrantSortPreset(DEFAULT_SORT_VALUE);
-              }}
-              sortOptions={
-                grantSortPreset === 'table_column'
-                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...grantSortOptions]
-                  : grantSortOptions
-              }
-              sortValue={grantSortPreset === 'table_column' ? '' : grantSortPreset}
-              onSortChange={(val) => {
-                if (val) setGrantSortPreset(val);
-              }}
-              filterContent={
-                <div>
-                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                    Status Permohonan Geran
-                  </label>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {([
-                      { id: 'all', label: 'Semua' },
-                      { id: 'pending', label: 'Menunggu' },
-                      { id: 'approved', label: 'Lulus' },
-                      { id: 'rejected', label: 'Ditolak' }
-                    ] as const).map((opt) => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => setStatusFilter(opt.id)}
-                        className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
-                          statusFilter === opt.id
-                            ? adminTheme.segmentedActiveClass
-                            : adminTheme.secondaryButtonClass
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
+          ) : (
+            <GoogleWorkspaceSplitPane
+              role="admin"
+              mobileOpen={mobileGrantOpen && Boolean(selectedGrant)}
+              onMobileClose={() => setMobileGrantOpen(false)}
+              mobileTitle={selectedGrant?.businessName}
+              leftHeader={
+                <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                  <span>{sortedGrants.length} permohonan geran dipaparkan</span>
+                  {(searchQuery || statusFilter !== 'all' || grantSortPreset !== DEFAULT_SORT_VALUE) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setStatusFilter('all');
+                        setGrantSortPreset(DEFAULT_SORT_VALUE);
+                      }}
+                      className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                    >
+                      Set Semula
+                    </button>
+                  )}
                 </div>
               }
-            />
-
-            {sortedGrants.length === 0 ? (
-              <div className="py-12 px-6 text-center space-y-2">
-                <Coins className="w-9 h-9 text-stone-400 dark:text-stone-500 mx-auto" />
-                <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">
-                  Tiada rekod permohonan dana geran sepadan dengan tapisan semasa.
-                </p>
-                {(searchQuery || statusFilter !== 'all') && (
-                  <button
-                    type="button"
+              leftContent={grantsPagination.paginatedItems.map((grant) => {
+                const isSelected = selectedGrant?.id === grant.id;
+                return (
+                  <div
+                    key={grant.id}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => {
-                      setSearchQuery('');
-                      setStatusFilter('all');
-                      setGrantSortPreset(DEFAULT_SORT_VALUE);
+                      setSelectedGrantId(grant.id);
+                      setMobileGrantOpen(true);
                     }}
-                    className={`mt-1 px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedGrantId(grant.id);
+                        setMobileGrantOpen(true);
+                      }
+                    }}
+                    className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                      isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                    }`}
                   >
-                    Set Semula
-                  </button>
-                )}
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left border-collapse">
-                    <thead>
-                      <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                        <th className="py-3 pl-5 pr-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleGrantSort('businessName')}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Perniagaan &amp; Pemohon</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleGrantSort('programTitle')}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Program &amp; SSM</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleGrantSort('grantAmount')}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Nilai Geran</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => toggleGrantSort('status')}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-white cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Status</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 pl-2 pr-5 w-12 text-right">
-                          <span className="sr-only">Tindakan</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className={`divide-y ${adminTheme.dividerClass}`}>
-                      {grantsPagination.paginatedItems.map((grant) => {
-                        const isActioning = actionLoading === grant.id;
-                        const isExpanded = expandedGrantIds.includes(grant.id);
-                        return (
-                          <React.Fragment key={grant.id}>
-                            <tr className={`kbelia-table-row transition-colors ${adminTheme.rowHoverClass}`}>
-                              <td className="py-3.5 pl-5 pr-3">
-                                <div className="flex items-center gap-3 min-w-[200px]">
-                                  <div className={`w-10 h-10 rounded-xl shrink-0 border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
-                                    <FileText className="w-4 h-4" />
-                                  </div>
-                                  <div className="min-w-0">
-                                    <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
-                                      {grant.businessName}
-                                    </p>
-                                    <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[240px]">
-                                      {grant.applicantName}
-                                    </p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="py-3.5 px-3">
-                                <p className="font-medium text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
-                                  {grant.programTitle}
-                                </p>
-                                <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 whitespace-nowrap">
-                                  {grant.businessCategory} · SSM: {grant.ssmNumber || 'Dikecualikan'}
-                                </p>
-                              </td>
-                              <td className="py-3.5 px-3 font-mono font-bold text-stone-900 dark:text-[#F5F2EC] tabular-nums whitespace-nowrap">
-                                {grant.grantAmount}
-                              </td>
-                              <td className="py-3.5 px-3 whitespace-nowrap">
-                                <span
-                                  className={`text-[0.8125rem] font-semibold ${
-                                    grant.status === 'approved'
-                                      ? 'text-emerald-700 dark:text-emerald-400'
-                                      : grant.status === 'rejected'
-                                      ? 'text-rose-700 dark:text-rose-400'
-                                      : grant.status === 'cancelled'
-                                      ? 'text-stone-500 dark:text-stone-400'
-                                      : 'text-amber-700 dark:text-amber-300'
-                                  }`}
-                                >
-                                  {grant.status === 'approved'
-                                    ? 'Diluluskan'
-                                    : grant.status === 'rejected'
-                                    ? 'Ditolak'
-                                    : grant.status === 'cancelled'
-                                    ? 'Dibatalkan'
-                                    : 'Menunggu Semakan'}
-                                </span>
-                              </td>
-                              <td className="py-3.5 pl-2 pr-5 text-right">
-                                <RowActionMenu
-                                  ariaLabel={`Tindakan untuk ${grant.businessName}`}
-                                  items={[
-                                    {
-                                      label: isExpanded ? 'Tutup' : 'Lihat Butiran',
-                                      onClick: () => toggleExpandedId(setExpandedGrantIds, grant.id)
-                                    },
-                                    {
-                                      label: 'Lulus',
-                                      tone: 'accent',
-                                      disabled: isActioning || grant.status === 'approved',
-                                      onClick: () => handleApproveGrant(grant.id)
-                                    },
-                                    {
-                                      label: 'Tolak',
-                                      disabled: isActioning || grant.status === 'rejected',
-                                      onClick: () =>
-                                        setRejectModalData({
-                                          type: 'grant',
-                                          id: grant.id,
-                                          name: grant.applicantName,
-                                          business: grant.businessName,
-                                          slotOrProgram: `${grant.programTitle} (${grant.grantAmount})`
-                                        })
-                                    },
-                                    ...(grant.status !== 'pending'
-                                      ? [
-                                          {
-                                            label: 'Set Menunggu',
-                                            disabled: isActioning,
-                                            onClick: () => handleDirectGrantStatus(grant, 'pending')
-                                          }
-                                        ]
-                                      : []),
-                                    {
-                                      label: 'Sunting',
-                                      dividerBefore: true,
-                                      onClick: () => setEditingGrant(grant)
-                                    },
-                                    {
-                                      label: 'Padam',
-                                      tone: 'danger',
-                                      onClick: () =>
-                                        confirmDelete({
-                                          itemName: `${grant.businessName} (${grant.programTitle})`,
-                                          itemType: 'Permohonan Geran',
-                                          onConfirm: () => handleDeleteGrantRecord(grant)
-                                        })
-                                    }
-                                  ]}
-                                />
-                              </td>
-                            </tr>
-
-                            {isExpanded && (
-                              <tr className={adminTheme.surfaceMutedClass}>
-                                <td colSpan={5} className="px-5 py-4 space-y-3">
-                                  <div className="text-sm text-stone-700 dark:text-stone-300">
-                                    Akaun Bank: <strong className="text-stone-900 dark:text-[#F5F2EC]">{grant.bankName}</strong> ({grant.bankAccountNumber})
-                                  </div>
-
-                                  {grant.fundPurpose && (
-                                    <div className={`p-3 rounded-xl border text-sm text-stone-900 dark:text-[#F5F2EC] ${adminTheme.surfaceClass} ${adminTheme.dividerClass}`}>
-                                      <span className="font-semibold block mb-0.5">
-                                        Cadangan Penggunaan Dana:
-                                      </span>
-                                      {grant.fundPurpose}
-                                    </div>
-                                  )}
-
-                                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
-                                    <input
-                                      type="text"
-                                      placeholder="Masukkan catatan pegawai"
-                                      value={adminNoteInput[grant.id] ?? (grant.adminNotes || '')}
-                                      onChange={(e) => setAdminNoteInput({ ...adminNoteInput, [grant.id]: e.target.value })}
-                                      className={`flex-1 px-3 py-1.5 rounded-xl text-sm border focus:outline-none ${adminTheme.inputClass}`}
-                                    />
-                                    <div className="flex items-center gap-2">
-                                      <button
-                                        type="button"
-                                        disabled={isActioning}
-                                        onClick={() => handleApproveGrant(grant.id)}
-                                        className={`py-1.5 px-3 rounded-xl text-sm font-bold flex items-center gap-1 ${adminTheme.primaryButtonClass}`}
-                                      >
-                                        <CheckCircle2 className="w-3.5 h-3.5" />
-                                        <span>Lulus</span>
-                                      </button>
-                                      <button
-                                        type="button"
-                                        disabled={isActioning}
-                                        onClick={() =>
-                                          setRejectModalData({
-                                            type: 'grant',
-                                            id: grant.id,
-                                            name: grant.applicantName,
-                                            business: grant.businessName,
-                                            slotOrProgram: `${grant.programTitle} (${grant.grantAmount})`
-                                          })
-                                        }
-                                        className={`py-1.5 px-3 rounded-xl text-sm font-bold ${adminTheme.dangerOutlineButtonClass}`}
-                                      >
-                                        Tolak
-                                      </button>
-                                    </div>
-                                  </div>
-                                </td>
-                              </tr>
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
+                    <div className={`w-10 h-10 rounded-xl shrink-0 border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
+                      <FileText className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] leading-snug truncate kbelia-trim">
+                          {grant.businessName}
+                        </p>
+                        <span
+                          className={`text-[11px] font-bold shrink-0 px-2 py-0.5 rounded-lg ${
+                            grant.status === 'approved'
+                              ? 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300'
+                              : grant.status === 'rejected'
+                              ? 'bg-rose-500/12 text-rose-700 dark:text-rose-300'
+                              : grant.status === 'cancelled'
+                              ? 'bg-stone-500/12 text-stone-600 dark:text-stone-400'
+                              : 'bg-amber-500/12 text-amber-700 dark:text-amber-300'
+                          }`}
+                        >
+                          {grant.status === 'approved'
+                            ? 'Diluluskan'
+                            : grant.status === 'rejected'
+                            ? 'Ditolak'
+                            : grant.status === 'cancelled'
+                            ? 'Dibatalkan'
+                            : 'Menunggu'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 truncate tabular-nums">
+                        {grant.applicantName} · {grant.programTitle} · <strong className="font-mono">{grant.grantAmount}</strong>
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              leftFooter={
                 <PaginationBar
                   currentPage={grantsPagination.currentPage}
                   totalItems={grantsPagination.totalItems}
@@ -1651,253 +1481,349 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   itemLabel="permohonan geran"
                   accent="amber"
                 />
-              </>
-            )}
-          </div>
+              }
+              rightContent={
+                selectedGrant ? (
+                  <div>
+                    <SidePreviewHeader
+                      role="admin"
+                      media={
+                        <div className={`w-12 h-12 rounded-xl border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
+                          <Coins className="w-5 h-5" />
+                        </div>
+                      }
+                      title={selectedGrant.businessName}
+                      status={
+                        <span
+                          className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                            selectedGrant.status === 'approved'
+                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                              : selectedGrant.status === 'rejected'
+                              ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300'
+                              : selectedGrant.status === 'cancelled'
+                              ? 'bg-stone-500/15 text-stone-600 dark:text-stone-300'
+                              : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                          }`}
+                        >
+                          {selectedGrant.status === 'approved'
+                            ? 'Diluluskan'
+                            : selectedGrant.status === 'rejected'
+                            ? 'Ditolak'
+                            : selectedGrant.status === 'cancelled'
+                            ? 'Dibatalkan'
+                            : 'Menunggu Semakan'}
+                        </span>
+                      }
+                      subtitle={selectedGrant.programTitle}
+                      meta={
+                        <>
+                          <span>{selectedGrant.applicantName}</span>
+                          <span>·</span>
+                          <span><AcronymText text={selectedGrant.businessCategory} /></span>
+                          <span>·</span>
+                          <span>
+                            <span className="kbelia-acro">SSM</span>:{' '}
+                            {selectedGrant.ssmNumber ? (
+                              <MiddleTruncate text={selectedGrant.ssmNumber} startChars={8} endChars={5} />
+                            ) : (
+                              'Dikecualikan'
+                            )}
+                          </span>
+                        </>
+                      }
+                      actions={
+                        <>
+                          <button
+                            type="button"
+                            disabled={actionLoading === selectedGrant.id || selectedGrant.status === 'approved'}
+                            onClick={() => handleApproveGrant(selectedGrant.id)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.primaryButtonClass}`}
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Lulus</span>
+                          </button>
+                          <button
+                            type="button"
+                            disabled={actionLoading === selectedGrant.id || selectedGrant.status === 'rejected'}
+                            onClick={() =>
+                              setRejectModalData({
+                                type: 'grant',
+                                id: selectedGrant.id,
+                                name: selectedGrant.applicantName,
+                                business: selectedGrant.businessName,
+                                slotOrProgram: `${selectedGrant.programTitle} (${selectedGrant.grantAmount})`
+                              })
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.dangerOutlineButtonClass}`}
+                          >
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>Tolak</span>
+                          </button>
+                          {selectedGrant.status !== 'pending' && (
+                            <button
+                              type="button"
+                              disabled={actionLoading === selectedGrant.id}
+                              onClick={() => handleDirectGrantStatus(selectedGrant, 'pending')}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 cursor-pointer disabled:opacity-45 ${adminTheme.secondaryButtonClass}`}
+                            >
+                              <Clock className="w-3.5 h-3.5" />
+                              <span>Set Menunggu</span>
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setEditingGrant(selectedGrant)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Sunting</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              confirmDelete({
+                                itemName: `${selectedGrant.businessName} (${selectedGrant.programTitle})`,
+                                itemType: 'Permohonan Geran',
+                                onConfirm: () => handleDeleteGrantRecord(selectedGrant)
+                              })
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Padam</span>
+                          </button>
+                        </>
+                      }
+                    />
+
+                    <div className="p-4 sm:p-5 space-y-4">
+                      <SidePreviewMetricsStrip
+                        role="admin"
+                        columns={3}
+                        items={[
+                          { label: 'Nilai Geran Dimohon', value: selectedGrant.grantAmount, accent: true, mono: true },
+                          { label: 'Bank Penerima', value: selectedGrant.bankName || '-' },
+                          { label: 'Nombor Akaun Bank', value: selectedGrant.bankAccountNumber || '-', mono: true }
+                        ]}
+                      />
+
+                      {selectedGrant.fundPurpose && (
+                        <div className={`p-3.5 rounded-xl border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 block mb-1">
+                            Cadangan Penggunaan Dana
+                          </span>
+                          <p className="text-sm text-stone-900 dark:text-[#F5F2EC] leading-relaxed kbelia-prose">
+                            {selectedGrant.fundPurpose}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className={`p-3.5 rounded-xl border space-y-2.5 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                        <label className="text-[11px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 block">
+                          Catatan Pegawai
+                        </label>
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                          <input
+                            type="text"
+                            placeholder="Masukkan catatan pegawai"
+                            value={adminNoteInput[selectedGrant.id] ?? (selectedGrant.adminNotes || '')}
+                            onChange={(e) => setAdminNoteInput({ ...adminNoteInput, [selectedGrant.id]: e.target.value })}
+                            className={`flex-1 px-3 py-2 rounded-xl text-sm border focus:outline-none ${adminTheme.inputClass}`}
+                          />
+                          <div className="flex items-center gap-2 shrink-0">
+                            <button
+                              type="button"
+                              disabled={actionLoading === selectedGrant.id}
+                              onClick={() => handleApproveGrant(selectedGrant.id)}
+                              className={`py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Lulus</span>
+                            </button>
+                            <button
+                              type="button"
+                              disabled={actionLoading === selectedGrant.id}
+                              onClick={() =>
+                                setRejectModalData({
+                                  type: 'grant',
+                                  id: selectedGrant.id,
+                                  name: selectedGrant.applicantName,
+                                  business: selectedGrant.businessName,
+                                  slotOrProgram: `${selectedGrant.programTitle} (${selectedGrant.grantAmount})`
+                                })
+                              }
+                              className={`py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                            >
+                              Tolak
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <SidePreviewEmptyState
+                    icon={<Coins className="w-10 h-10" />}
+                    title="Pilih permohonan geran"
+                    description="Klik mana-mana permohonan geran di sebelah kiri untuk menyemak butiran bank, tujuan dana, dan keputusan kelulusan."
+                  />
+                )
+              }
+            />
+          )}
         </div>
       )}
 
-      {/* TAB 3: FACILITY & KIOSK MAINTENANCE CONTROL */}
+      {/* TAB 3: FACILITY & KIOSK MAINTENANCE CONTROL (Google Workspace Split-Panes) */}
       {activeTab === 'facility' && (
-        <div key="facility" className="space-y-5 animate-dashboard-tab">
-          <div className="space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div>
-                <h4 className="text-lg sm:text-xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
-                  Kawalan Fasiliti &amp; Status Unit Kiosk ({slots.length})
-                </h4>
+        <div key="facility" className="space-y-6 animate-dashboard-tab">
+          {/* Section A: Unit Kiosk */}
+          <div className="space-y-4">
+            <WorkspaceHeaderCard
+              role="admin"
+              icon={<Building2 className="w-5 h-5" />}
+              title={`Kawalan Fasiliti & Status Unit Kiosk (${slots.length})`}
+              subtitle="Kemas kini status ketersediaan, penyelenggaraan, dan butiran unit kapsul niaga."
+              rightActions={
+                <button
+                  type="button"
+                  onClick={() => setShowAddSlotModal(true)}
+                  className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah Unit</span>
+                </button>
+              }
+              tabs={[
+                { id: 'all', label: 'Semua', count: slotCounts.all },
+                { id: 'available', label: 'Tersedia', count: slotCounts.available },
+                { id: 'occupied', label: 'Diduduki', count: slotCounts.occupied },
+                { id: 'maintenance', label: 'Pembaikan', count: slotCounts.maintenance }
+              ]}
+              activeTab={slotStatusFilter}
+              onTabChange={(id) => {
+                setSlotStatusFilter(id as 'all' | 'available' | 'occupied' | 'maintenance');
+                setMobileSlotOpen(false);
+              }}
+              searchValue={slotSearch}
+              onSearchChange={setSlotSearch}
+              searchPlaceholder="Cari kod kiosk, nama atau daerah..."
+              extraControls={
+                <select
+                  value={slotSortPreset}
+                  onChange={(e) => setSlotSortPreset(e.target.value)}
+                  aria-label="Susun unit kiosk"
+                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                >
+                  {slotSortOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              }
+            />
+
+            {filteredFacilitySlots.length === 0 ? (
+              <div className={`rounded-2xl border py-10 px-6 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+                <Building2 className="w-9 h-9 text-stone-400 dark:text-stone-500 mx-auto" />
+                <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] kbelia-trim">
+                  Tiada unit kiosk sepadan dengan carian atau penapis.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSlotSearch('');
+                    setSlotStatusFilter('all');
+                    setSlotSortPreset(DEFAULT_SORT_VALUE);
+                  }}
+                  className={`mt-1 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                >
+                  Set Semula
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setShowAddSlotModal(true)}
-                className={`px-4 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto ${adminTheme.primaryButtonClass}`}
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Unit</span>
-              </button>
-            </div>
-
-            <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
-              <ReferenceTableToolbar
-                accent="amber"
-                searchValue={slotSearch}
-                onSearchChange={setSlotSearch}
-                searchPlaceholder="Cari kod kiosk, nama atau daerah..."
-                filterCount={(slotStatusFilter !== 'all' ? 1 : 0) + (slotSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
-                onResetFilters={() => {
-                  setSlotStatusFilter('all');
-                  setSlotSortPreset(DEFAULT_SORT_VALUE);
-                }}
-                sortOptions={
-                  slotSortPreset === 'table_column'
-                    ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...slotSortOptions]
-                    : slotSortOptions
-                }
-                sortValue={slotSortPreset === 'table_column' ? '' : slotSortPreset}
-                onSortChange={(val) => {
-                  if (val) setSlotSortPreset(val);
-                }}
-                filterContent={
-                  <div>
-                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                      Status Unit Kiosk
-                    </label>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {([
-                        { id: 'all', label: 'Semua' },
-                        { id: 'available', label: 'Tersedia' },
-                        { id: 'occupied', label: 'Diduduki' },
-                        { id: 'maintenance', label: 'Pembaikan' }
-                      ] as const).map((opt) => (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setSlotStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
-                            slotStatusFilter === opt.id
-                              ? adminTheme.segmentedActiveClass
-                              : adminTheme.secondaryButtonClass
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
+            ) : (
+              <GoogleWorkspaceSplitPane
+                role="admin"
+                mobileOpen={mobileSlotOpen && Boolean(selectedSlot)}
+                onMobileClose={() => setMobileSlotOpen(false)}
+                mobileTitle={selectedSlot ? `${selectedSlot.code} · ${selectedSlot.name}` : undefined}
+                leftHeader={
+                  <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <span>{filteredFacilitySlots.length} unit kiosk dipaparkan</span>
+                    {(slotSearch || slotStatusFilter !== 'all' || slotSortPreset !== DEFAULT_SORT_VALUE) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSlotSearch('');
+                          setSlotStatusFilter('all');
+                          setSlotSortPreset(DEFAULT_SORT_VALUE);
+                        }}
+                        className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                      >
+                        Set Semula
+                      </button>
+                    )}
                   </div>
                 }
-              />
-
-              {filteredFacilitySlots.length === 0 ? (
-                <div className="py-10 px-6 text-center space-y-2">
-                  <Building2 className="w-9 h-9 text-stone-400 dark:text-stone-500 mx-auto" />
-                  <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">
-                    Tiada unit kiosk sepadan dengan carian atau penapis.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSlotSearch('');
-                      setSlotStatusFilter('all');
-                      setSlotSortPreset(DEFAULT_SORT_VALUE);
-                    }}
-                    className={`mt-1 px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
-                  >
-                    Set Semula
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left border-collapse">
-                      <thead>
-                        <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                          <th className="py-3 pl-5 pr-3">
-                            <button
-                              type="button"
-                              onClick={() => toggleSlotSort('name')}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Unit Kiosk</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => toggleSlotSort('district')}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Hab &amp; Daerah</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => toggleSlotSort('monthlyRate')}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Kadar Sewa</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => toggleSlotSort('status')}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Status</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 pl-2 pr-5 w-12 text-right">
-                            <span className="sr-only">Tindakan</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className={`divide-y ${adminTheme.dividerClass}`}>
-                        {facilitySlotsPagination.paginatedItems.map((slot) => (
-                          <tr
-                            key={slot.id}
-                            className={`transition-colors ${adminTheme.rowHoverClass}`}
+                leftContent={facilitySlotsPagination.paginatedItems.map((slot) => {
+                  const isSelected = selectedSlot?.id === slot.id;
+                  return (
+                    <div
+                      key={slot.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {
+                        setSelectedSlotId(slot.id);
+                        setMobileSlotOpen(true);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedSlotId(slot.id);
+                          setMobileSlotOpen(true);
+                        }
+                      }}
+                      className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                        isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                      }`}
+                    >
+                      <div className={`w-12 h-12 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                        <PortalImage
+                          src={resolveSlotImage(slot)}
+                          alt={slot.name}
+                          fallbackType="kiosk"
+                          fallbackLabel={slot.code}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] leading-snug truncate kbelia-trim">
+                            {slot.code} · {slot.name}
+                          </p>
+                          <span
+                            className={`text-[11px] font-bold shrink-0 px-2 py-0.5 rounded-lg ${
+                              slot.status === 'available'
+                                ? 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300'
+                                : slot.status === 'maintenance'
+                                ? 'bg-amber-500/12 text-amber-700 dark:text-amber-300'
+                                : 'bg-stone-500/12 text-stone-600 dark:text-stone-400'
+                            }`}
                           >
-                            <td className="py-3.5 pl-5 pr-3">
-                              <div className="flex items-center gap-3 min-w-[200px]">
-                                <div className={`w-14 h-14 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                                  <PortalImage
-                                    src={resolveSlotImage(slot)}
-                                    alt={slot.name}
-                                    fallbackType="kiosk"
-                                    fallbackLabel={slot.code}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                                <div className="min-w-0">
-                                  <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
-                                    {slot.code} · {slot.name}
-                                  </p>
-                                  <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[240px]">
-                                    {slot.size}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="py-3.5 px-3">
-                              <p className="font-medium text-stone-900 dark:text-[#F5F2EC] whitespace-nowrap">
-                                {slot.hubLocation}
-                              </p>
-                              <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 whitespace-nowrap">
-                                {slot.district}
-                              </p>
-                            </td>
-                            <td className="py-3.5 px-3 font-mono font-bold text-stone-900 dark:text-[#F5F2EC] tabular-nums whitespace-nowrap">
-                              RM{slot.monthlyRate}/bulan
-                            </td>
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <span
-                                className={`text-[0.8125rem] font-semibold ${
-                                  slot.status === 'available'
-                                    ? 'text-emerald-700 dark:text-emerald-400'
-                                    : slot.status === 'maintenance'
-                                    ? 'text-amber-700 dark:text-amber-300'
-                                    : 'text-stone-500 dark:text-stone-400'
-                                }`}
-                              >
-                                {slot.status === 'available'
-                                  ? 'Tersedia'
-                                  : slot.status === 'maintenance'
-                                  ? 'Dalam Pembaikan'
-                                  : 'Diduduki'}
-                              </span>
-                            </td>
-                            <td className="py-3.5 pl-2 pr-5 text-right">
-                              <RowActionMenu
-                                ariaLabel={`Tindakan untuk ${slot.code}`}
-                                items={[
-                                  ...(onUpdateSlotStatus
-                                    ? [
-                                        {
-                                          label: 'Set Tersedia',
-                                          disabled: slot.status === 'available',
-                                          onClick: () => onUpdateSlotStatus(slot.id, 'available')
-                                        },
-                                        {
-                                          label: 'Set Pembaikan',
-                                          disabled: slot.status === 'maintenance',
-                                          onClick: () => onUpdateSlotStatus(slot.id, 'maintenance')
-                                        },
-                                        {
-                                          label: 'Set Diduduki',
-                                          disabled: slot.status === 'occupied',
-                                          onClick: () => onUpdateSlotStatus(slot.id, 'occupied')
-                                        }
-                                      ]
-                                    : []),
-                                  {
-                                    label: 'Sunting',
-                                    dividerBefore: Boolean(onUpdateSlotStatus),
-                                    onClick: () => setEditingSlot(slot)
-                                  },
-                                  {
-                                    label: 'Padam',
-                                    tone: 'danger',
-                                    onClick: () =>
-                                      confirmDelete({
-                                        itemName: `${slot.code} · ${slot.name}`,
-                                        itemType: 'Slot Kiosk',
-                                        onConfirm: () => handleDeleteSlotRecord(slot)
-                                      })
-                                  }
-                                ]}
-                              />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
+                            {slot.status === 'available'
+                              ? 'Tersedia'
+                              : slot.status === 'maintenance'
+                              ? 'Pembaikan'
+                              : 'Diduduki'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-stone-500 dark:text-stone-400 truncate tabular-nums">
+                          {slot.hubLocation} · {slot.district} · RM{slot.monthlyRate}/bln
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+                leftFooter={
                   <PaginationBar
                     currentPage={facilitySlotsPagination.currentPage}
                     totalItems={facilitySlotsPagination.totalItems}
@@ -1906,290 +1832,452 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                     itemLabel="unit kiosk"
                     accent="amber"
                   />
-                </>
-              )}
-            </div>
+                }
+                rightContent={
+                  selectedSlot ? (
+                    <div>
+                      <SidePreviewHeader
+                        role="admin"
+                        title={`${selectedSlot.code} · ${selectedSlot.name}`}
+                        status={
+                          <span
+                            className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                              selectedSlot.status === 'available'
+                                ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                                : selectedSlot.status === 'maintenance'
+                                ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                                : 'bg-stone-500/15 text-stone-600 dark:text-stone-300'
+                            }`}
+                          >
+                            {selectedSlot.status === 'available'
+                              ? 'Tersedia'
+                              : selectedSlot.status === 'maintenance'
+                              ? 'Dalam Pembaikan'
+                              : 'Diduduki'}
+                          </span>
+                        }
+                        subtitle={selectedSlot.hubLocation}
+                        meta={
+                          <>
+                            <span>{selectedSlot.district}</span>
+                            <span>·</span>
+                            <span>{selectedSlot.size}</span>
+                          </>
+                        }
+                        actions={
+                          <>
+                            {onUpdateSlotStatus && (
+                              <>
+                                <button
+                                  type="button"
+                                  disabled={selectedSlot.status === 'available'}
+                                  onClick={() => onUpdateSlotStatus(selectedSlot.id, 'available')}
+                                  className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.secondaryButtonClass}`}
+                                >
+                                  Set Tersedia
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={selectedSlot.status === 'maintenance'}
+                                  onClick={() => onUpdateSlotStatus(selectedSlot.id, 'maintenance')}
+                                  className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.secondaryButtonClass}`}
+                                >
+                                  Set Pembaikan
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={selectedSlot.status === 'occupied'}
+                                  onClick={() => onUpdateSlotStatus(selectedSlot.id, 'occupied')}
+                                  className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.secondaryButtonClass}`}
+                                >
+                                  Set Diduduki
+                                </button>
+                              </>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => setEditingSlot(selectedSlot)}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Sunting</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                confirmDelete({
+                                  itemName: `${selectedSlot.code} · ${selectedSlot.name}`,
+                                  itemType: 'Slot Kiosk',
+                                  onConfirm: () => handleDeleteSlotRecord(selectedSlot)
+                                })
+                              }
+                              className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Padam</span>
+                            </button>
+                          </>
+                        }
+                      />
+
+                      <div className="p-4 sm:p-5 space-y-4">
+                        <div className={`w-full h-44 sm:h-52 rounded-xl overflow-hidden border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <PortalImage
+                            src={resolveSlotImage(selectedSlot)}
+                            alt={selectedSlot.name}
+                            fallbackType="kiosk"
+                            fallbackLabel={selectedSlot.code}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+
+                        <SidePreviewMetricsStrip
+                          role="admin"
+                          columns={3}
+                          items={[
+                            { label: 'Kadar Sewa Bulanan', value: `RM${selectedSlot.monthlyRate}/bulan`, accent: true, mono: true },
+                            { label: 'Daerah', value: selectedSlot.district },
+                            { label: 'Saiz Kapsul', value: selectedSlot.size }
+                          ]}
+                        />
+
+                        {selectedSlot.amenities && selectedSlot.amenities.length > 0 && (
+                          <div className={`p-3.5 rounded-xl border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                            <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 block mb-2">
+                              Kemudahan Disediakan
+                            </span>
+                            <div className="flex flex-wrap gap-1.5">
+                              {selectedSlot.amenities.map((am, idx) => (
+                                <span
+                                  key={idx}
+                                  className={`px-2.5 py-1 rounded-lg text-xs font-medium border ${adminTheme.surfaceClass} ${adminTheme.dividerClass}`}
+                                >
+                                  {am}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <SidePreviewEmptyState
+                      icon={<Building2 className="w-10 h-10" />}
+                      title="Pilih unit kiosk"
+                      description="Klik mana-mana unit di senarai kiri untuk melihat gambar kiosk, status semasa, dan kemudahan."
+                    />
+                  )
+                }
+              />
+            )}
           </div>
 
-          {/* Aduan & Tiket Penyelenggaraan Penyewa */}
-          <div className="space-y-3 pt-2">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h4 className="text-base sm:text-lg font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight flex items-center gap-2">
-                  <Wrench className={`w-4.5 h-4.5 shrink-0 ${adminTheme.accentTextClass}`} />
-                  <span>Tiket Aduan Penyelenggaraan Penyewa ({maintenanceTickets.length})</span>
-                </h4>
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setEditingTicket(null);
-                  setShowCreateTicket(true);
-                }}
-                className={`px-4 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shrink-0 ${adminTheme.primaryButtonClass}`}
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Tiket</span>
-              </button>
-            </div>
+          {/* Section B: Tiket Aduan Penyelenggaraan Penyewa */}
+          <div className="space-y-4 pt-2">
+            <WorkspaceHeaderCard
+              role="admin"
+              icon={<Wrench className="w-5 h-5" />}
+              title={`Tiket Aduan Penyelenggaraan Penyewa (${maintenanceTickets.length})`}
+              subtitle="Pantau laporan kerosakan daripada penyewa kiosk dan tugaskan kerja baik pulih."
+              rightActions={
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingTicket(null);
+                    setShowCreateTicket(true);
+                  }}
+                  className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah Tiket</span>
+                </button>
+              }
+              tabs={[
+                { id: 'all', label: 'Semua', count: ticketCounts.all },
+                { id: 'received', label: 'Diterima', count: ticketCounts.received },
+                { id: 'in_progress', label: 'Sedang Dibaiki', count: ticketCounts.in_progress },
+                { id: 'resolved', label: 'Selesai', count: ticketCounts.resolved }
+              ]}
+              activeTab={ticketStatusFilter}
+              onTabChange={(id) => {
+                setTicketStatusFilter(id as 'all' | 'received' | 'in_progress' | 'resolved');
+                setMobileTicketOpen(false);
+              }}
+              searchValue={ticketSearch}
+              onSearchChange={setTicketSearch}
+              searchPlaceholder="Cari kiosk, pelapor atau aduan..."
+              extraControls={
+                <select
+                  value={ticketSortPreset}
+                  onChange={(e) => setTicketSortPreset(e.target.value)}
+                  aria-label="Susun tiket aduan"
+                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                >
+                  {ticketSortOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              }
+            />
 
             {maintenanceTickets.length === 0 ? (
               <div className={`p-8 text-center rounded-2xl border border-dashed text-sm text-stone-600 dark:text-stone-300 ${adminTheme.surfaceClass}`}>
                 Tiada aduan kerosakan aktif diterima daripada penyewa buat masa ini.
               </div>
-            ) : (
-              <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
-                <ReferenceTableToolbar
-                  accent="amber"
-                  searchValue={ticketSearch}
-                  onSearchChange={setTicketSearch}
-                  searchPlaceholder="Cari kiosk, pelapor atau aduan..."
-                  filterCount={(ticketStatusFilter !== 'all' ? 1 : 0) + (ticketSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
-                  onResetFilters={() => {
+            ) : sortedTickets.length === 0 ? (
+              <div className={`rounded-2xl border py-10 px-6 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+                <Wrench className="w-8 h-8 text-stone-400 dark:text-stone-500 mx-auto" />
+                <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] kbelia-trim">
+                  Tiada tiket aduan sepadan dengan carian atau penapis.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTicketSearch('');
                     setTicketStatusFilter('all');
                     setTicketSortPreset(DEFAULT_SORT_VALUE);
                   }}
-                  sortOptions={
-                    ticketSortPreset === 'table_column'
-                      ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...ticketSortOptions]
-                      : ticketSortOptions
-                  }
-                  sortValue={ticketSortPreset === 'table_column' ? '' : ticketSortPreset}
-                  onSortChange={(val) => {
-                    if (val) setTicketSortPreset(val);
-                  }}
-                  filterContent={
-                    <div>
-                      <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                        Status Tiket Aduan
-                      </label>
-                      <div className="grid grid-cols-2 gap-1.5">
-                        {([
-                          { id: 'all', label: 'Semua' },
-                          { id: 'received', label: 'Diterima' },
-                          { id: 'in_progress', label: 'Sedang Dibaiki' },
-                          { id: 'resolved', label: 'Selesai' }
-                        ] as const).map((opt) => (
-                          <button
-                            key={opt.id}
-                            type="button"
-                            onClick={() => setTicketStatusFilter(opt.id)}
-                            className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
-                              ticketStatusFilter === opt.id
-                                ? adminTheme.segmentedActiveClass
-                                : adminTheme.secondaryButtonClass
+                  className={`mt-1 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                >
+                  Set Semula
+                </button>
+              </div>
+            ) : (
+              <GoogleWorkspaceSplitPane
+                role="admin"
+                mobileOpen={mobileTicketOpen && Boolean(selectedTicket)}
+                onMobileClose={() => setMobileTicketOpen(false)}
+                mobileTitle={selectedTicket ? `${selectedTicket.slotCode} · ${selectedTicket.issueCategory}` : undefined}
+                leftHeader={
+                  <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <span>{sortedTickets.length} tiket aduan dipaparkan</span>
+                    {(ticketSearch || ticketStatusFilter !== 'all' || ticketSortPreset !== DEFAULT_SORT_VALUE) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTicketSearch('');
+                          setTicketStatusFilter('all');
+                          setTicketSortPreset(DEFAULT_SORT_VALUE);
+                        }}
+                        className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                      >
+                        Set Semula
+                      </button>
+                    )}
+                  </div>
+                }
+                leftContent={ticketsPagination.paginatedItems.map((ticket) => {
+                  const isSelected = selectedTicket?.id === ticket.id;
+                  return (
+                    <div
+                      key={ticket.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {
+                        setSelectedTicketId(ticket.id);
+                        setMobileTicketOpen(true);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedTicketId(ticket.id);
+                          setMobileTicketOpen(true);
+                        }
+                      }}
+                      className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                        isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-xl shrink-0 border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
+                        <Wrench className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] leading-snug truncate kbelia-trim">
+                            {ticket.slotCode} · {ticket.kioskName}
+                          </p>
+                          <span
+                            className={`text-[11px] font-bold shrink-0 px-2 py-0.5 rounded-lg ${
+                              ticket.status === 'resolved'
+                                ? 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300'
+                                : ticket.status === 'in_progress'
+                                ? 'bg-[#9A5628]/12 text-[#9A5628] dark:text-[#D98A4E]'
+                                : 'bg-amber-500/12 text-amber-700 dark:text-amber-300'
                             }`}
                           >
-                            {opt.label}
-                          </button>
-                        ))}
+                            {ticket.status === 'resolved'
+                              ? 'Selesai'
+                              : ticket.status === 'in_progress'
+                              ? 'Sedang Dibaiki'
+                              : 'Diterima'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-stone-500 dark:text-stone-400 truncate">
+                          {ticket.issueCategory} · {ticket.reporterName}
+                        </p>
                       </div>
                     </div>
-                  }
-                />
+                  );
+                })}
+                leftFooter={
+                  <PaginationBar
+                    currentPage={ticketsPagination.currentPage}
+                    totalItems={ticketsPagination.totalItems}
+                    itemsPerPage={7}
+                    onPageChange={ticketsPagination.setCurrentPage}
+                    itemLabel="tiket aduan"
+                    accent="amber"
+                  />
+                }
+                rightContent={
+                  selectedTicket ? (
+                    <div>
+                      <SidePreviewHeader
+                        role="admin"
+                        media={
+                          <div className={`w-11 h-11 rounded-xl border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
+                            <Wrench className="w-5 h-5" />
+                          </div>
+                        }
+                        title={`${selectedTicket.slotCode} · ${selectedTicket.kioskName}`}
+                        status={
+                          <span
+                            className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                              selectedTicket.status === 'resolved'
+                                ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                                : selectedTicket.status === 'in_progress'
+                                ? 'bg-[#9A5628]/15 text-[#9A5628] dark:text-[#D98A4E]'
+                                : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'
+                            }`}
+                          >
+                            {selectedTicket.status === 'resolved'
+                              ? 'Selesai'
+                              : selectedTicket.status === 'in_progress'
+                              ? 'Sedang Dibaiki'
+                              : 'Diterima'}
+                          </span>
+                        }
+                        subtitle={selectedTicket.issueCategory}
+                        meta={
+                          <>
+                            <span>Pelapor: {selectedTicket.reporterName}</span>
+                            {selectedTicket.reporterPhone && (
+                              <>
+                                <span>·</span>
+                                <span className="font-mono">{selectedTicket.reporterPhone}</span>
+                              </>
+                            )}
+                          </>
+                        }
+                        actions={
+                          <>
+                            {onUpdateTicketStatus && selectedTicket.status === 'received' && (
+                              <button
+                                type="button"
+                                disabled={actionLoading === selectedTicket.id}
+                                onClick={() =>
+                                  onUpdateTicketStatus(
+                                    selectedTicket.id,
+                                    'in_progress',
+                                    'Juruteknik telah ditugaskan untuk pemeriksaan.'
+                                  )
+                                }
+                                className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                              >
+                                Tugaskan
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              disabled={actionLoading === selectedTicket.id || selectedTicket.status === 'in_progress'}
+                              onClick={() => handleDirectTicketStatus(selectedTicket, 'in_progress')}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.secondaryButtonClass}`}
+                            >
+                              Set Dibaiki
+                            </button>
+                            <button
+                              type="button"
+                              disabled={actionLoading === selectedTicket.id || selectedTicket.status === 'resolved'}
+                              onClick={() =>
+                                onUpdateTicketStatus
+                                  ? onUpdateTicketStatus(
+                                      selectedTicket.id,
+                                      'resolved',
+                                      'Kerja baik pulih selesai dan disahkan.'
+                                    )
+                                  : handleDirectTicketStatus(selectedTicket, 'resolved')
+                              }
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.primaryButtonClass}`}
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Selesai</span>
+                            </button>
+                            {selectedTicket.status !== 'received' && (
+                              <button
+                                type="button"
+                                disabled={actionLoading === selectedTicket.id}
+                                onClick={() => handleDirectTicketStatus(selectedTicket, 'received')}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer disabled:opacity-45 ${adminTheme.secondaryButtonClass}`}
+                              >
+                                Set Diterima
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => setEditingTicket(selectedTicket)}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Sunting</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                confirmDelete({
+                                  itemName: `${selectedTicket.slotCode} · ${selectedTicket.issueCategory}`,
+                                  itemType: 'Tiket Aduan Fasiliti',
+                                  onConfirm: () => handleDeleteTicketRecord(selectedTicket)
+                                })
+                              }
+                              className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Padam</span>
+                            </button>
+                          </>
+                        }
+                      />
 
-                {sortedTickets.length === 0 ? (
-                  <div className="py-10 px-6 text-center space-y-2">
-                    <Wrench className="w-8 h-8 text-stone-400 dark:text-stone-500 mx-auto" />
-                    <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">
-                      Tiada tiket aduan sepadan dengan carian atau penapis.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTicketSearch('');
-                        setTicketStatusFilter('all');
-                        setTicketSortPreset(DEFAULT_SORT_VALUE);
-                      }}
-                      className={`mt-1 px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
-                    >
-                      Set Semula
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm text-left border-collapse">
-                        <thead>
-                          <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                            <th className="py-3 pl-5 pr-3">
-                              <button
-                                type="button"
-                                onClick={() => toggleTicketSort('slotCode')}
-                                className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                              >
-                                <span>Kiosk &amp; Pelapor</span>
-                                <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                              </button>
-                            </th>
-                            <th className="py-3 px-3">
-                              <button
-                                type="button"
-                                onClick={() => toggleTicketSort('issueCategory')}
-                                className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                              >
-                                <span>Kategori &amp; Aduan</span>
-                                <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                              </button>
-                            </th>
-                            <th className="py-3 px-3">
-                              <button
-                                type="button"
-                                onClick={() => toggleTicketSort('status')}
-                                className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                              >
-                                <span>Status</span>
-                                <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                              </button>
-                            </th>
-                            <th className="py-3 pl-2 pr-5 w-12 text-right">
-                              <span className="sr-only">Tindakan</span>
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className={`divide-y ${adminTheme.dividerClass}`}>
-                          {ticketsPagination.paginatedItems.map((ticket) => {
-                            const isExpanded = expandedTicketIds.includes(ticket.id);
-                            const isBusy = actionLoading === ticket.id;
-                            return (
-                              <React.Fragment key={ticket.id}>
-                                <tr className={`transition-colors ${adminTheme.rowHoverClass}`}>
-                                  <td className="py-3.5 pl-5 pr-3">
-                                    <div className="flex items-center gap-3 min-w-[200px]">
-                                      <div className={`w-10 h-10 rounded-xl shrink-0 border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
-                                        <Wrench className="w-4 h-4" />
-                                      </div>
-                                      <div className="min-w-0">
-                                        <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[220px]">
-                                          {ticket.slotCode} · {ticket.kioskName}
-                                        </p>
-                                        <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[220px]">
-                                          {ticket.reporterName}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="py-3.5 px-3">
-                                    <p className="font-medium text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
-                                      {ticket.issueCategory}
-                                    </p>
-                                    <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[280px]">
-                                      {ticket.description}
-                                    </p>
-                                  </td>
-                                  <td className="py-3.5 px-3 whitespace-nowrap">
-                                    <span
-                                      className={`text-[0.8125rem] font-semibold ${
-                                        ticket.status === 'resolved'
-                                          ? 'text-emerald-700 dark:text-emerald-400'
-                                          : ticket.status === 'in_progress'
-                                          ? adminTheme.accentTextClass
-                                          : 'text-amber-700 dark:text-amber-300'
-                                      }`}
-                                    >
-                                      {ticket.status === 'resolved'
-                                        ? 'Selesai'
-                                        : ticket.status === 'in_progress'
-                                        ? 'Sedang Dibaiki'
-                                        : 'Diterima'}
-                                    </span>
-                                  </td>
-                                  <td className="py-3.5 pl-2 pr-5 text-right">
-                                    <RowActionMenu
-                                      ariaLabel={`Tindakan untuk tiket ${ticket.slotCode}`}
-                                      items={[
-                                        {
-                                          label: isExpanded ? 'Tutup' : 'Lihat Butiran',
-                                          onClick: () => toggleExpandedId(setExpandedTicketIds, ticket.id)
-                                        },
-                                        {
-                                          label: 'Set Dibaiki',
-                                          disabled: isBusy || ticket.status === 'in_progress',
-                                          onClick: () => handleDirectTicketStatus(ticket, 'in_progress')
-                                        },
-                                        {
-                                          label: 'Selesai',
-                                          tone: 'accent',
-                                          disabled: isBusy || ticket.status === 'resolved',
-                                          onClick: () => handleDirectTicketStatus(ticket, 'resolved')
-                                        },
-                                        ...(ticket.status !== 'received'
-                                          ? [
-                                              {
-                                                label: 'Set Diterima',
-                                                disabled: isBusy,
-                                                onClick: () => handleDirectTicketStatus(ticket, 'received')
-                                              }
-                                            ]
-                                          : []),
-                                        {
-                                          label: 'Sunting',
-                                          dividerBefore: true,
-                                          onClick: () => setEditingTicket(ticket)
-                                        },
-                                        {
-                                          label: 'Padam',
-                                          tone: 'danger',
-                                          onClick: () =>
-                                            confirmDelete({
-                                              itemName: `${ticket.slotCode} · ${ticket.issueCategory}`,
-                                              itemType: 'Tiket Aduan Fasiliti',
-                                              onConfirm: () => handleDeleteTicketRecord(ticket)
-                                            })
-                                        }
-                                      ]}
-                                    />
-                                  </td>
-                                </tr>
+                      <div className="p-4 sm:p-5 space-y-4">
+                        <SidePreviewMetricsStrip
+                          role="admin"
+                          columns={3}
+                          items={[
+                            { label: 'Kod Kiosk', value: selectedTicket.slotCode, mono: true },
+                            { label: 'Kategori Aduan', value: selectedTicket.issueCategory },
+                            { label: 'Pelapor', value: `${selectedTicket.reporterName}${selectedTicket.reporterPhone ? ` (${selectedTicket.reporterPhone})` : ''}` }
+                          ]}
+                        />
 
-                                {isExpanded && (
-                                  <tr className={adminTheme.surfaceMutedClass}>
-                                    <td colSpan={4} className="px-5 py-3.5 space-y-2.5">
-                                      <p className="text-sm text-stone-900 dark:text-[#F5F2EC] leading-relaxed">{ticket.description}</p>
-                                      <p className="text-[0.8125rem] text-stone-600 dark:text-stone-300">
-                                        Pelapor: <strong className="text-stone-900 dark:text-[#F5F2EC]">{ticket.reporterName}</strong> ({ticket.reporterPhone})
-                                      </p>
-                                      {onUpdateTicketStatus && ticket.status !== 'resolved' && (
-                                        <div className="flex flex-wrap items-center gap-2 pt-1">
-                                          {ticket.status === 'received' && (
-                                            <button
-                                              type="button"
-                                              onClick={() => onUpdateTicketStatus(ticket.id, 'in_progress', 'Juruteknik telah ditugaskan untuk pemeriksaan.')}
-                                              className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
-                                            >
-                                              Tugaskan
-                                            </button>
-                                          )}
-                                          <button
-                                            type="button"
-                                            onClick={() => onUpdateTicketStatus(ticket.id, 'resolved', 'Kerja baik pulih selesai dan disahkan.')}
-                                            className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${adminTheme.primaryButtonClass}`}
-                                          >
-                                            Selesai
-                                          </button>
-                                        </div>
-                                      )}
-                                    </td>
-                                  </tr>
-                                )}
-                              </React.Fragment>
-                            );
-                          })}
-                        </tbody>
-                      </table>
+                        <div className={`p-4 rounded-xl border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 block mb-1.5">
+                            Butiran Kerosakan / Aduan
+                          </span>
+                          <p className="text-sm text-stone-900 dark:text-[#F5F2EC] leading-relaxed whitespace-pre-line kbelia-prose">
+                            {selectedTicket.description}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-
-                    <PaginationBar
-                      currentPage={ticketsPagination.currentPage}
-                      totalItems={ticketsPagination.totalItems}
-                      itemsPerPage={7}
-                      onPageChange={ticketsPagination.setCurrentPage}
-                      itemLabel="tiket aduan"
-                      accent="amber"
+                  ) : (
+                    <SidePreviewEmptyState
+                      icon={<Wrench className="w-10 h-10" />}
+                      title="Pilih tiket aduan"
+                      description="Klik mana-mana tiket aduan di sebelah kiri untuk melihat laporan kerosakan dan tindakan penyelenggaraan."
                     />
-                  </>
-                )}
-              </div>
+                  )
+                }
+              />
             )}
           </div>
         </div>

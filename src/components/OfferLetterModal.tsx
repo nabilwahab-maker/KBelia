@@ -33,6 +33,9 @@ import { loadLocalPortalSettings } from '../services/dataService';
 import { useAuth } from '../context/AuthContext';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
 import { showToast } from './ToastNotification';
+import { MiddleTruncate } from './TypographyPrimitives';
+import { QrCodeGraphic } from './QrCodeGraphic';
+import { buildVerificationQrPayload } from '../utils/qrUtils';
 
 interface OfferLetterModalProps {
   booking: CapsuleBooking | null;
@@ -177,7 +180,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
               <div className="text-left sm:text-right text-[0.8125rem] text-black/70 dark:text-white/75 space-y-1 font-mono">
                 <div className="flex items-center sm:justify-end gap-1.5">
                   <span>Nombor Rujukan:</span>
-                  <span className="font-bold text-black dark:text-white">{refNumber}</span>
+                  <MiddleTruncate text={refNumber} startChars={10} endChars={5} className="font-bold text-black dark:text-white" />
                   <button
                     type="button"
                     onClick={handleCopyRef}
@@ -206,7 +209,7 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
             {/* Decision Statement */}
             <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800/60 rounded-2xl flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-black dark:text-white/75 shrink-0 mt-0.5" />
-              <div className="text-sm sm:text-[0.9375rem] text-black dark:text-white leading-relaxed">
+              <div className="text-sm sm:text-[0.9375rem] text-black dark:text-white leading-relaxed kbelia-prose">
                 Sukacita dimaklumkan bahawa permohonan anda untuk menyewa ruang kiosk niaga bagi premis <strong>{booking.slotName} ({booking.slotCode})</strong> telah <strong>DILULUSKAN</strong> di bawah Skim Kapsul Niaga Usahawan Belia Kelantan.
               </div>
             </div>
@@ -263,10 +266,17 @@ export const OfferLetterModal: React.FC<OfferLetterModalProps> = ({
                 </div>
               </div>
 
-              {/* Verifiable QR Block */}
-              <div className="flex flex-col items-center shrink-0 p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 shadow-xs">
-                <QrCode className="w-12 h-12 text-black dark:text-white" />
-                <span className="text-[0.8125rem] font-mono text-black/70 dark:text-white/75 mt-1 font-bold">SAH & BERAUDIT</span>
+              {/* Verifiable Real Scannable QR Block */}
+              <div
+                className="flex flex-col items-center shrink-0 p-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-300 dark:border-slate-600 shadow-xs cursor-pointer hover:border-amber-500 transition-colors"
+                onClick={() => onOpenVerification && onOpenVerification(refNumber)}
+                title="Klik untuk buka pengesahan & muat turun PNG QR"
+              >
+                <QrCodeGraphic
+                  value={buildVerificationQrPayload(refNumber)}
+                  size={74}
+                  caption="SAH & BERAUDIT"
+                />
               </div>
             </div>
 

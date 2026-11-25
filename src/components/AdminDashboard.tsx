@@ -28,7 +28,12 @@ import {
   Activity,
   Newspaper,
   Plus,
-  ArrowUpDown
+  Edit3,
+  Trash2,
+  MapPin,
+  Star,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { 
   BusinessListing, 
@@ -108,7 +113,6 @@ import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { PortalImage } from './PortalImage';
 import { resolveBookingKioskImage, resolveSlotImage, resolveProgramImage } from '../utils/visualAssets';
 import { PaginationBar, usePagination } from './PaginationBar';
-import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import {
   DEFAULT_SORT_VALUE,
   ToolbarSortOption,
@@ -119,6 +123,15 @@ import {
   sortRecords
 } from '../utils/sortUtils';
 import { usePrefersReducedMotion } from '../hooks/useMotion';
+import { MiddleTruncate } from './TypographyPrimitives';
+import {
+  GoogleWorkspaceSplitPane,
+  SidePreviewEmptyState,
+  SidePreviewHeader,
+  SidePreviewMetricsStrip,
+  WorkspaceHeaderCard,
+  getWorkspaceActiveRowClass
+} from './GoogleWorkspaceSplitPane';
 
 interface AdminDashboardProps {
   slots: CapsuleSlot[];
@@ -283,55 +296,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const safeBookings = bookings || [];
   const safePrograms = programs || [];
 
-  // Filter states
+  // Filter, sort & split-pane selection states
   const [bookingFilter, setBookingFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
   const [adminBookingSearch, setAdminBookingSearch] = useState('');
-  const [adminBookingSort, setAdminBookingSort] = useState<{
-    key: 'businessName' | 'category' | 'hubLocation' | 'status';
-    dir: 'asc' | 'desc';
-  }>({ key: 'status', dir: 'asc' });
   const [adminBookingSortPreset, setAdminBookingSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [mobileBookingOpen, setMobileBookingOpen] = useState(false);
 
   const [bizSearch, setBizSearch] = useState('');
   const [bizStatusFilter, setBizStatusFilter] = useState<'all' | 'approved' | 'hidden' | 'featured'>('all');
   const [bizDistrictFilter, setBizDistrictFilter] = useState<string>('Semua');
-  const [bizSort, setBizSort] = useState<{
-    key: 'businessName' | 'category' | 'district' | 'isApproved';
-    dir: 'asc' | 'desc';
-  }>({ key: 'businessName', dir: 'asc' });
   const [bizSortPreset, setBizSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
+  const [selectedBizId, setSelectedBizId] = useState<string | null>(null);
+  const [mobileBizOpen, setMobileBizOpen] = useState(false);
 
   const [adminSlotSearch, setAdminSlotSearch] = useState('');
   const [adminSlotStatusFilter, setAdminSlotStatusFilter] = useState<'all' | SlotStatus>('all');
   const [adminSlotDistrictFilter, setAdminSlotDistrictFilter] = useState<string>('Semua');
-  const [adminSlotSort, setAdminSlotSort] = useState<{
-    key: 'name' | 'district' | 'monthlyRate' | 'status';
-    dir: 'asc' | 'desc';
-  }>({ key: 'name', dir: 'asc' });
   const [adminSlotSortPreset, setAdminSlotSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
+  const [mobileSlotOpen, setMobileSlotOpen] = useState(false);
 
   const [progSearch, setProgSearch] = useState('');
   const [progCategoryFilter, setProgCategoryFilter] = useState<'Semua' | YouthProgram['category']>('Semua');
-  const [progSort, setProgSort] = useState<{
-    key: 'title' | 'category' | 'grantAmount';
-    dir: 'asc' | 'desc';
-  }>({ key: 'title', dir: 'asc' });
   const [progSortPreset, setProgSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
+  const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
+  const [mobileProgramOpen, setMobileProgramOpen] = useState(false);
 
   const [mentorListSearch, setMentorListSearch] = useState('');
-  const [mentorListSort, setMentorListSort] = useState<{
-    key: 'name' | 'agency' | 'menteeCount';
-    dir: 'asc' | 'desc';
-  }>({ key: 'name', dir: 'asc' });
   const [mentorListSortPreset, setMentorListSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
+  const [selectedMentorId, setSelectedMentorId] = useState<string | null>(null);
+  const [mobileMentorOpen, setMobileMentorOpen] = useState(false);
 
   const [mentorshipSearch, setMentorshipSearch] = useState('');
   const [mentorshipStatusFilter, setMentorshipStatusFilter] = useState<'all' | MentorshipRegistration['status']>('all');
-  const [mentorshipSort, setMentorshipSort] = useState<{
-    key: 'entrepreneurName' | 'mentorName' | 'preferredDate' | 'status';
-    dir: 'asc' | 'desc';
-  }>({ key: 'status', dir: 'asc' });
   const [mentorshipSortPreset, setMentorshipSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
+  const [selectedMentorshipId, setSelectedMentorshipId] = useState<string | null>(null);
+  const [mobileMentorshipOpen, setMobileMentorshipOpen] = useState(false);
 
   const adminBookingSortOptions: ToolbarSortOption[] = buildStandardSortOptions([
     { value: 'status_pending', label: 'Status (Menunggu Dahulu)' },
@@ -723,13 +724,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
-  const [expandedAdminBookingIds, setExpandedAdminBookingIds] = useState<string[]>([]);
-  const toggleAdminBookingExpand = (id: string) => {
-    setExpandedAdminBookingIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
   const filteredBookings = safeBookings.filter(b => {
     if (!b) return false;
     if (bookingFilter !== 'all' && b.status !== bookingFilter) return false;
@@ -744,31 +738,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   });
 
   const adminBookingOrder: Record<string, number> = { pending: 0, approved: 1, rejected: 2, cancelled: 3 };
-  const sortedBookings =
-    adminBookingSortPreset === 'table_column'
-      ? [...filteredBookings].sort((a, b) => {
-          const dirMult = adminBookingSort.dir === 'asc' ? 1 : -1;
-          if (adminBookingSort.key === 'businessName') {
-            return `${a.slotCode} ${a.businessName}`.localeCompare(`${b.slotCode} ${b.businessName}`) * dirMult;
-          }
-          if (adminBookingSort.key === 'category') {
-            return (a.businessCategory || '').localeCompare(b.businessCategory || '') * dirMult;
-          }
-          if (adminBookingSort.key === 'hubLocation') {
-            return (a.hubLocation || '').localeCompare(b.hubLocation || '') * dirMult;
-          }
-          return ((adminBookingOrder[a.status] ?? 4) - (adminBookingOrder[b.status] ?? 4)) * dirMult;
-        })
-      : sortRecords(filteredBookings, {
-          sortBy: adminBookingSortPreset,
-          getName: (b) => b.businessName || b.applicantName || b.slotCode || '',
-          customCompare: (a, b, mode) => {
-            if (mode === 'status_pending') return (adminBookingOrder[a.status] ?? 4) - (adminBookingOrder[b.status] ?? 4);
-            if (mode === 'hub_asc') return compareText(a.hubLocation, b.hubLocation);
-            if (mode === 'category_asc') return compareText(a.businessCategory, b.businessCategory);
-            return null;
-          }
-        });
+  const sortedBookings = sortRecords(filteredBookings, {
+    sortBy: adminBookingSortPreset,
+    getName: (b) => b.businessName || b.applicantName || b.slotCode || '',
+    customCompare: (a, b, mode) => {
+      if (mode === 'status_pending') return (adminBookingOrder[a.status] ?? 4) - (adminBookingOrder[b.status] ?? 4);
+      if (mode === 'hub_asc') return compareText(a.hubLocation, b.hubLocation);
+      if (mode === 'category_asc') return compareText(a.businessCategory, b.businessCategory);
+      return null;
+    }
+  });
 
   const baseFilteredBusinesses = safeBusinesses.filter((biz) => {
     if (bizStatusFilter === 'approved' && !biz.isApproved) return false;
@@ -785,26 +764,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     );
   });
 
-  const filteredBusinesses =
-    bizSortPreset === 'table_column'
-      ? [...baseFilteredBusinesses].sort((a, b) => {
-          const dirMult = bizSort.dir === 'asc' ? 1 : -1;
-          if (bizSort.key === 'category') return (a.category || '').localeCompare(b.category || '') * dirMult;
-          if (bizSort.key === 'district') return (a.district || '').localeCompare(b.district || '') * dirMult;
-          if (bizSort.key === 'isApproved') return ((a.isApproved ? 1 : 0) - (b.isApproved ? 1 : 0)) * dirMult;
-          return (a.businessName || '').localeCompare(b.businessName || '') * dirMult;
-        })
-      : sortRecords(baseFilteredBusinesses, {
-          sortBy: bizSortPreset,
-          getName: (biz) => biz.businessName || biz.ownerName || '',
-          customCompare: (a, b, mode) => {
-            if (mode === 'featured_first') return (a.isFeatured ? 0 : 1) - (b.isFeatured ? 0 : 1);
-            if (mode === 'district_asc') return compareText(a.district, b.district);
-            if (mode === 'category_asc') return compareText(a.category, b.category);
-            if (mode === 'status_approved') return (a.isApproved ? 0 : 1) - (b.isApproved ? 0 : 1);
-            return null;
-          }
-        });
+  const filteredBusinesses = sortRecords(baseFilteredBusinesses, {
+    sortBy: bizSortPreset,
+    getName: (biz) => biz.businessName || biz.ownerName || '',
+    customCompare: (a, b, mode) => {
+      if (mode === 'featured_first') return (a.isFeatured ? 0 : 1) - (b.isFeatured ? 0 : 1);
+      if (mode === 'district_asc') return compareText(a.district, b.district);
+      if (mode === 'category_asc') return compareText(a.category, b.category);
+      if (mode === 'status_approved') return (a.isApproved ? 0 : 1) - (b.isApproved ? 0 : 1);
+      return null;
+    }
+  });
 
   const baseFilteredAdminSlots = safeSlots.filter((s) => {
     if (adminSlotStatusFilter !== 'all' && s.status !== adminSlotStatusFilter) return false;
@@ -819,27 +789,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     );
   });
 
-  const slotStatusOrder: Record<string, number> = { available: 0, occupied: 1, maintenance: 2 };
-  const filteredAdminSlots =
-    adminSlotSortPreset === 'table_column'
-      ? [...baseFilteredAdminSlots].sort((a, b) => {
-          const dirMult = adminSlotSort.dir === 'asc' ? 1 : -1;
-          if (adminSlotSort.key === 'district') return (a.district || '').localeCompare(b.district || '') * dirMult;
-          if (adminSlotSort.key === 'monthlyRate') return ((Number(a.monthlyRate) || 0) - (Number(b.monthlyRate) || 0)) * dirMult;
-          if (adminSlotSort.key === 'status') return (a.status || '').localeCompare(b.status || '') * dirMult;
-          return `${a.code} ${a.name}`.localeCompare(`${b.code} ${b.name}`) * dirMult;
-        })
-      : sortRecords(baseFilteredAdminSlots, {
-          sortBy: adminSlotSortPreset,
-          getName: (s) => `${s.code || ''} ${s.name || ''}`.trim(),
-          customCompare: (a, b, mode) => {
-            if (mode === 'rate_asc') return (Number(a.monthlyRate) || 0) - (Number(b.monthlyRate) || 0);
-            if (mode === 'rate_desc') return (Number(b.monthlyRate) || 0) - (Number(a.monthlyRate) || 0);
-            if (mode === 'district_asc') return compareText(a.district, b.district);
-            if (mode === 'status_available') return (slotStatusOrder[a.status] ?? 3) - (slotStatusOrder[b.status] ?? 3);
-            return null;
-          }
-        });
+  const slotStatusOrder: Record<string, number> = { available: 0, occupied: 1, reserved: 2, maintenance: 3 };
+  const filteredAdminSlots = sortRecords(baseFilteredAdminSlots, {
+    sortBy: adminSlotSortPreset,
+    getName: (s) => `${s.code || ''} ${s.name || ''}`.trim(),
+    customCompare: (a, b, mode) => {
+      if (mode === 'rate_asc') return (Number(a.monthlyRate) || 0) - (Number(b.monthlyRate) || 0);
+      if (mode === 'rate_desc') return (Number(b.monthlyRate) || 0) - (Number(a.monthlyRate) || 0);
+      if (mode === 'district_asc') return compareText(a.district, b.district);
+      if (mode === 'status_available') return (slotStatusOrder[a.status] ?? 4) - (slotStatusOrder[b.status] ?? 4);
+      return null;
+    }
+  });
 
   const baseFilteredAdminPrograms = safePrograms.filter((p) => {
     if (progCategoryFilter !== 'Semua' && p.category !== progCategoryFilter) return false;
@@ -852,28 +813,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     );
   });
 
-  const filteredAdminPrograms =
-    progSortPreset === 'table_column'
-      ? [...baseFilteredAdminPrograms].sort((a, b) => {
-          const dirMult = progSort.dir === 'asc' ? 1 : -1;
-          if (progSort.key === 'category') return (a.category || '').localeCompare(b.category || '') * dirMult;
-          if (progSort.key === 'grantAmount') {
-            const numA = Number(String(a.grantAmount || '0').replace(/[^0-9.]/g, '')) || 0;
-            const numB = Number(String(b.grantAmount || '0').replace(/[^0-9.]/g, '')) || 0;
-            return (numA - numB) * dirMult;
-          }
-          return (a.title || '').localeCompare(b.title || '') * dirMult;
-        })
-      : sortRecords(baseFilteredAdminPrograms, {
-          sortBy: progSortPreset,
-          getName: (p) => p.title || '',
-          customCompare: (a, b, mode) => {
-            if (mode === 'amount_desc') return parseNumericAmount(b.grantAmount) - parseNumericAmount(a.grantAmount);
-            if (mode === 'category_asc') return compareText(a.category, b.category);
-            if (mode === 'date_asc') return getTimestampMs(a.date) - getTimestampMs(b.date);
-            return null;
-          }
-        });
+  const filteredAdminPrograms = sortRecords(baseFilteredAdminPrograms, {
+    sortBy: progSortPreset,
+    getName: (p) => p.title || '',
+    customCompare: (a, b, mode) => {
+      if (mode === 'amount_desc') return parseNumericAmount(b.grantAmount) - parseNumericAmount(a.grantAmount);
+      if (mode === 'category_asc') return compareText(a.category, b.category);
+      if (mode === 'date_asc') return getTimestampMs(a.date) - getTimestampMs(b.date);
+      return null;
+    }
+  });
 
   const baseFilteredAdminMentors = mentors.filter((m) => {
     const q = mentorListSearch.trim().toLowerCase();
@@ -886,32 +835,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     );
   });
 
-  const filteredAdminMentors =
-    mentorListSortPreset === 'table_column'
-      ? [...baseFilteredAdminMentors].sort((a, b) => {
-          const dirMult = mentorListSort.dir === 'asc' ? 1 : -1;
-          if (mentorListSort.key === 'agency') return (a.agency || '').localeCompare(b.agency || '') * dirMult;
-          if (mentorListSort.key === 'menteeCount') {
-            const countA = mentorshipRegistrations.filter(r => r.mentorId === a.id).length;
-            const countB = mentorshipRegistrations.filter(r => r.mentorId === b.id).length;
-            return (countA - countB) * dirMult;
-          }
-          return (a.name || '').localeCompare(b.name || '') * dirMult;
-        })
-      : sortRecords(baseFilteredAdminMentors, {
-          sortBy: mentorListSortPreset,
-          getName: (m) => m.name || '',
-          customCompare: (a, b, mode) => {
-            if (mode === 'mentees_desc') {
-              const countA = mentorshipRegistrations.filter(r => r.mentorId === a.id).length;
-              const countB = mentorshipRegistrations.filter(r => r.mentorId === b.id).length;
-              return countB - countA;
-            }
-            if (mode === 'agency_asc') return compareText(a.agency, b.agency);
-            if (mode === 'title_asc') return compareText(a.title, b.title);
-            return null;
-          }
-        });
+  const filteredAdminMentors = sortRecords(baseFilteredAdminMentors, {
+    sortBy: mentorListSortPreset,
+    getName: (m) => m.name || '',
+    customCompare: (a, b, mode) => {
+      if (mode === 'mentees_desc') {
+        const countA = mentorshipRegistrations.filter(r => r.mentorId === a.id).length;
+        const countB = mentorshipRegistrations.filter(r => r.mentorId === b.id).length;
+        return countB - countA;
+      }
+      if (mode === 'agency_asc') return compareText(a.agency, b.agency);
+      if (mode === 'title_asc') return compareText(a.title, b.title);
+      return null;
+    }
+  });
 
   const mentorStatusOrder: Record<string, number> = { pending: 0, confirmed: 1, completed: 2, cancelled: 3 };
   const baseFilteredMentorships = mentorshipRegistrations.filter((m) => {
@@ -927,39 +864,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     );
   });
 
-  const sortedMentorships =
-    mentorshipSortPreset === 'table_column'
-      ? [...baseFilteredMentorships].sort((a, b) => {
-          const dirMult = mentorshipSort.dir === 'asc' ? 1 : -1;
-          if (mentorshipSort.key === 'entrepreneurName') {
-            return (a.entrepreneurName || '').localeCompare(b.entrepreneurName || '') * dirMult;
-          }
-          if (mentorshipSort.key === 'mentorName') {
-            return (a.mentorName || '').localeCompare(b.mentorName || '') * dirMult;
-          }
-          if (mentorshipSort.key === 'preferredDate') {
-            return (a.preferredDate || '').localeCompare(b.preferredDate || '') * dirMult;
-          }
-          return ((mentorStatusOrder[a.status] ?? 4) - (mentorStatusOrder[b.status] ?? 4)) * dirMult;
-        })
-      : sortRecords(baseFilteredMentorships, {
-          sortBy: mentorshipSortPreset,
-          getName: (m) => `${m.entrepreneurName || ''} ${m.businessName || ''}`.trim(),
-          customCompare: (a, b, mode) => {
-            if (mode === 'status_pending') return (mentorStatusOrder[a.status] ?? 4) - (mentorStatusOrder[b.status] ?? 4);
-            if (mode === 'session_date_asc') return getTimestampMs(a.preferredDate) - getTimestampMs(b.preferredDate);
-            if (mode === 'mentor_asc') return compareText(a.mentorName, b.mentorName);
-            if (mode === 'district_asc') return compareText(a.district, b.district);
-            return null;
-          }
-        });
+  const sortedMentorships = sortRecords(baseFilteredMentorships, {
+    sortBy: mentorshipSortPreset,
+    getName: (m) => `${m.entrepreneurName || ''} ${m.businessName || ''}`.trim(),
+    customCompare: (a, b, mode) => {
+      if (mode === 'status_pending') return (mentorStatusOrder[a.status] ?? 4) - (mentorStatusOrder[b.status] ?? 4);
+      if (mode === 'session_date_asc') return getTimestampMs(a.preferredDate) - getTimestampMs(b.preferredDate);
+      if (mode === 'mentor_asc') return compareText(a.mentorName, b.mentorName);
+      if (mode === 'district_asc') return compareText(a.district, b.district);
+      return null;
+    }
+  });
 
   const adminBookingsPagination = usePagination(sortedBookings, 7, [
     bookingFilter,
     adminBookingSearch,
     adminBookingSortPreset,
-    adminBookingSort.key,
-    adminBookingSort.dir,
     sortedBookings.length
   ]);
   const businessesPagination = usePagination(filteredBusinesses, 7, [
@@ -967,8 +887,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     bizStatusFilter,
     bizDistrictFilter,
     bizSortPreset,
-    bizSort.key,
-    bizSort.dir,
     filteredBusinesses.length
   ]);
   const slotsPagination = usePagination(filteredAdminSlots, 7, [
@@ -976,33 +894,56 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     adminSlotStatusFilter,
     adminSlotDistrictFilter,
     adminSlotSortPreset,
-    adminSlotSort.key,
-    adminSlotSort.dir,
     filteredAdminSlots.length
   ]);
   const programsPagination = usePagination(filteredAdminPrograms, 7, [
     progSearch,
     progCategoryFilter,
     progSortPreset,
-    progSort.key,
-    progSort.dir,
     filteredAdminPrograms.length
   ]);
   const adminMentorsPagination = usePagination(filteredAdminMentors, 7, [
     mentorListSearch,
     mentorListSortPreset,
-    mentorListSort.key,
-    mentorListSort.dir,
     filteredAdminMentors.length
   ]);
   const adminMentorshipsPagination = usePagination(sortedMentorships, 7, [
     mentorshipSearch,
     mentorshipStatusFilter,
     mentorshipSortPreset,
-    mentorshipSort.key,
-    mentorshipSort.dir,
     sortedMentorships.length
   ]);
+
+  const selectedBooking =
+    sortedBookings.find((b) => b.id === selectedBookingId) ||
+    adminBookingsPagination.paginatedItems[0] ||
+    sortedBookings[0] ||
+    null;
+  const selectedBusiness =
+    filteredBusinesses.find((b) => b.id === selectedBizId) ||
+    businessesPagination.paginatedItems[0] ||
+    filteredBusinesses[0] ||
+    null;
+  const selectedSlot =
+    filteredAdminSlots.find((s) => s.id === selectedSlotId) ||
+    slotsPagination.paginatedItems[0] ||
+    filteredAdminSlots[0] ||
+    null;
+  const selectedProgram =
+    filteredAdminPrograms.find((p) => p.id === selectedProgramId) ||
+    programsPagination.paginatedItems[0] ||
+    filteredAdminPrograms[0] ||
+    null;
+  const selectedMentorItem =
+    filteredAdminMentors.find((m) => m.id === selectedMentorId) ||
+    adminMentorsPagination.paginatedItems[0] ||
+    filteredAdminMentors[0] ||
+    null;
+  const selectedMentorship =
+    sortedMentorships.find((m) => m.id === selectedMentorshipId) ||
+    adminMentorshipsPagination.paginatedItems[0] ||
+    sortedMentorships[0] ||
+    null;
 
   if (!isAdmin) {
     return (
@@ -1098,7 +1039,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <p className={`text-xs sm:text-[13px] font-semibold mb-1 ${adminTheme.accentTextClass}`}>
                   {isMs ? 'Rangkaian Seluruh Negeri Kelantan' : 'Statewide Network Across Kelantan'}
                 </p>
-                <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-[#F5F2EC] tracking-tight">
+                <h1 className="font-display text-fluid-portal font-bold text-slate-900 dark:text-[#F5F2EC] tracking-tight kbelia-trim">
                   {currentAdminHeader.prefix}
                   <span className={adminTheme.accentTextClass}>{currentAdminHeader.accent}</span>
                 </h1>
@@ -1819,357 +1760,161 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* TAB 1: BOOKINGS MANAGEMENT */}
       {adminTab === 'bookings' && (
         <div key="bookings" className="space-y-4 animate-dashboard-tab">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <h3 className="text-lg sm:text-xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
-                Senarai Permohonan Sewaan Kapsul
-              </h3>
+          <WorkspaceHeaderCard
+            role="admin"
+            icon={<Clock className="w-5 h-5" />}
+            title="Senarai Permohonan Sewaan Kapsul"
+            subtitle="Semak cadangan perniagaan, status permohonan, dan kelulusan ruang niaga kapsul."
+            rightActions={
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingBooking(null);
+                  setIsCreatingBooking(true);
+                }}
+                className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors ${adminTheme.primaryButtonClass}`}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah</span>
+              </button>
+            }
+            tabs={[
+              { id: 'all', label: 'Semua', count: safeBookings.length },
+              { id: 'pending', label: 'Menunggu', count: safeBookings.filter(b => b?.status === 'pending').length },
+              { id: 'approved', label: 'Diluluskan', count: safeBookings.filter(b => b?.status === 'approved').length },
+              { id: 'rejected', label: 'Ditolak', count: safeBookings.filter(b => b?.status === 'rejected').length }
+            ]}
+            activeTab={bookingFilter}
+            onTabChange={(id) => {
+              setBookingFilter(id as 'all' | 'pending' | 'approved' | 'rejected');
+              setMobileBookingOpen(false);
+            }}
+            searchValue={adminBookingSearch}
+            onSearchChange={setAdminBookingSearch}
+            searchPlaceholder="Cari pemohon, syarikat atau kod..."
+            extraControls={
+              <select
+                value={adminBookingSortPreset}
+                onChange={(e) => setAdminBookingSortPreset(e.target.value)}
+                aria-label="Susun permohonan sewaan"
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+              >
+                {adminBookingSortOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            }
+          />
+
+          {sortedBookings.length === 0 ? (
+            <div className={`rounded-2xl border backdrop-blur-xs py-12 px-6 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+              <Clock className="w-10 h-10 text-stone-400 dark:text-stone-500 mx-auto" />
+              <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] kbelia-trim">
+                Tiada Permohonan Dalam Kategori Ini
+              </p>
+              {(adminBookingSearch || bookingFilter !== 'all' || adminBookingSortPreset !== DEFAULT_SORT_VALUE) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdminBookingSearch('');
+                    setBookingFilter('all');
+                    setAdminBookingSortPreset(DEFAULT_SORT_VALUE);
+                  }}
+                  className={`mt-1 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                >
+                  Set Semula
+                </button>
+              )}
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setEditingBooking(null);
-                setIsCreatingBooking(true);
-              }}
-              className={`px-4 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors ${adminTheme.primaryButtonClass}`}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Tambah</span>
-            </button>
-          </div>
-
-          <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
-            <ReferenceTableToolbar
-              accent="amber"
-              searchValue={adminBookingSearch}
-              onSearchChange={setAdminBookingSearch}
-              searchPlaceholder="Cari pemohon, syarikat atau kod..."
-              filterCount={(bookingFilter !== 'all' ? 1 : 0) + (adminBookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
-              onResetFilters={() => {
-                setBookingFilter('all');
-                setAdminBookingSortPreset(DEFAULT_SORT_VALUE);
-              }}
-              sortOptions={
-                adminBookingSortPreset === 'table_column'
-                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...adminBookingSortOptions]
-                  : adminBookingSortOptions
-              }
-              sortValue={adminBookingSortPreset === 'table_column' ? '' : adminBookingSortPreset}
-              onSortChange={(val) => {
-                if (val) setAdminBookingSortPreset(val);
-              }}
-              filterContent={
-                <div>
-                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                    Status Permohonan
-                  </label>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {([
-                      { id: 'all', label: 'Semua' },
-                      { id: 'pending', label: 'Menunggu' },
-                      { id: 'approved', label: 'Diluluskan' },
-                      { id: 'rejected', label: 'Ditolak' }
-                    ] as const).map((opt) => (
-                      <button
-                        key={opt.id}
-                        type="button"
-                        onClick={() => setBookingFilter(opt.id)}
-                        className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
-                          bookingFilter === opt.id
-                            ? adminTheme.segmentedActiveClass
-                            : adminTheme.secondaryButtonClass
-                        }`}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
+          ) : (
+            <GoogleWorkspaceSplitPane
+              role="admin"
+              mobileOpen={mobileBookingOpen && Boolean(selectedBooking)}
+              onMobileClose={() => setMobileBookingOpen(false)}
+              mobileTitle={selectedBooking ? `${selectedBooking.slotCode} · ${selectedBooking.businessName}` : undefined}
+              leftHeader={
+                <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                  <span>{sortedBookings.length} permohonan sewaan</span>
+                  {(adminBookingSearch || bookingFilter !== 'all' || adminBookingSortPreset !== DEFAULT_SORT_VALUE) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAdminBookingSearch('');
+                        setBookingFilter('all');
+                        setAdminBookingSortPreset(DEFAULT_SORT_VALUE);
+                      }}
+                      className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                    >
+                      Set Semula
+                    </button>
+                  )}
                 </div>
               }
-            />
+              leftContent={adminBookingsPagination.paginatedItems.map((b) => {
+                const isSelected = selectedBooking?.id === b.id;
+                const statusLabel =
+                  b.status === 'approved'
+                    ? 'Diluluskan'
+                    : b.status === 'rejected'
+                    ? 'Ditolak'
+                    : b.status === 'cancelled'
+                    ? 'Dibatalkan'
+                    : 'Menunggu';
+                const statusColor =
+                  b.status === 'approved'
+                    ? 'text-emerald-700 dark:text-emerald-400'
+                    : b.status === 'rejected'
+                    ? 'text-rose-700 dark:text-rose-400'
+                    : b.status === 'cancelled'
+                    ? 'text-stone-500 dark:text-stone-400'
+                    : 'text-amber-700 dark:text-amber-300';
 
-            {sortedBookings.length === 0 ? (
-              <div className="py-12 px-6 text-center space-y-2">
-                <Clock className="w-10 h-10 text-stone-400 dark:text-stone-500 mx-auto" />
-                <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">Tiada Permohonan Dalam Kategori Ini</p>
-                {(adminBookingSearch || bookingFilter !== 'all') && (
-                  <button
-                    type="button"
+                return (
+                  <div
+                    key={b.id}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => {
-                      setAdminBookingSearch('');
-                      setBookingFilter('all');
-                      setAdminBookingSortPreset(DEFAULT_SORT_VALUE);
+                      setSelectedBookingId(b.id);
+                      setMobileBookingOpen(true);
                     }}
-                    className={`mt-1 px-3.5 py-2 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedBookingId(b.id);
+                        setMobileBookingOpen(true);
+                      }
+                    }}
+                    className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                      isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                    }`}
                   >
-                    Set Semula
-                  </button>
-                )}
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left border-collapse">
-                    <thead>
-                      <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                        <th className="py-3 pl-5 pr-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAdminBookingSortPreset('table_column');
-                              setAdminBookingSort((prev) =>
-                                prev.key === 'businessName'
-                                  ? { key: 'businessName', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'businessName', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Kapsul &amp; Perniagaan</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAdminBookingSortPreset('table_column');
-                              setAdminBookingSort((prev) =>
-                                prev.key === 'category'
-                                  ? { key: 'category', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'category', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Kategori</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAdminBookingSortPreset('table_column');
-                              setAdminBookingSort((prev) =>
-                                prev.key === 'hubLocation'
-                                  ? { key: 'hubLocation', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'hubLocation', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Pemohon &amp; Lokasi</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAdminBookingSortPreset('table_column');
-                              setAdminBookingSort((prev) =>
-                                prev.key === 'status'
-                                  ? { key: 'status', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'status', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Status</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 pl-2 pr-5 w-12 text-right">
-                          <span className="sr-only">Tindakan</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className={`divide-y ${adminTheme.dividerClass}`}>
-                      {adminBookingsPagination.paginatedItems.map((b) => {
-                        const isExpanded = expandedAdminBookingIds.includes(b.id);
-                        return (
-                          <React.Fragment key={b.id}>
-                            <tr className={`transition-colors ${adminTheme.rowHoverClass}`}>
-                              <td className="py-3.5 pl-5 pr-3">
-                                <div className="flex items-center gap-3 min-w-[200px]">
-                                  <div className={`w-14 h-14 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                                    <PortalImage
-                                      src={resolveBookingKioskImage(b, safeSlots)}
-                                      alt={`Reka bentuk kiosk ${b.slotName}`}
-                                      fallbackType="kiosk"
-                                      fallbackLabel={b.slotCode}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
-                                  <div className="min-w-0">
-                                    <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[230px]">
-                                      {b.slotCode} · {b.businessName}
-                                    </p>
-                                    <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[230px]">
-                                      {b.slotName}
-                                    </p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="py-3.5 px-3 text-stone-700 dark:text-stone-300 whitespace-nowrap">
-                                {b.businessCategory === 'Makanan & Minuman (F&B)' ? 'Makanan & Minuman' : b.businessCategory}
-                              </td>
-                              <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
-                                <p className="font-medium text-stone-900 dark:text-[#F5F2EC]">{b.applicantName}</p>
-                                <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400">
-                                  {b.hubLocation} · {b.durationMonths} bulan
-                                </p>
-                              </td>
-                              <td className="py-3.5 px-3 whitespace-nowrap">
-                                <span
-                                  className={`text-[0.8125rem] font-semibold ${
-                                    b.status === 'approved'
-                                      ? 'text-emerald-700 dark:text-emerald-400'
-                                      : b.status === 'rejected'
-                                      ? 'text-rose-700 dark:text-rose-400'
-                                      : b.status === 'cancelled'
-                                      ? 'text-stone-500 dark:text-stone-400'
-                                      : 'text-amber-700 dark:text-amber-300'
-                                  }`}
-                                >
-                                  {b.status === 'approved'
-                                    ? 'Diluluskan'
-                                    : b.status === 'rejected'
-                                    ? 'Ditolak'
-                                    : b.status === 'cancelled'
-                                    ? 'Dibatalkan'
-                                    : 'Menunggu Kelulusan'}
-                                </span>
-                              </td>
-                              <td className="py-3.5 pl-2 pr-5 text-right">
-                                <RowActionMenu
-                                  ariaLabel={`Tindakan untuk ${b.businessName}`}
-                                  items={[
-                                    {
-                                      label: isExpanded ? 'Tutup' : 'Lihat Butiran',
-                                      onClick: () => toggleAdminBookingExpand(b.id)
-                                    },
-                                    {
-                                      label: 'Lulus',
-                                      tone: 'accent',
-                                      disabled: loading || b.status === 'approved',
-                                      onClick: () => handleApproveBooking(b)
-                                    },
-                                    {
-                                      label: 'Tolak',
-                                      disabled: loading || b.status === 'rejected',
-                                      onClick: () => handleRejectBooking(b)
-                                    },
-                                    ...(b.status !== 'pending'
-                                      ? [
-                                          {
-                                            label: 'Set Menunggu',
-                                            disabled: loading,
-                                            onClick: () => handleDirectAdminBookingStatus(b, 'pending')
-                                          }
-                                        ]
-                                      : []),
-                                    {
-                                      label: 'Sunting',
-                                      dividerBefore: true,
-                                      onClick: () => {
-                                        setIsCreatingBooking(false);
-                                        setEditingBooking(b);
-                                      }
-                                    },
-                                    {
-                                      label: 'Padam',
-                                      tone: 'danger',
-                                      onClick: () =>
-                                        confirmDelete({
-                                          itemName: `${b.businessName} (${b.slotCode})`,
-                                          itemType: 'Permohonan Sewaan Kiosk',
-                                          onConfirm: () => handleDeleteAdminBooking(b)
-                                        })
-                                    }
-                                  ]}
-                                />
-                              </td>
-                            </tr>
-
-                            {isExpanded && (
-                              <tr className={adminTheme.surfaceMutedClass}>
-                                <td colSpan={5} className="px-5 py-4 space-y-3">
-                                  <div className={`grid sm:grid-cols-3 gap-3 p-3.5 rounded-xl text-sm text-stone-800 dark:text-stone-200 border ${adminTheme.surfaceClass} ${adminTheme.dividerClass}`}>
-                                    <div>
-                                      <span className="text-stone-500 dark:text-stone-400 block text-[0.8125rem]">Pemohon:</span>
-                                      <strong className="text-stone-900 dark:text-[#F5F2EC]">{b.applicantName}</strong>
-                                    </div>
-                                    <div>
-                                      <span className="text-stone-500 dark:text-stone-400 block text-[0.8125rem]">E-mel / Telefon:</span>
-                                      <span className="font-mono text-[0.8125rem] text-stone-900 dark:text-[#F5F2EC]">{b.applicantEmail} · {b.applicantPhone}</span>
-                                    </div>
-                                    <div>
-                                      <span className="text-stone-500 dark:text-stone-400 block text-[0.8125rem]">Tempoh &amp; Tarikh Mula:</span>
-                                      <span className="text-stone-900 dark:text-[#F5F2EC] tabular-nums">{b.durationMonths} Bulan (Mulai {b.startDate})</span>
-                                    </div>
-                                  </div>
-
-                                  {b.pitchNotes && (
-                                    <div className={`text-sm text-stone-900 dark:text-[#F5F2EC] p-3 rounded-xl border ${adminTheme.surfaceClass} ${adminTheme.dividerClass}`}>
-                                      <span className="font-bold block mb-0.5">Cadangan Pitching Usahawan:</span>
-                                      <p className="text-stone-700 dark:text-stone-300">{b.pitchNotes}</p>
-                                    </div>
-                                  )}
-
-                                  {b.status === 'pending' && (
-                                    <div className="pt-1 space-y-3">
-                                      <div>
-                                        <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 mb-1">
-                                          Catatan Pentadbir
-                                        </label>
-                                        <input
-                                          type="text"
-                                          placeholder="Masukkan catatan pentadbir"
-                                          value={reviewNoteInput[b.id] || ''}
-                                          onChange={(e) => setReviewNoteInput({ ...reviewNoteInput, [b.id]: e.target.value })}
-                                          className={`w-full px-3 py-2 text-sm border rounded-xl focus:outline-none ${adminTheme.inputClass}`}
-                                        />
-                                      </div>
-
-                                      <div className="flex items-center justify-end gap-2">
-                                        <button
-                                          type="button"
-                                          onClick={() => handleRejectBooking(b)}
-                                          disabled={loading}
-                                          className={`px-3.5 py-1.5 text-[0.8125rem] font-bold rounded-xl ${adminTheme.dangerOutlineButtonClass}`}
-                                        >
-                                          Tolak
-                                        </button>
-                                        <button
-                                          type="button"
-                                          onClick={() => handleApproveBooking(b)}
-                                          disabled={loading}
-                                          className={`px-4 py-1.5 font-bold text-[0.8125rem] rounded-xl shadow-xs flex items-center gap-1.5 ${adminTheme.primaryButtonClass}`}
-                                        >
-                                          <CheckCircle2 className="w-3.5 h-3.5" />
-                                          <span>Lulus</span>
-                                        </button>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {b.adminNotes && b.status !== 'pending' && (
-                                    <div className={`text-sm text-stone-900 dark:text-[#F5F2EC] p-2.5 rounded-xl border ${adminTheme.surfaceClass} ${adminTheme.dividerClass}`}>
-                                      <strong>Catatan Pentadbir:</strong> {b.adminNotes}
-                                    </div>
-                                  )}
-                                </td>
-                              </tr>
-                            )}
-                          </React.Fragment>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
+                    <div className={`w-12 h-12 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                      <PortalImage
+                        src={resolveBookingKioskImage(b, safeSlots)}
+                        alt={`Reka bentuk kiosk ${b.slotName}`}
+                        fallbackType="kiosk"
+                        fallbackLabel={b.slotCode}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] leading-snug truncate kbelia-trim">
+                          {b.slotCode} · {b.businessName}
+                        </p>
+                        <span className={`text-[11px] font-bold shrink-0 ${statusColor}`}>
+                          {statusLabel}
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-600 dark:text-stone-400 truncate tabular-nums">
+                        {b.applicantName} · {b.hubLocation} · {b.durationMonths} bln
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              leftFooter={
                 <PaginationBar
                   currentPage={adminBookingsPagination.currentPage}
                   totalItems={adminBookingsPagination.totalItems}
@@ -2178,302 +1923,366 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   itemLabel="permohonan sewaan"
                   accent="amber"
                 />
-              </>
-            )}
-          </div>
+              }
+              rightContent={
+                selectedBooking ? (
+                  <div>
+                    <SidePreviewHeader
+                      role="admin"
+                      media={
+                        <div className={`w-14 h-14 rounded-xl overflow-hidden border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <PortalImage
+                            src={resolveBookingKioskImage(selectedBooking, safeSlots)}
+                            alt={`Reka bentuk kiosk ${selectedBooking.slotName}`}
+                            fallbackType="kiosk"
+                            fallbackLabel={selectedBooking.slotCode}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      }
+                      title={`${selectedBooking.slotCode} · ${selectedBooking.businessName}`}
+                      status={
+                        <span
+                          className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                            selectedBooking.status === 'approved'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400'
+                              : selectedBooking.status === 'rejected'
+                              ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-400'
+                              : selectedBooking.status === 'cancelled'
+                              ? 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                              : adminTheme.activeNavClass
+                          }`}
+                        >
+                          {selectedBooking.status === 'approved'
+                            ? 'Diluluskan'
+                            : selectedBooking.status === 'rejected'
+                            ? 'Ditolak'
+                            : selectedBooking.status === 'cancelled'
+                            ? 'Dibatalkan'
+                            : 'Menunggu Kelulusan'}
+                        </span>
+                      }
+                      subtitle={selectedBooking.slotName}
+                      meta={
+                        <>
+                          <span>
+                            {selectedBooking.businessCategory === 'Makanan & Minuman (F&B)'
+                              ? 'Makanan & Minuman'
+                              : selectedBooking.businessCategory}
+                          </span>
+                          <span>·</span>
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5" />
+                            {selectedBooking.hubLocation}
+                          </span>
+                        </>
+                      }
+                      actions={
+                        <>
+                          <button
+                            type="button"
+                            disabled={loading || selectedBooking.status === 'approved'}
+                            onClick={() => handleApproveBooking(selectedBooking)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-45 ${adminTheme.primaryButtonClass}`}
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Lulus</span>
+                          </button>
+                          <button
+                            type="button"
+                            disabled={loading || selectedBooking.status === 'rejected'}
+                            onClick={() => handleRejectBooking(selectedBooking)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer disabled:opacity-45 ${adminTheme.dangerOutlineButtonClass}`}
+                          >
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>Tolak</span>
+                          </button>
+                          {selectedBooking.status !== 'pending' && (
+                            <button
+                              type="button"
+                              disabled={loading}
+                              onClick={() => handleDirectAdminBookingStatus(selectedBooking, 'pending')}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer disabled:opacity-45 ${adminTheme.secondaryButtonClass}`}
+                            >
+                              Set Menunggu
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsCreatingBooking(false);
+                              setEditingBooking(selectedBooking);
+                            }}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-semibold border inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Sunting</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              confirmDelete({
+                                itemName: `${selectedBooking.businessName} (${selectedBooking.slotCode})`,
+                                itemType: 'Permohonan Sewaan Kiosk',
+                                onConfirm: () => handleDeleteAdminBooking(selectedBooking)
+                              })
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Padam</span>
+                          </button>
+                        </>
+                      }
+                    />
+
+                    <div className="p-4 sm:p-5 space-y-4">
+                      <SidePreviewMetricsStrip
+                        role="admin"
+                        columns={3}
+                        items={[
+                          { label: 'Pemohon', value: selectedBooking.applicantName },
+                          {
+                            label: 'E-mel / Telefon',
+                            value: `${selectedBooking.applicantEmail || '-'} · ${selectedBooking.applicantPhone || '-'}`,
+                            mono: true
+                          },
+                          {
+                            label: 'Tempoh & Tarikh Mula',
+                            value: `${selectedBooking.durationMonths} Bulan (Mulai ${selectedBooking.startDate})`
+                          }
+                        ]}
+                      />
+
+                      {selectedBooking.pitchNotes && (
+                        <div className={`p-4 rounded-xl border space-y-1.5 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 block">
+                            Cadangan Pitching Usahawan
+                          </span>
+                          <p className="text-sm text-stone-800 dark:text-stone-200 leading-relaxed whitespace-pre-line">
+                            {selectedBooking.pitchNotes}
+                          </p>
+                        </div>
+                      )}
+
+                      {selectedBooking.status === 'pending' && (
+                        <div className={`p-4 rounded-xl border space-y-3 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <div>
+                            <label className="block text-xs font-bold uppercase tracking-wider text-stone-600 dark:text-stone-300 mb-1.5">
+                              Catatan Pentadbir
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Masukkan catatan pentadbir"
+                              value={reviewNoteInput[selectedBooking.id] || ''}
+                              onChange={(e) =>
+                                setReviewNoteInput({ ...reviewNoteInput, [selectedBooking.id]: e.target.value })
+                              }
+                              className={`w-full px-3.5 py-2 text-sm border rounded-xl focus:outline-none ${adminTheme.inputClass}`}
+                            />
+                          </div>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleRejectBooking(selectedBooking)}
+                              disabled={loading}
+                              className={`px-3.5 py-1.5 text-xs font-bold rounded-xl cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                            >
+                              Tolak
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleApproveBooking(selectedBooking)}
+                              disabled={loading}
+                              className={`px-4 py-1.5 font-bold text-xs rounded-xl shadow-xs inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                            >
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Lulus</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedBooking.adminNotes && selectedBooking.status !== 'pending' && (
+                        <div className={`p-4 rounded-xl border space-y-1 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 block">
+                            Catatan Pentadbir
+                          </span>
+                          <p className="text-sm text-stone-800 dark:text-stone-200 leading-relaxed">
+                            {selectedBooking.adminNotes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <SidePreviewEmptyState
+                    icon={<Clock className="w-10 h-10 text-stone-400" />}
+                    title="Tiada Permohonan Dipilih"
+                    description="Pilih mana-mana permohonan sewaan kapsul di sebelah kiri untuk menyemak butiran."
+                  />
+                )
+              }
+            />
+          )}
         </div>
       )}
 
       {/* TAB 2: BUSINESSES DIRECTORY MANAGEMENT */}
       {adminTab === 'businesses' && (
         <div key="businesses" className="space-y-4 animate-dashboard-tab">
-          <div>
-            <h3 className="text-lg sm:text-xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
-              Senarai Kedai &amp; Usahawan
-            </h3>
-          </div>
-
-          <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
-            <ReferenceTableToolbar
-              accent="amber"
-              searchValue={bizSearch}
-              onSearchChange={setBizSearch}
-              searchPlaceholder="Cari perniagaan atau kategori..."
-              filterCount={
-                (bizStatusFilter !== 'all' ? 1 : 0) +
-                (bizDistrictFilter !== 'Semua' ? 1 : 0) +
-                (bizSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
-              }
-              onResetFilters={() => {
-                setBizStatusFilter('all');
-                setBizDistrictFilter('Semua');
-                setBizSortPreset(DEFAULT_SORT_VALUE);
-              }}
-              sortOptions={
-                bizSortPreset === 'table_column'
-                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...bizSortOptions]
-                  : bizSortOptions
-              }
-              sortValue={bizSortPreset === 'table_column' ? '' : bizSortPreset}
-              rightSlot={
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEditingBusiness(null);
-                    setIsCreatingBusiness(true);
-                  }}
-                  className={`px-3.5 py-2 rounded-xl text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
+          <WorkspaceHeaderCard
+            role="admin"
+            icon={<Store className="w-5 h-5" />}
+            title="Senarai Kedai & Usahawan"
+            subtitle="Pantau direktori perniagaan belia, katalog produk, dan status paparan awam."
+            rightActions={
+              <button
+                type="button"
+                onClick={() => {
+                  setEditingBusiness(null);
+                  setIsCreatingBusiness(true);
+                }}
+                className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors ${adminTheme.primaryButtonClass}`}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah</span>
+              </button>
+            }
+            tabs={[
+              { id: 'all', label: 'Semua', count: safeBusinesses.length },
+              { id: 'approved', label: 'Aktif', count: safeBusinesses.filter(b => b.isApproved).length },
+              { id: 'hidden', label: 'Tersembunyi', count: safeBusinesses.filter(b => !b.isApproved).length },
+              { id: 'featured', label: 'Pilihan', count: safeBusinesses.filter(b => b.isFeatured).length }
+            ]}
+            activeTab={bizStatusFilter}
+            onTabChange={(id) => {
+              setBizStatusFilter(id as 'all' | 'approved' | 'hidden' | 'featured');
+              setMobileBizOpen(false);
+            }}
+            searchValue={bizSearch}
+            onSearchChange={setBizSearch}
+            searchPlaceholder="Cari perniagaan atau kategori..."
+            extraControls={
+              <>
+                <select
+                  value={bizDistrictFilter}
+                  onChange={(e) => setBizDistrictFilter(e.target.value)}
+                  aria-label="Tapis daerah perniagaan"
+                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
                 >
-                  <Plus className="w-4 h-4" />
-                  <span>Tambah</span>
-                </button>
+                  <option value="Semua">Semua Daerah</option>
+                  {DISTRICTS.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+                <select
+                  value={bizSortPreset}
+                  onChange={(e) => setBizSortPreset(e.target.value)}
+                  aria-label="Susun senarai perniagaan"
+                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                >
+                  {bizSortOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </>
+            }
+          />
+
+          {filteredBusinesses.length === 0 ? (
+            <div className={`rounded-2xl border backdrop-blur-xs py-12 px-6 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+              <Store className="w-10 h-10 text-stone-400 dark:text-stone-500 mx-auto" />
+              <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] kbelia-trim">
+                Tiada perniagaan sepadan dengan carian atau penapis.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setBizSearch('');
+                  setBizStatusFilter('all');
+                  setBizDistrictFilter('Semua');
+                  setBizSortPreset(DEFAULT_SORT_VALUE);
+                }}
+                className={`mt-1 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
+              >
+                Set Semula
+              </button>
+            </div>
+          ) : (
+            <GoogleWorkspaceSplitPane
+              role="admin"
+              mobileOpen={mobileBizOpen && Boolean(selectedBusiness)}
+              onMobileClose={() => setMobileBizOpen(false)}
+              mobileTitle={selectedBusiness?.businessName}
+              leftHeader={
+                <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                  <span>{filteredBusinesses.length} perniagaan dipaparkan</span>
+                  {(bizSearch || bizStatusFilter !== 'all' || bizDistrictFilter !== 'Semua' || bizSortPreset !== DEFAULT_SORT_VALUE) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBizSearch('');
+                        setBizStatusFilter('all');
+                        setBizDistrictFilter('Semua');
+                        setBizSortPreset(DEFAULT_SORT_VALUE);
+                      }}
+                      className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                    >
+                      Set Semula
+                    </button>
+                  )}
+                </div>
               }
-              onSortChange={(val) => {
-                if (val) setBizSortPreset(val);
-              }}
-              filterContent={
-                <>
-                  <div>
-                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                      Status Paparan
-                    </label>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {([
-                        { id: 'all', label: 'Semua' },
-                        { id: 'approved', label: 'Aktif' },
-                        { id: 'hidden', label: 'Tersembunyi' },
-                        { id: 'featured', label: 'Pilihan' }
-                      ] as const).map((opt) => (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setBizStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
-                            bizStatusFilter === opt.id
-                              ? adminTheme.segmentedActiveClass
-                              : adminTheme.secondaryButtonClass
+              leftContent={businessesPagination.paginatedItems.map((biz) => {
+                const bizProductCount = products.filter(p => p.businessId === biz.id).length;
+                const isSelected = selectedBusiness?.id === biz.id;
+                return (
+                  <div
+                    key={biz.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setSelectedBizId(biz.id);
+                      setMobileBizOpen(true);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedBizId(biz.id);
+                        setMobileBizOpen(true);
+                      }
+                    }}
+                    className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                      isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                    }`}
+                  >
+                    <img
+                      src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
+                      alt={biz.businessName}
+                      className={`w-12 h-12 rounded-xl object-cover border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}
+                    />
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] leading-snug truncate kbelia-trim">
+                          {biz.businessName}
+                        </p>
+                        <span
+                          className={`text-[11px] font-bold shrink-0 ${
+                            biz.isApproved ? 'text-emerald-700 dark:text-emerald-400' : 'text-stone-500 dark:text-stone-400'
                           }`}
                         >
-                          {opt.label}
-                        </button>
-                      ))}
+                          {biz.isApproved ? 'Aktif' : 'Tersembunyi'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-600 dark:text-stone-400 truncate tabular-nums">
+                        {biz.ownerName} · {biz.district} · {bizProductCount} item{biz.isFeatured ? ' · Pilihan' : ''}
+                      </p>
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                      Daerah
-                    </label>
-                    <select
-                      value={bizDistrictFilter}
-                      onChange={(e) => setBizDistrictFilter(e.target.value)}
-                      className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none ${adminTheme.inputClass}`}
-                    >
-                      <option value="Semua">Semua Daerah</option>
-                      {DISTRICTS.map((d) => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                  </div>
-                </>
-              }
-            />
-
-            {filteredBusinesses.length === 0 ? (
-              <div className="py-12 px-6 text-center space-y-2">
-                <Store className="w-10 h-10 text-stone-400 dark:text-stone-500 mx-auto" />
-                <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">
-                  Tiada perniagaan sepadan dengan carian atau penapis.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setBizSearch('');
-                    setBizStatusFilter('all');
-                    setBizDistrictFilter('Semua');
-                    setBizSortPreset(DEFAULT_SORT_VALUE);
-                  }}
-                  className={`mt-1 px-3.5 py-2 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
-                >
-                  Set Semula
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left border-collapse">
-                    <thead>
-                      <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                        <th className="py-3 pl-5 pr-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setBizSortPreset('table_column');
-                              setBizSort((prev) =>
-                                prev.key === 'businessName'
-                                  ? { key: 'businessName', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'businessName', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Perniagaan &amp; Pemilik</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setBizSortPreset('table_column');
-                              setBizSort((prev) =>
-                                prev.key === 'category'
-                                  ? { key: 'category', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'category', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Kategori</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setBizSortPreset('table_column');
-                              setBizSort((prev) =>
-                                prev.key === 'district'
-                                  ? { key: 'district', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'district', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Daerah &amp; SSM</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">Produk</th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setBizSortPreset('table_column');
-                              setBizSort((prev) =>
-                                prev.key === 'isApproved'
-                                  ? { key: 'isApproved', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'isApproved', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Status</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 pl-2 pr-5 w-12 text-right">
-                          <span className="sr-only">Tindakan</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className={`divide-y ${adminTheme.dividerClass}`}>
-                      {businessesPagination.paginatedItems.map((biz) => {
-                        const bizProductCount = products.filter(p => p.businessId === biz.id).length;
-                        return (
-                          <tr key={biz.id} className={`transition-colors ${adminTheme.rowHoverClass}`}>
-                            <td className="py-3.5 pl-5 pr-3">
-                              <div className="flex items-center gap-3 min-w-[200px]">
-                                <img
-                                  src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
-                                  alt={biz.businessName}
-                                  className={`w-14 h-14 rounded-xl object-cover border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}
-                                />
-                                <div className="min-w-0">
-                                  <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[230px]">
-                                    {biz.businessName}
-                                  </p>
-                                  <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[230px]">
-                                    {biz.ownerName}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="py-3.5 px-3 text-stone-700 dark:text-stone-300 whitespace-nowrap">
-                              {formatBusinessCategory(biz.category)}
-                            </td>
-                            <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
-                              <p className="font-medium text-stone-900 dark:text-[#F5F2EC]">{biz.district}</p>
-                              <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400">
-                                SSM: {biz.ssmNumber || 'Tiada'}
-                              </p>
-                            </td>
-                            <td className="py-3.5 px-3 tabular-nums whitespace-nowrap text-stone-900 dark:text-[#F5F2EC] font-medium">
-                              {bizProductCount} item
-                            </td>
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <div className="flex items-center gap-2 text-[0.8125rem] font-semibold">
-                                <span
-                                  className={
-                                    biz.isApproved
-                                      ? 'text-emerald-700 dark:text-emerald-400'
-                                      : 'text-stone-500 dark:text-stone-400'
-                                  }
-                                >
-                                  {biz.isApproved ? 'Aktif' : 'Tersembunyi'}
-                                </span>
-                                {biz.isFeatured && (
-                                  <span className={adminTheme.accentTextClass}>
-                                    · Pilihan
-                                  </span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="py-3.5 pl-2 pr-5 text-right">
-                              <RowActionMenu
-                                ariaLabel={`Tindakan untuk ${biz.businessName}`}
-                                items={[
-                                  {
-                                    label: `Urus Produk (${bizProductCount})`,
-                                    tone: 'accent',
-                                    onClick: () => setManagingProductsBusiness(biz)
-                                  },
-                                  {
-                                    label: biz.isFeatured ? 'Buang Pilihan' : 'Jadikan Pilihan',
-                                    onClick: () => handleToggleFeatured(biz)
-                                  },
-                                  {
-                                    label: biz.isApproved ? 'Sembunyikan' : 'Aktifkan',
-                                    onClick: () => handleToggleApprovedBusiness(biz)
-                                  },
-                                  {
-                                    label: 'Sunting',
-                                    dividerBefore: true,
-                                    onClick: () => {
-                                      setIsCreatingBusiness(false);
-                                      setEditingBusiness(biz);
-                                    }
-                                  },
-                                  {
-                                    label: 'Padam',
-                                    tone: 'danger',
-                                    onClick: () =>
-                                      confirmDelete({
-                                        itemName: biz.businessName,
-                                        itemType: 'Senarai Perniagaan',
-                                        onConfirm: () => handleDeleteBusiness(biz.id, biz.businessName)
-                                      })
-                                  }
-                                ]}
-                              />
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
+                );
+              })}
+              leftFooter={
                 <PaginationBar
                   currentPage={businessesPagination.currentPage}
                   totalItems={businessesPagination.totalItems}
@@ -2482,20 +2291,208 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   itemLabel="perniagaan"
                   accent="amber"
                 />
-              </>
-            )}
-          </div>
+              }
+              rightContent={
+                selectedBusiness ? (
+                  (() => {
+                    const selectedBizProductCount = products.filter(p => p.businessId === selectedBusiness.id).length;
+                    return (
+                      <div>
+                        <SidePreviewHeader
+                          role="admin"
+                          media={
+                            <img
+                              src={selectedBusiness.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
+                              alt={selectedBusiness.businessName}
+                              className={`w-14 h-14 rounded-xl object-cover border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}
+                            />
+                          }
+                          title={selectedBusiness.businessName}
+                          status={
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                                  selectedBusiness.isApproved
+                                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400'
+                                    : 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                                }`}
+                              >
+                                {selectedBusiness.isApproved ? 'Aktif' : 'Tersembunyi'}
+                              </span>
+                              {selectedBusiness.isFeatured && (
+                                <span className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${adminTheme.activeNavClass}`}>
+                                  Pilihan
+                                </span>
+                              )}
+                            </div>
+                          }
+                          subtitle={selectedBusiness.ownerName}
+                          meta={
+                            <>
+                              <span>{formatBusinessCategory(selectedBusiness.category)}</span>
+                              <span>·</span>
+                              <span className="inline-flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5" />
+                                {selectedBusiness.district}
+                              </span>
+                            </>
+                          }
+                          actions={
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => setManagingProductsBusiness(selectedBusiness)}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                              >
+                                <Store className="w-3.5 h-3.5" />
+                                <span>Urus Produk ({selectedBizProductCount})</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleToggleFeatured(selectedBusiness)}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                              >
+                                <Star className="w-3.5 h-3.5" />
+                                <span>{selectedBusiness.isFeatured ? 'Buang Pilihan' : 'Jadikan Pilihan'}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleToggleApprovedBusiness(selectedBusiness)}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                              >
+                                {selectedBusiness.isApproved ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                <span>{selectedBusiness.isApproved ? 'Sembunyikan' : 'Aktifkan'}</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setIsCreatingBusiness(false);
+                                  setEditingBusiness(selectedBusiness);
+                                }}
+                                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                              >
+                                <Edit3 className="w-3.5 h-3.5" />
+                                <span>Sunting</span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  confirmDelete({
+                                    itemName: selectedBusiness.businessName,
+                                    itemType: 'Senarai Perniagaan',
+                                    onConfirm: () => handleDeleteBusiness(selectedBusiness.id, selectedBusiness.businessName)
+                                  })
+                                }
+                                className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                                <span>Padam</span>
+                              </button>
+                            </>
+                          }
+                        />
+
+                        <div className="p-4 sm:p-5 space-y-4">
+                          <SidePreviewMetricsStrip
+                            role="admin"
+                            columns={3}
+                            items={[
+                              { label: 'Pemilik', value: selectedBusiness.ownerName },
+                              { label: 'Kategori', value: formatBusinessCategory(selectedBusiness.category) },
+                              { label: 'Daerah', value: selectedBusiness.district },
+                              {
+                                label: 'No. Pendaftaran SSM',
+                                value: selectedBusiness.ssmNumber ? (
+                                  <MiddleTruncate text={selectedBusiness.ssmNumber} startChars={8} endChars={5} />
+                                ) : (
+                                  'Tiada'
+                                ),
+                                mono: true
+                              },
+                              { label: 'Katalog Produk', value: `${selectedBizProductCount} item`, accent: true },
+                              {
+                                label: 'Status Paparan',
+                                value: selectedBusiness.isApproved ? 'Aktif dalam Direktori' : 'Disembunyikan'
+                              }
+                            ]}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })()
+                ) : (
+                  <SidePreviewEmptyState
+                    icon={<Store className="w-10 h-10 text-stone-400" />}
+                    title="Tiada Perniagaan Dipilih"
+                    description="Pilih mana-mana perniagaan di sebelah kiri untuk melihat maklumat dan mengurus produk."
+                  />
+                )
+              }
+            />
+          )}
         </div>
       )}
 
       {/* TAB 3: CAPSULE SLOTS MANAGEMENT */}
       {adminTab === 'slots' && (
         <div key="slots" className="space-y-4 animate-dashboard-tab">
-          <div>
-            <h3 className="text-lg sm:text-xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
-              Inventori &amp; Pengurusan Kapsul Rangkaian Negeri
-            </h3>
-          </div>
+          <WorkspaceHeaderCard
+            role="admin"
+            icon={<Building2 className="w-5 h-5" />}
+            title="Inventori & Pengurusan Kapsul Rangkaian Negeri"
+            subtitle="Selaraskan unit kapsul niaga, kadar sewaan bulanan, dan status ketersediaan."
+            rightActions={
+              <button
+                type="button"
+                id="btn-admin-add-slot-toggle"
+                onClick={() => setShowSlotForm(!showSlotForm)}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
+              >
+                <Building2 className="w-4 h-4" />
+                <span>{showSlotForm ? 'Tutup' : 'Tambah Kiosk'}</span>
+              </button>
+            }
+            tabs={[
+              { id: 'all', label: 'Semua', count: safeSlots.length },
+              { id: 'available', label: 'Tersedia', count: safeSlots.filter(s => s.status === 'available').length },
+              { id: 'occupied', label: 'Beroperasi', count: safeSlots.filter(s => s.status === 'occupied').length },
+              { id: 'reserved', label: 'Ditempah', count: safeSlots.filter(s => s.status === 'reserved').length },
+              { id: 'maintenance', label: 'Selenggara', count: safeSlots.filter(s => s.status === 'maintenance').length }
+            ]}
+            activeTab={adminSlotStatusFilter}
+            onTabChange={(id) => {
+              setAdminSlotStatusFilter(id as 'all' | SlotStatus);
+              setMobileSlotOpen(false);
+            }}
+            searchValue={adminSlotSearch}
+            onSearchChange={setAdminSlotSearch}
+            searchPlaceholder="Cari kod, nama, hab atau daerah..."
+            extraControls={
+              <>
+                <select
+                  value={adminSlotDistrictFilter}
+                  onChange={(e) => setAdminSlotDistrictFilter(e.target.value)}
+                  aria-label="Tapis daerah slot kapsul"
+                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                >
+                  <option value="Semua">Semua Daerah</option>
+                  {DISTRICTS.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+                <select
+                  value={adminSlotSortPreset}
+                  onChange={(e) => setAdminSlotSortPreset(e.target.value)}
+                  aria-label="Susun slot kapsul"
+                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                >
+                  {adminSlotSortOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </>
+            }
+          />
 
           {/* New Slot Form */}
           {showSlotForm && (
@@ -2643,286 +2640,114 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           )}
 
-          {/* Slots Reference Table View */}
-          <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
-            <ReferenceTableToolbar
-              accent="amber"
-              searchValue={adminSlotSearch}
-              onSearchChange={setAdminSlotSearch}
-              searchPlaceholder="Cari kod, nama, hab atau daerah..."
-              filterCount={
-                (adminSlotStatusFilter !== 'all' ? 1 : 0) +
-                (adminSlotDistrictFilter !== 'Semua' ? 1 : 0) +
-                (adminSlotSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+          {/* Slots Google Workspace Split-Pane View */}
+          {filteredAdminSlots.length === 0 ? (
+            <div className={`rounded-2xl border backdrop-blur-xs py-12 px-6 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+              <Building2 className="w-10 h-10 text-stone-400 dark:text-stone-500 mx-auto" />
+              <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] kbelia-trim">
+                Tiada slot kapsul sepadan dengan carian atau penapis.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setAdminSlotSearch('');
+                  setAdminSlotStatusFilter('all');
+                  setAdminSlotDistrictFilter('Semua');
+                  setAdminSlotSortPreset(DEFAULT_SORT_VALUE);
+                }}
+                className={`mt-1 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
+              >
+                Set Semula
+              </button>
+            </div>
+          ) : (
+            <GoogleWorkspaceSplitPane
+              role="admin"
+              mobileOpen={mobileSlotOpen && Boolean(selectedSlot)}
+              onMobileClose={() => setMobileSlotOpen(false)}
+              mobileTitle={selectedSlot ? `${selectedSlot.code} · ${selectedSlot.name}` : undefined}
+              leftHeader={
+                <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                  <span>{filteredAdminSlots.length} unit kapsul</span>
+                  {(adminSlotSearch || adminSlotStatusFilter !== 'all' || adminSlotDistrictFilter !== 'Semua' || adminSlotSortPreset !== DEFAULT_SORT_VALUE) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAdminSlotSearch('');
+                        setAdminSlotStatusFilter('all');
+                        setAdminSlotDistrictFilter('Semua');
+                        setAdminSlotSortPreset(DEFAULT_SORT_VALUE);
+                      }}
+                      className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                    >
+                      Set Semula
+                    </button>
+                  )}
+                </div>
               }
-              onResetFilters={() => {
-                setAdminSlotStatusFilter('all');
-                setAdminSlotDistrictFilter('Semua');
-                setAdminSlotSortPreset(DEFAULT_SORT_VALUE);
-              }}
-              sortOptions={
-                adminSlotSortPreset === 'table_column'
-                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...adminSlotSortOptions]
-                  : adminSlotSortOptions
-              }
-              sortValue={adminSlotSortPreset === 'table_column' ? '' : adminSlotSortPreset}
-              onSortChange={(val) => {
-                if (val) setAdminSlotSortPreset(val);
-              }}
-              rightSlot={
-                <button
-                  type="button"
-                  id="btn-admin-add-slot-toggle"
-                  onClick={() => setShowSlotForm(!showSlotForm)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
-                >
-                  <Building2 className="w-4 h-4" />
-                  <span>{showSlotForm ? 'Tutup' : 'Tambah Kiosk'}</span>
-                </button>
-              }
-              filterContent={
-                <>
-                  <div>
-                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                      Status Kapsul
-                    </label>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {([
-                        { id: 'all', label: 'Semua' },
-                        { id: 'available', label: 'Tersedia' },
-                        { id: 'occupied', label: 'Beroperasi' },
-                        { id: 'maintenance', label: 'Selenggara' }
-                      ] as const).map((opt) => (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setAdminSlotStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
-                            adminSlotStatusFilter === opt.id
-                              ? adminTheme.segmentedActiveClass
-                              : adminTheme.secondaryButtonClass
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
+              leftContent={slotsPagination.paginatedItems.map((s) => {
+                const isSelected = selectedSlot?.id === s.id;
+                const slotStatusLabel =
+                  s.status === 'available'
+                    ? 'Tersedia'
+                    : s.status === 'occupied'
+                    ? 'Beroperasi'
+                    : s.status === 'reserved'
+                    ? 'Ditempah'
+                    : 'Selenggara';
+                const slotStatusColor =
+                  s.status === 'available'
+                    ? 'text-emerald-700 dark:text-emerald-400'
+                    : s.status === 'occupied'
+                    ? adminTheme.accentTextClass
+                    : 'text-amber-700 dark:text-amber-300';
+
+                return (
+                  <div
+                    key={s.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setSelectedSlotId(s.id);
+                      setMobileSlotOpen(true);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedSlotId(s.id);
+                        setMobileSlotOpen(true);
+                      }
+                    }}
+                    className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                      isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                    }`}
+                  >
+                    <div className={`w-12 h-12 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                      <PortalImage
+                        src={resolveSlotImage(s)}
+                        alt={s.name}
+                        fallbackType="kiosk"
+                        fallbackLabel={s.code}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] leading-snug truncate kbelia-trim">
+                          {s.code} · {s.name}
+                        </p>
+                        <span className={`text-[11px] font-bold shrink-0 ${slotStatusColor}`}>
+                          {slotStatusLabel}
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-600 dark:text-stone-400 truncate tabular-nums">
+                        {s.hubLocation} · {s.district} · RM{s.monthlyRate}/bln
+                      </p>
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                      Daerah
-                    </label>
-                    <select
-                      value={adminSlotDistrictFilter}
-                      onChange={(e) => setAdminSlotDistrictFilter(e.target.value)}
-                      className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none ${adminTheme.inputClass}`}
-                    >
-                      <option value="Semua">Semua Daerah</option>
-                      {DISTRICTS.map((d) => (
-                        <option key={d} value={d}>{d}</option>
-                      ))}
-                    </select>
-                  </div>
-                </>
-              }
-            />
-
-            {filteredAdminSlots.length === 0 ? (
-              <div className="py-12 px-6 text-center space-y-2">
-                <Building2 className="w-10 h-10 text-stone-400 dark:text-stone-500 mx-auto" />
-                <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">
-                  Tiada slot kapsul sepadan dengan carian atau penapis.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setAdminSlotSearch('');
-                    setAdminSlotStatusFilter('all');
-                    setAdminSlotDistrictFilter('Semua');
-                    setAdminSlotSortPreset(DEFAULT_SORT_VALUE);
-                  }}
-                  className={`mt-1 px-3.5 py-2 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
-                >
-                  Set Semula
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left border-collapse">
-                    <thead>
-                      <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                        <th className="py-3 pl-5 pr-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAdminSlotSortPreset('table_column');
-                              setAdminSlotSort((prev) =>
-                                prev.key === 'name'
-                                  ? { key: 'name', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'name', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Unit Kapsul</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAdminSlotSortPreset('table_column');
-                              setAdminSlotSort((prev) =>
-                                prev.key === 'district'
-                                  ? { key: 'district', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'district', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Lokasi &amp; Daerah</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAdminSlotSortPreset('table_column');
-                              setAdminSlotSort((prev) =>
-                                prev.key === 'monthlyRate'
-                                  ? { key: 'monthlyRate', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'monthlyRate', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Kadar Sewa</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setAdminSlotSortPreset('table_column');
-                              setAdminSlotSort((prev) =>
-                                prev.key === 'status'
-                                  ? { key: 'status', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'status', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Status</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 pl-2 pr-5 w-12 text-right">
-                          <span className="sr-only">Tindakan</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className={`divide-y ${adminTheme.dividerClass}`}>
-                      {slotsPagination.paginatedItems.map((s) => (
-                        <tr key={s.id} className={`transition-colors ${adminTheme.rowHoverClass}`}>
-                          <td className="py-3.5 pl-5 pr-3">
-                            <div className="flex items-center gap-3 min-w-[200px]">
-                              <div className={`w-14 h-14 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                                <PortalImage
-                                  src={resolveSlotImage(s)}
-                                  alt={s.name}
-                                  fallbackType="kiosk"
-                                  fallbackLabel={s.code}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[230px]">
-                                  {s.code} · {s.name}
-                                </p>
-                                <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[230px]">
-                                  {s.size}{s.currentTenantBusinessName ? ` · Penyewa: ${s.currentTenantBusinessName}` : ''}
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-3.5 px-3 whitespace-nowrap">
-                            <p className="font-medium text-stone-900 dark:text-[#F5F2EC]">{s.hubLocation}</p>
-                            <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400">{s.district}</p>
-                          </td>
-                          <td className="py-3.5 px-3 font-mono font-bold text-stone-900 dark:text-[#F5F2EC] tabular-nums whitespace-nowrap">
-                            RM{s.monthlyRate}/bulan
-                          </td>
-                          <td className="py-3.5 px-3 whitespace-nowrap">
-                            <span
-                              className={`text-[0.8125rem] font-semibold ${
-                                s.status === 'available'
-                                  ? 'text-emerald-700 dark:text-emerald-400'
-                                  : s.status === 'occupied'
-                                  ? adminTheme.accentTextClass
-                                  : 'text-amber-700 dark:text-amber-300'
-                              }`}
-                            >
-                              {s.status === 'available'
-                                ? 'Tersedia'
-                                : s.status === 'occupied'
-                                ? 'Beroperasi'
-                                : s.status === 'reserved'
-                                ? 'Ditempah'
-                                : 'Selenggara'}
-                            </span>
-                          </td>
-                          <td className="py-3.5 pl-2 pr-5 text-right">
-                            <RowActionMenu
-                              ariaLabel={`Tindakan untuk ${s.code}`}
-                              items={[
-                                {
-                                  label: 'Set Tersedia',
-                                  disabled: s.status === 'available',
-                                  onClick: () => handleDirectSlotStatusChange(s, 'available')
-                                },
-                                {
-                                  label: 'Set Beroperasi',
-                                  disabled: s.status === 'occupied',
-                                  onClick: () => handleDirectSlotStatusChange(s, 'occupied')
-                                },
-                                {
-                                  label: 'Set Ditempah',
-                                  disabled: s.status === 'reserved',
-                                  onClick: () => handleDirectSlotStatusChange(s, 'reserved')
-                                },
-                                {
-                                  label: 'Set Selenggara',
-                                  disabled: s.status === 'maintenance',
-                                  onClick: () => handleDirectSlotStatusChange(s, 'maintenance')
-                                },
-                                {
-                                  label: 'Edit Slot Kapsul',
-                                  dividerBefore: true,
-                                  onClick: () => setEditingSlot(s)
-                                },
-                                {
-                                  label: 'Padam Slot',
-                                  tone: 'danger',
-                                  onClick: () =>
-                                    confirmDelete({
-                                      itemName: `${s.code} · ${s.name}`,
-                                      itemType: 'Slot Kiosk',
-                                      onConfirm: () => handleDeleteSlot(s.id)
-                                    })
-                                }
-                              ]}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
+                );
+              })}
+              leftFooter={
                 <PaginationBar
                   currentPage={slotsPagination.currentPage}
                   totalItems={slotsPagination.totalItems}
@@ -2931,20 +2756,204 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   itemLabel="slot kapsul"
                   accent="amber"
                 />
-              </>
-            )}
-          </div>
+              }
+              rightContent={
+                selectedSlot ? (
+                  <div>
+                    <SidePreviewHeader
+                      role="admin"
+                      media={
+                        <div className={`w-14 h-14 rounded-xl overflow-hidden border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <PortalImage
+                            src={resolveSlotImage(selectedSlot)}
+                            alt={selectedSlot.name}
+                            fallbackType="kiosk"
+                            fallbackLabel={selectedSlot.code}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      }
+                      title={`${selectedSlot.code} · ${selectedSlot.name}`}
+                      status={
+                        <span
+                          className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                            selectedSlot.status === 'available'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400'
+                              : selectedSlot.status === 'occupied'
+                              ? adminTheme.activeNavClass
+                              : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
+                          }`}
+                        >
+                          {selectedSlot.status === 'available'
+                            ? 'Tersedia'
+                            : selectedSlot.status === 'occupied'
+                            ? 'Beroperasi'
+                            : selectedSlot.status === 'reserved'
+                            ? 'Ditempah'
+                            : 'Selenggara'}
+                        </span>
+                      }
+                      subtitle={selectedSlot.hubLocation}
+                      meta={
+                        <>
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5" />
+                            {selectedSlot.district}
+                          </span>
+                          <span>·</span>
+                          <span>{selectedSlot.size}</span>
+                        </>
+                      }
+                      actions={
+                        <>
+                          <button
+                            type="button"
+                            disabled={selectedSlot.status === 'available'}
+                            onClick={() => handleDirectSlotStatusChange(selectedSlot, 'available')}
+                            className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer disabled:opacity-40 ${adminTheme.secondaryButtonClass}`}
+                          >
+                            Set Tersedia
+                          </button>
+                          <button
+                            type="button"
+                            disabled={selectedSlot.status === 'occupied'}
+                            onClick={() => handleDirectSlotStatusChange(selectedSlot, 'occupied')}
+                            className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer disabled:opacity-40 ${adminTheme.secondaryButtonClass}`}
+                          >
+                            Set Beroperasi
+                          </button>
+                          <button
+                            type="button"
+                            disabled={selectedSlot.status === 'reserved'}
+                            onClick={() => handleDirectSlotStatusChange(selectedSlot, 'reserved')}
+                            className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer disabled:opacity-40 ${adminTheme.secondaryButtonClass}`}
+                          >
+                            Set Ditempah
+                          </button>
+                          <button
+                            type="button"
+                            disabled={selectedSlot.status === 'maintenance'}
+                            onClick={() => handleDirectSlotStatusChange(selectedSlot, 'maintenance')}
+                            className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer disabled:opacity-40 ${adminTheme.secondaryButtonClass}`}
+                          >
+                            Set Selenggara
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEditingSlot(selectedSlot)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Edit Slot Kapsul</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              confirmDelete({
+                                itemName: `${selectedSlot.code} · ${selectedSlot.name}`,
+                                itemType: 'Slot Kiosk',
+                                onConfirm: () => handleDeleteSlot(selectedSlot.id)
+                              })
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Padam Slot</span>
+                          </button>
+                        </>
+                      }
+                    />
+
+                    <div className="p-4 sm:p-5 space-y-4">
+                      <SidePreviewMetricsStrip
+                        role="admin"
+                        columns={3}
+                        items={[
+                          { label: 'Kadar Sewa Bulanan', value: `RM${selectedSlot.monthlyRate}/bulan`, accent: true, mono: true },
+                          { label: 'Saiz Unit', value: selectedSlot.size },
+                          { label: 'Penyewa Semasa', value: selectedSlot.currentTenantBusinessName || 'Tiada Penyewa' }
+                        ]}
+                      />
+
+                      {selectedSlot.amenities && selectedSlot.amenities.length > 0 && (
+                        <div className={`p-4 rounded-xl border space-y-2 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 block">
+                            Kemudahan Disediakan
+                          </span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {selectedSlot.amenities.map((item, idx) => (
+                              <span
+                                key={idx}
+                                className={`px-2.5 py-1 rounded-lg text-xs font-semibold border ${adminTheme.surfaceClass} ${adminTheme.dividerClass} text-stone-700 dark:text-stone-300`}
+                              >
+                                {item}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <SidePreviewEmptyState
+                    icon={<Building2 className="w-10 h-10 text-stone-400" />}
+                    title="Tiada Slot Kapsul Dipilih"
+                    description="Pilih mana-mana unit kapsul di sebelah kiri untuk menyemak status dan kadar sewaan."
+                  />
+                )
+              }
+            />
+          )}
         </div>
       )}
 
       {/* TAB 4: PROGRAMS MANAGEMENT */}
       {adminTab === 'programs' && (
         <div key="programs" className="space-y-4 animate-dashboard-tab">
-          <div>
-            <h3 className="text-lg sm:text-xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
-              Pengurusan Inisiatif Geran &amp; Program Belia
-            </h3>
-          </div>
+          <WorkspaceHeaderCard
+            role="admin"
+            icon={<Award className="w-5 h-5" />}
+            title="Pengurusan Inisiatif Geran & Program Belia"
+            subtitle="Terbitkan program geran, bengkel latihan, ekspo, dan sesi pitching usahawan."
+            rightActions={
+              <button
+                type="button"
+                id="btn-admin-add-prog-toggle"
+                onClick={() => setShowProgramForm(!showProgramForm)}
+                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
+              >
+                <Award className="w-4 h-4" />
+                <span>{showProgramForm ? 'Tutup' : 'Tambah Program'}</span>
+              </button>
+            }
+            tabs={[
+              { id: 'Semua', label: 'Semua', count: safePrograms.length },
+              { id: 'Geran & Dana', label: 'Geran & Dana', count: safePrograms.filter(p => p.category === 'Geran & Dana').length },
+              { id: 'Bengkel & Latihan', label: 'Bengkel & Latihan', count: safePrograms.filter(p => p.category === 'Bengkel & Latihan').length },
+              { id: 'Pameran & Ekspo', label: 'Pameran & Ekspo', count: safePrograms.filter(p => p.category === 'Pameran & Ekspo').length },
+              { id: 'Pitching & Inkubasi', label: 'Pitching & Inkubasi', count: safePrograms.filter(p => p.category === 'Pitching & Inkubasi').length }
+            ]}
+            activeTab={progCategoryFilter}
+            onTabChange={(id) => {
+              setProgCategoryFilter(id as 'Semua' | YouthProgram['category']);
+              setMobileProgramOpen(false);
+            }}
+            searchValue={progSearch}
+            onSearchChange={setProgSearch}
+            searchPlaceholder="Cari tajuk atau kategori program..."
+            extraControls={
+              <select
+                value={progSortPreset}
+                onChange={(e) => setProgSortPreset(e.target.value)}
+                aria-label="Susun senarai program"
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+              >
+                {progSortOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            }
+          />
 
           {/* New Program Form */}
           {showProgramForm && (
@@ -3078,202 +3087,96 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           )}
 
-          <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
-            <ReferenceTableToolbar
-              accent="amber"
-              searchValue={progSearch}
-              onSearchChange={setProgSearch}
-              searchPlaceholder="Cari tajuk atau kategori program..."
-              filterCount={(progCategoryFilter !== 'Semua' ? 1 : 0) + (progSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
-              onResetFilters={() => {
-                setProgCategoryFilter('Semua');
-                setProgSortPreset(DEFAULT_SORT_VALUE);
-              }}
-              sortOptions={
-                progSortPreset === 'table_column'
-                  ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...progSortOptions]
-                  : progSortOptions
+          {filteredAdminPrograms.length === 0 ? (
+            <div className={`rounded-2xl border backdrop-blur-xs py-12 px-6 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+              <Award className="w-10 h-10 text-stone-400 dark:text-stone-500 mx-auto" />
+              <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] kbelia-trim">
+                Tiada program atau geran sepadan dengan carian atau penapis.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setProgSearch('');
+                  setProgCategoryFilter('Semua');
+                  setProgSortPreset(DEFAULT_SORT_VALUE);
+                }}
+                className={`mt-1 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
+              >
+                Set Semula
+              </button>
+            </div>
+          ) : (
+            <GoogleWorkspaceSplitPane
+              role="admin"
+              mobileOpen={mobileProgramOpen && Boolean(selectedProgram)}
+              onMobileClose={() => setMobileProgramOpen(false)}
+              mobileTitle={selectedProgram?.title}
+              leftHeader={
+                <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                  <span>{filteredAdminPrograms.length} program disenaraikan</span>
+                  {(progSearch || progCategoryFilter !== 'Semua' || progSortPreset !== DEFAULT_SORT_VALUE) && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProgSearch('');
+                        setProgCategoryFilter('Semua');
+                        setProgSortPreset(DEFAULT_SORT_VALUE);
+                      }}
+                      className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                    >
+                      Set Semula
+                    </button>
+                  )}
+                </div>
               }
-              sortValue={progSortPreset === 'table_column' ? '' : progSortPreset}
-              onSortChange={(val) => {
-                if (val) setProgSortPreset(val);
-              }}
-              rightSlot={
-                <button
-                  type="button"
-                  id="btn-admin-add-prog-toggle"
-                  onClick={() => setShowProgramForm(!showProgramForm)}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold shadow-xs transition-colors cursor-pointer whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
-                >
-                  <Award className="w-4 h-4" />
-                  <span>{showProgramForm ? 'Tutup' : 'Tambah Program'}</span>
-                </button>
-              }
-              filterContent={
-                <div>
-                  <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                    Kategori Program
-                  </label>
-                  <select
-                    value={progCategoryFilter}
-                    onChange={(e) => setProgCategoryFilter(e.target.value as 'Semua' | YouthProgram['category'])}
-                    className={`w-full px-3 py-2 rounded-xl text-sm border focus:outline-none ${adminTheme.inputClass}`}
+              leftContent={programsPagination.paginatedItems.map((p) => {
+                const isSelected = selectedProgram?.id === p.id;
+                return (
+                  <div
+                    key={p.id}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setSelectedProgramId(p.id);
+                      setMobileProgramOpen(true);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        setSelectedProgramId(p.id);
+                        setMobileProgramOpen(true);
+                      }
+                    }}
+                    className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                      isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                    }`}
                   >
-                    <option value="Semua">Semua Kategori</option>
-                    <option value="Geran & Dana">Geran &amp; Dana</option>
-                    <option value="Bengkel & Latihan">Bengkel &amp; Latihan</option>
-                    <option value="Pameran & Ekspo">Pameran &amp; Ekspo</option>
-                    <option value="Pitching & Inkubasi">Pitching &amp; Inkubasi</option>
-                  </select>
-                </div>
-              }
-            />
-
-            {filteredAdminPrograms.length === 0 ? (
-              <div className="py-12 px-6 text-center space-y-2">
-                <Award className="w-10 h-10 text-stone-400 dark:text-stone-500 mx-auto" />
-                <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">
-                  Tiada program atau geran sepadan dengan carian atau penapis.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProgSearch('');
-                    setProgCategoryFilter('Semua');
-                    setProgSortPreset(DEFAULT_SORT_VALUE);
-                  }}
-                  className={`mt-1 px-3.5 py-2 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
-                >
-                  Set Semula
-                </button>
-              </div>
-            ) : (
-              <>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left border-collapse">
-                    <thead>
-                      <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                        <th className="py-3 pl-5 pr-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setProgSortPreset('table_column');
-                              setProgSort((prev) =>
-                                prev.key === 'title'
-                                  ? { key: 'title', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'title', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Program</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setProgSortPreset('table_column');
-                              setProgSort((prev) =>
-                                prev.key === 'category'
-                                  ? { key: 'category', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'category', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Kategori</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setProgSortPreset('table_column');
-                              setProgSort((prev) =>
-                                prev.key === 'grantAmount'
-                                  ? { key: 'grantAmount', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                  : { key: 'grantAmount', dir: 'asc' }
-                              );
-                            }}
-                            className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                          >
-                            <span>Nilai Bantuan</span>
-                            <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                          </button>
-                        </th>
-                        <th className="py-3 px-3">Tarikh &amp; Lokasi</th>
-                        <th className="py-3 pl-2 pr-5 w-12 text-right">
-                          <span className="sr-only">Tindakan</span>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className={`divide-y ${adminTheme.dividerClass}`}>
-                      {programsPagination.paginatedItems.map((p) => (
-                        <tr key={p.id} className={`transition-colors ${adminTheme.rowHoverClass}`}>
-                          <td className="py-3.5 pl-5 pr-3">
-                            <div className="flex items-center gap-3 min-w-[200px]">
-                              <div className={`w-14 h-14 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                                <PortalImage
-                                  src={resolveProgramImage(p)}
-                                  alt={p.title}
-                                  fallbackType="program"
-                                  fallbackLabel={p.category}
-                                  className="w-full h-full object-cover"
-                                />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[260px]">
-                                  {p.title}
-                                </p>
-                                <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[260px]">
-                                  {p.description}
-                                </p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-3.5 px-3 whitespace-nowrap">
-                            <span className={`text-[0.8125rem] font-semibold ${adminTheme.accentTextClass}`}>
-                              {p.category}
-                            </span>
-                          </td>
-                          <td className="py-3.5 px-3 font-mono font-bold text-stone-900 dark:text-[#F5F2EC] tabular-nums whitespace-nowrap">
-                            {p.grantAmount || '-'}
-                          </td>
-                          <td className="py-3.5 px-3 whitespace-nowrap">
-                            <p className="font-medium text-stone-900 dark:text-[#F5F2EC]">{p.date || '-'}</p>
-                            <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[180px]">{p.location || '-'}</p>
-                          </td>
-                          <td className="py-3.5 pl-2 pr-5 text-right">
-                            <RowActionMenu
-                              ariaLabel={`Tindakan untuk ${p.title}`}
-                              items={[
-                                {
-                                  label: 'Sunting',
-                                  onClick: () => setEditingProgram(p)
-                                },
-                                {
-                                  label: 'Padam',
-                                  tone: 'danger',
-                                  dividerBefore: true,
-                                  onClick: () =>
-                                    confirmDelete({
-                                      itemName: p.title,
-                                      itemType: 'Program & Geran',
-                                      onConfirm: () => handleDeleteProg(p.id)
-                                    })
-                                }
-                              ]}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
+                    <div className={`w-12 h-12 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                      <PortalImage
+                        src={resolveProgramImage(p)}
+                        alt={p.title}
+                        fallbackType="program"
+                        fallbackLabel={p.category}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] leading-snug line-clamp-2 kbelia-trim">
+                          {p.title}
+                        </p>
+                        <span className={`text-[11px] font-bold shrink-0 ${adminTheme.accentTextClass}`}>
+                          {p.category}
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-600 dark:text-stone-400 truncate tabular-nums">
+                        {p.grantAmount || '-'} · {p.date || '-'}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+              leftFooter={
                 <PaginationBar
                   currentPage={programsPagination.currentPage}
                   totalItems={programsPagination.totalItems}
@@ -3282,198 +3185,228 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   itemLabel="program"
                   accent="amber"
                 />
-              </>
-            )}
-          </div>
+              }
+              rightContent={
+                selectedProgram ? (
+                  <div>
+                    <SidePreviewHeader
+                      role="admin"
+                      media={
+                        <div className={`w-14 h-14 rounded-xl overflow-hidden border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <PortalImage
+                            src={resolveProgramImage(selectedProgram)}
+                            alt={selectedProgram.title}
+                            fallbackType="program"
+                            fallbackLabel={selectedProgram.category}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      }
+                      title={selectedProgram.title}
+                      status={
+                        <span className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${adminTheme.activeNavClass}`}>
+                          {selectedProgram.category}
+                        </span>
+                      }
+                      subtitle={selectedProgram.organizer || 'Unit Belia & Keusahawanan Kelantan'}
+                      meta={
+                        <>
+                          <span>{selectedProgram.date || '-'}</span>
+                          <span>·</span>
+                          <span className="inline-flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5" />
+                            {selectedProgram.location || '-'}
+                          </span>
+                        </>
+                      }
+                      actions={
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => setEditingProgram(selectedProgram)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                            <span>Sunting</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              confirmDelete({
+                                itemName: selectedProgram.title,
+                                itemType: 'Program & Geran',
+                                onConfirm: () => handleDeleteProg(selectedProgram.id)
+                              })
+                            }
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            <span>Padam</span>
+                          </button>
+                        </>
+                      }
+                    />
+
+                    <div className="p-4 sm:p-5 space-y-4">
+                      <SidePreviewMetricsStrip
+                        role="admin"
+                        columns={3}
+                        items={[
+                          { label: 'Kategori', value: selectedProgram.category },
+                          { label: 'Nilai Bantuan', value: selectedProgram.grantAmount || '-', accent: true, mono: true },
+                          { label: 'Tarikh Pelaksanaan', value: selectedProgram.date || '-' }
+                        ]}
+                      />
+
+                      {selectedProgram.description && (
+                        <div className={`p-4 rounded-xl border space-y-1.5 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 block">
+                            Keterangan Program
+                          </span>
+                          <p className="text-sm text-stone-800 dark:text-stone-200 leading-relaxed whitespace-pre-line">
+                            {selectedProgram.description}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <SidePreviewEmptyState
+                    icon={<Award className="w-10 h-10 text-stone-400" />}
+                    title="Tiada Program Dipilih"
+                    description="Pilih mana-mana program atau geran di sebelah kiri untuk menyemak butiran."
+                  />
+                )
+              }
+            />
+          )}
         </div>
       )}
 
       {/* TAB: MENTOR & MENTEE MONITORING HUB */}
       {adminTab === 'mentors' && (
-        <div key="mentors" className="space-y-4 animate-dashboard-tab">
+        <div key="mentors" className="space-y-5 animate-dashboard-tab">
           <div className={`p-5 rounded-2xl shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 border ${adminTheme.surfaceClass}`}>
             <div className="space-y-1">
               <div className={`inline-flex items-center gap-1.5 text-[0.8125rem] font-bold uppercase tracking-wider ${adminTheme.accentTextClass}`}>
                 <GraduationCap className="w-3.5 h-3.5" />
                 <span>Hab Bimbingan Mentor KBelia</span>
               </div>
-              <h3 className="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
+              <h3 className="text-xl sm:text-2xl font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight kbelia-trim">
                 Pemantauan Mentor &amp; Usahawan Negeri Kelantan
               </h3>
             </div>
           </div>
 
-          {/* Mentor Management Table */}
-          <div className="space-y-3">
-            <h4 className="text-base sm:text-lg font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight flex items-center gap-2">
-              <GraduationCap className={`w-4.5 h-4.5 ${adminTheme.accentTextClass}`} />
-              <span>Senarai Mentor</span>
-            </h4>
+          {/* Mentor Management Split-Pane */}
+          <div className="space-y-4">
+            <WorkspaceHeaderCard
+              role="admin"
+              icon={<GraduationCap className="w-5 h-5" />}
+              title="Senarai Mentor"
+              subtitle="Urus profil mentor bertauliah dan bilangan usahawan di bawah seliaan."
+              rightActions={
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedMentorForEdit(null);
+                    setIsCreatingMentor(true);
+                  }}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah</span>
+                </button>
+              }
+              searchValue={mentorListSearch}
+              onSearchChange={setMentorListSearch}
+              searchPlaceholder="Cari mentor, agensi atau jawatan..."
+              extraControls={
+                <select
+                  value={mentorListSortPreset}
+                  onChange={(e) => setMentorListSortPreset(e.target.value)}
+                  aria-label="Susun senarai mentor"
+                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                >
+                  {mentorListSortOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              }
+            />
 
-            <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
-              <ReferenceTableToolbar
-                accent="amber"
-                searchValue={mentorListSearch}
-                onSearchChange={setMentorListSearch}
-                searchPlaceholder="Cari mentor, agensi atau jawatan..."
-                filterCount={mentorListSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0}
-                onResetFilters={() => setMentorListSortPreset(DEFAULT_SORT_VALUE)}
-                sortOptions={
-                  mentorListSortPreset === 'table_column'
-                    ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...mentorListSortOptions]
-                    : mentorListSortOptions
-                }
-                sortValue={mentorListSortPreset === 'table_column' ? '' : mentorListSortPreset}
-                onSortChange={(val) => {
-                  if (val) setMentorListSortPreset(val);
-                }}
-                rightSlot={
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedMentorForEdit(null);
-                      setIsCreatingMentor(true);
-                    }}
-                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Tambah</span>
-                  </button>
-                }
-              />
-
-              {filteredAdminMentors.length === 0 ? (
-                <div className="py-10 px-6 text-center text-sm text-stone-600 dark:text-stone-300">
-                  Tiada profil mentor sepadan dengan carian anda.
-                </div>
-              ) : (
-                <>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left border-collapse">
-                      <thead>
-                        <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                          <th className="py-3 pl-5 pr-3">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setMentorListSortPreset('table_column');
-                                setMentorListSort((prev) =>
-                                  prev.key === 'name'
-                                    ? { key: 'name', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                    : { key: 'name', dir: 'asc' }
-                                );
-                              }}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Mentor</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setMentorListSortPreset('table_column');
-                                setMentorListSort((prev) =>
-                                  prev.key === 'agency'
-                                    ? { key: 'agency', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                    : { key: 'agency', dir: 'asc' }
-                                );
-                              }}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Agensi &amp; Jawatan</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setMentorListSortPreset('table_column');
-                                setMentorListSort((prev) =>
-                                  prev.key === 'menteeCount'
-                                    ? { key: 'menteeCount', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                    : { key: 'menteeCount', dir: 'desc' }
-                                );
-                              }}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Usahawan Diselia</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">E-mel</th>
-                          <th className="py-3 pl-2 pr-5 w-12 text-right">
-                            <span className="sr-only">Tindakan</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className={`divide-y ${adminTheme.dividerClass}`}>
-                        {adminMentorsPagination.paginatedItems.map((m) => {
-                          const menteeCount = mentorshipRegistrations.filter(r => r.mentorId === m.id).length;
-                          return (
-                            <tr key={m.id} className={`transition-colors ${adminTheme.rowHoverClass}`}>
-                              <td className="py-3.5 pl-5 pr-3">
-                                <div className="flex items-center gap-3 min-w-[180px]">
-                                  <img
-                                    src={m.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg'}
-                                    alt={m.name}
-                                    className={`w-14 h-14 rounded-xl object-cover border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}
-                                  />
-                                  <span className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[220px]">
-                                    {m.name}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="py-3.5 px-3">
-                                <p className="font-medium text-stone-900 dark:text-[#F5F2EC] truncate max-w-[240px]">
-                                  {m.agency.split('(')[0].trim()}
-                                </p>
-                                <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[240px]">
-                                  {m.title}
-                                </p>
-                              </td>
-                              <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
-                                <span className={`text-[0.8125rem] font-semibold ${adminTheme.accentTextClass}`}>
-                                  {menteeCount} Usahawan
-                                </span>
-                              </td>
-                              <td className="py-3.5 px-3 font-mono text-[0.8125rem] text-stone-600 dark:text-stone-300 whitespace-nowrap">
-                                {m.email}
-                              </td>
-                              <td className="py-3.5 pl-2 pr-5 text-right">
-                                <RowActionMenu
-                                  ariaLabel={`Tindakan untuk ${m.name}`}
-                                  items={[
-                                    {
-                                      label: 'Sunting',
-                                      onClick: () => {
-                                        setIsCreatingMentor(false);
-                                        setSelectedMentorForEdit(m);
-                                      }
-                                    },
-                                    {
-                                      label: 'Padam',
-                                      tone: 'danger',
-                                      dividerBefore: true,
-                                      onClick: () =>
-                                        confirmDelete({
-                                          itemName: m.name,
-                                          itemType: 'Profil Mentor',
-                                          onConfirm: () => handleDeleteMentor(m)
-                                        })
-                                    }
-                                  ]}
-                                />
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+            {filteredAdminMentors.length === 0 ? (
+              <div className={`rounded-2xl border backdrop-blur-xs py-10 px-6 text-center text-sm text-stone-600 dark:text-stone-300 ${adminTheme.surfaceClass}`}>
+                Tiada profil mentor sepadan dengan carian anda.
+              </div>
+            ) : (
+              <GoogleWorkspaceSplitPane
+                role="admin"
+                mobileOpen={mobileMentorOpen && Boolean(selectedMentorItem)}
+                onMobileClose={() => setMobileMentorOpen(false)}
+                mobileTitle={selectedMentorItem?.name}
+                leftHeader={
+                  <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <span>{filteredAdminMentors.length} mentor berdaftar</span>
+                    {(mentorListSearch || mentorListSortPreset !== DEFAULT_SORT_VALUE) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMentorListSearch('');
+                          setMentorListSortPreset(DEFAULT_SORT_VALUE);
+                        }}
+                        className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                      >
+                        Set Semula
+                      </button>
+                    )}
                   </div>
-
+                }
+                leftContent={adminMentorsPagination.paginatedItems.map((m) => {
+                  const menteeCount = mentorshipRegistrations.filter(r => r.mentorId === m.id).length;
+                  const isSelected = selectedMentorItem?.id === m.id;
+                  return (
+                    <div
+                      key={m.id}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => {
+                        setSelectedMentorId(m.id);
+                        setMobileMentorOpen(true);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedMentorId(m.id);
+                          setMobileMentorOpen(true);
+                        }
+                      }}
+                      className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                        isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                      }`}
+                    >
+                      <img
+                        src={m.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg'}
+                        alt={m.name}
+                        className={`w-12 h-12 rounded-xl object-cover border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}
+                      />
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] leading-snug truncate kbelia-trim">
+                            {m.name}
+                          </p>
+                          <span className={`text-[11px] font-bold shrink-0 tabular-nums ${adminTheme.accentTextClass}`}>
+                            {menteeCount} Usahawan
+                          </span>
+                        </div>
+                        <p className="text-xs text-stone-600 dark:text-stone-400 truncate">
+                          {m.agency.split('(')[0].trim()} · {m.title}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+                leftFooter={
                   <PaginationBar
                     currentPage={adminMentorsPagination.currentPage}
                     totalItems={adminMentorsPagination.totalItems}
@@ -3482,287 +3415,250 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     itemLabel="mentor"
                     accent="amber"
                   />
-                </>
-              )}
-            </div>
+                }
+                rightContent={
+                  selectedMentorItem ? (
+                    (() => {
+                      const selectedMenteeCount = mentorshipRegistrations.filter(
+                        r => r.mentorId === selectedMentorItem.id
+                      ).length;
+                      return (
+                        <div>
+                          <SidePreviewHeader
+                            role="admin"
+                            media={
+                              <img
+                                src={selectedMentorItem.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg'}
+                                alt={selectedMentorItem.name}
+                                className={`w-14 h-14 rounded-xl object-cover border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}
+                              />
+                            }
+                            title={selectedMentorItem.name}
+                            status={
+                              <span className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold tabular-nums ${adminTheme.activeNavClass}`}>
+                                {selectedMenteeCount} Usahawan
+                              </span>
+                            }
+                            subtitle={selectedMentorItem.title}
+                            meta={<span>{selectedMentorItem.agency}</span>}
+                            actions={
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setIsCreatingMentor(false);
+                                    setSelectedMentorForEdit(selectedMentorItem);
+                                  }}
+                                  className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                                >
+                                  <Edit3 className="w-3.5 h-3.5" />
+                                  <span>Sunting</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    confirmDelete({
+                                      itemName: selectedMentorItem.name,
+                                      itemType: 'Profil Mentor',
+                                      onConfirm: () => handleDeleteMentor(selectedMentorItem)
+                                    })
+                                  }
+                                  className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                  <span>Padam</span>
+                                </button>
+                              </>
+                            }
+                          />
+
+                          <div className="p-4 sm:p-5 space-y-4">
+                            <SidePreviewMetricsStrip
+                              role="admin"
+                              columns={3}
+                              items={[
+                                { label: 'Agensi', value: selectedMentorItem.agency.split('(')[0].trim() },
+                                { label: 'Jawatan', value: selectedMentorItem.title },
+                                { label: 'Usahawan Diselia', value: `${selectedMenteeCount} Usahawan`, accent: true }
+                              ]}
+                            />
+
+                            <div className={`p-4 rounded-xl border space-y-1 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                              <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 block">
+                                Alamat E-mel Rasmi
+                              </span>
+                              <p className="text-sm font-mono text-stone-800 dark:text-stone-200">
+                                {selectedMentorItem.email || '-'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()
+                  ) : (
+                    <SidePreviewEmptyState
+                      icon={<GraduationCap className="w-10 h-10 text-stone-400" />}
+                      title="Tiada Mentor Dipilih"
+                      description="Pilih mana-mana profil mentor di sebelah kiri untuk melihat maklumat bimbingan."
+                    />
+                  )
+                }
+              />
+            )}
           </div>
 
-          {/* Mentee List View */}
-          <div className="space-y-3">
-            <div>
-              <h4 className="text-base sm:text-lg font-extrabold text-stone-900 dark:text-[#F5F2EC] tracking-tight">
-                Senarai Usahawan Berdaftar Mengikut Mentor
-              </h4>
-            </div>
+          {/* Mentee Sessions Split-Pane View */}
+          <div className="space-y-4">
+            <WorkspaceHeaderCard
+              role="admin"
+              icon={<UserCheck className="w-5 h-5" />}
+              title="Senarai Usahawan Berdaftar Mengikut Mentor"
+              subtitle="Pantau pendaftaran sesi bimbingan, mod pertemuan, dan status pengesahan."
+              rightActions={
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingMentorship(null);
+                    setIsCreatingMentorship(true);
+                  }}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah Sesi</span>
+                </button>
+              }
+              tabs={[
+                { id: 'all', label: 'Semua', count: mentorshipRegistrations.length },
+                { id: 'pending', label: 'Menunggu', count: mentorshipRegistrations.filter(m => m.status === 'pending').length },
+                { id: 'confirmed', label: 'Disahkan', count: mentorshipRegistrations.filter(m => m.status === 'confirmed').length },
+                { id: 'completed', label: 'Selesai', count: mentorshipRegistrations.filter(m => m.status === 'completed').length },
+                { id: 'cancelled', label: 'Dibatalkan', count: mentorshipRegistrations.filter(m => m.status === 'cancelled').length }
+              ]}
+              activeTab={mentorshipStatusFilter}
+              onTabChange={(id) => {
+                setMentorshipStatusFilter(id as 'all' | MentorshipRegistration['status']);
+                setMobileMentorshipOpen(false);
+              }}
+              searchValue={mentorshipSearch}
+              onSearchChange={setMentorshipSearch}
+              searchPlaceholder="Cari usahawan, mentor atau topik..."
+              extraControls={
+                <select
+                  value={mentorshipSortPreset}
+                  onChange={(e) => setMentorshipSortPreset(e.target.value)}
+                  aria-label="Susun pendaftaran bimbingan"
+                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                >
+                  {mentorshipSortOptions.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              }
+            />
 
-            <div className={`rounded-2xl border shadow-xs overflow-visible ${adminTheme.surfaceClass}`}>
-              <ReferenceTableToolbar
-                accent="amber"
-                searchValue={mentorshipSearch}
-                onSearchChange={setMentorshipSearch}
-                searchPlaceholder="Cari usahawan, mentor atau topik..."
-                filterCount={
-                  (mentorshipStatusFilter !== 'all' ? 1 : 0) +
-                  (mentorshipSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
-                }
-                onResetFilters={() => {
-                  setMentorshipStatusFilter('all');
-                  setMentorshipSortPreset(DEFAULT_SORT_VALUE);
-                }}
-                sortOptions={
-                  mentorshipSortPreset === 'table_column'
-                    ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...mentorshipSortOptions]
-                    : mentorshipSortOptions
-                }
-                sortValue={mentorshipSortPreset === 'table_column' ? '' : mentorshipSortPreset}
-                onSortChange={(val) => {
-                  if (val) setMentorshipSortPreset(val);
-                }}
-                rightSlot={
+            {sortedMentorships.length === 0 ? (
+              <div className={`rounded-2xl border backdrop-blur-xs py-12 px-6 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+                <UserCheck className="w-9 h-9 text-stone-400 dark:text-stone-500 mx-auto" />
+                <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] kbelia-trim">
+                  Tiada pendaftaran bimbingan ditemui.
+                </p>
+                {(mentorshipSearch || mentorshipStatusFilter !== 'all' || mentorshipSortPreset !== DEFAULT_SORT_VALUE) && (
                   <button
                     type="button"
                     onClick={() => {
-                      setEditingMentorship(null);
-                      setIsCreatingMentorship(true);
+                      setMentorshipSearch('');
+                      setMentorshipStatusFilter('all');
+                      setMentorshipSortPreset(DEFAULT_SORT_VALUE);
                     }}
-                    className={`px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors whitespace-nowrap shrink-0 ${adminTheme.primaryButtonClass}`}
+                    className={`mt-1 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
                   >
-                    <Plus className="w-4 h-4" />
-                    <span>Tambah Sesi</span>
+                    Set Semula
                   </button>
-                }
-                filterContent={
-                  <div>
-                    <label className="block text-[0.8125rem] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 mb-1.5">
-                      Status Sesi Bimbingan
-                    </label>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {([
-                        { id: 'all', label: 'Semua' },
-                        { id: 'pending', label: 'Menunggu' },
-                        { id: 'confirmed', label: 'Disahkan' },
-                        { id: 'completed', label: 'Selesai' }
-                      ] as const).map((opt) => (
-                        <button
-                          key={opt.id}
-                          type="button"
-                          onClick={() => setMentorshipStatusFilter(opt.id)}
-                          className={`px-2.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer transition-colors ${
-                            mentorshipStatusFilter === opt.id
-                              ? adminTheme.segmentedActiveClass
-                              : adminTheme.secondaryButtonClass
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
+                )}
+              </div>
+            ) : (
+              <GoogleWorkspaceSplitPane
+                role="admin"
+                mobileOpen={mobileMentorshipOpen && Boolean(selectedMentorship)}
+                onMobileClose={() => setMobileMentorshipOpen(false)}
+                mobileTitle={selectedMentorship?.entrepreneurName}
+                leftHeader={
+                  <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <span>{sortedMentorships.length} pendaftaran bimbingan</span>
+                    {(mentorshipSearch || mentorshipStatusFilter !== 'all' || mentorshipSortPreset !== DEFAULT_SORT_VALUE) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMentorshipSearch('');
+                          setMentorshipStatusFilter('all');
+                          setMentorshipSortPreset(DEFAULT_SORT_VALUE);
+                        }}
+                        className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
+                      >
+                        Set Semula
+                      </button>
+                    )}
                   </div>
                 }
-              />
+                leftContent={adminMentorshipsPagination.paginatedItems.map((m) => {
+                  const isSelected = selectedMentorship?.id === m.id;
+                  const statusLabel =
+                    m.status === 'completed'
+                      ? 'Selesai'
+                      : m.status === 'confirmed'
+                      ? 'Disahkan'
+                      : m.status === 'cancelled'
+                      ? 'Dibatalkan'
+                      : 'Menunggu';
+                  const statusColor =
+                    m.status === 'completed'
+                      ? 'text-emerald-700 dark:text-emerald-400'
+                      : m.status === 'confirmed'
+                      ? adminTheme.accentTextClass
+                      : m.status === 'cancelled'
+                      ? 'text-stone-500 dark:text-stone-400'
+                      : 'text-amber-700 dark:text-amber-300';
 
-              {sortedMentorships.length === 0 ? (
-                <div className="py-12 px-6 text-center space-y-2">
-                  <UserCheck className="w-9 h-9 text-stone-400 dark:text-stone-500 mx-auto" />
-                  <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">
-                    Tiada pendaftaran bimbingan ditemui.
-                  </p>
-                  {(mentorshipSearch || mentorshipStatusFilter !== 'all') && (
-                    <button
-                      type="button"
+                  return (
+                    <div
+                      key={m.id}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => {
-                        setMentorshipSearch('');
-                        setMentorshipStatusFilter('all');
-                        setMentorshipSortPreset(DEFAULT_SORT_VALUE);
+                        setSelectedMentorshipId(m.id);
+                        setMobileMentorshipOpen(true);
                       }}
-                      className={`mt-1 px-3.5 py-2 rounded-xl text-[0.8125rem] font-semibold border cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          setSelectedMentorshipId(m.id);
+                          setMobileMentorshipOpen(true);
+                        }
+                      }}
+                      className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                        isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                      }`}
                     >
-                      Set Semula
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <>
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left border-collapse">
-                      <thead>
-                        <tr className={`border-b text-[0.8125rem] font-semibold text-stone-600 dark:text-stone-300 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                          <th className="py-3 pl-5 pr-3">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setMentorshipSortPreset('table_column');
-                                setMentorshipSort((prev) =>
-                                  prev.key === 'entrepreneurName'
-                                    ? { key: 'entrepreneurName', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                    : { key: 'entrepreneurName', dir: 'asc' }
-                                );
-                              }}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Usahawan &amp; Perniagaan</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setMentorshipSortPreset('table_column');
-                                setMentorshipSort((prev) =>
-                                  prev.key === 'mentorName'
-                                    ? { key: 'mentorName', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                    : { key: 'mentorName', dir: 'asc' }
-                                );
-                              }}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Mentor &amp; Topik</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setMentorshipSortPreset('table_column');
-                                setMentorshipSort((prev) =>
-                                  prev.key === 'preferredDate'
-                                    ? { key: 'preferredDate', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                    : { key: 'preferredDate', dir: 'asc' }
-                                );
-                              }}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Tarikh &amp; Mod</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 px-3">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setMentorshipSortPreset('table_column');
-                                setMentorshipSort((prev) =>
-                                  prev.key === 'status'
-                                    ? { key: 'status', dir: prev.dir === 'asc' ? 'desc' : 'asc' }
-                                    : { key: 'status', dir: 'asc' }
-                                );
-                              }}
-                              className="inline-flex items-center gap-1.5 hover:text-stone-900 dark:hover:text-[#F5F2EC] cursor-pointer whitespace-nowrap"
-                            >
-                              <span>Status</span>
-                              <ArrowUpDown className="w-3.5 h-3.5 opacity-65" />
-                            </button>
-                          </th>
-                          <th className="py-3 pl-2 pr-5 w-12 text-right">
-                            <span className="sr-only">Tindakan</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className={`divide-y ${adminTheme.dividerClass}`}>
-                        {adminMentorshipsPagination.paginatedItems.map((m) => (
-                          <tr key={m.id} className={`transition-colors ${adminTheme.rowHoverClass}`}>
-                            <td className="py-3.5 pl-5 pr-3">
-                              <div className="flex items-center gap-3 min-w-[200px]">
-                                <div className={`w-10 h-10 rounded-xl shrink-0 border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
-                                  <UserCheck className="w-4 h-4" />
-                                </div>
-                                <div className="min-w-0">
-                                  <p className="font-semibold text-stone-900 dark:text-[#F5F2EC] truncate max-w-[230px]">
-                                    {m.entrepreneurName}
-                                  </p>
-                                  <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[230px]">
-                                    {m.businessName} · {m.district}
-                                  </p>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="py-3.5 px-3">
-                              <p className="font-medium text-stone-900 dark:text-[#F5F2EC] truncate max-w-[220px]">
-                                {m.mentorName}
-                              </p>
-                              <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400 truncate max-w-[220px]">
-                                {m.topic}
-                              </p>
-                            </td>
-                            <td className="py-3.5 px-3 tabular-nums whitespace-nowrap">
-                              <p className="font-medium text-stone-900 dark:text-[#F5F2EC]">{m.preferredDate}</p>
-                              <p className="text-[0.8125rem] text-stone-500 dark:text-stone-400">{normalizeMentorshipMode(m.mode)}</p>
-                            </td>
-                            <td className="py-3.5 px-3 whitespace-nowrap">
-                              <span
-                                className={`text-[0.8125rem] font-semibold ${
-                                  m.status === 'completed'
-                                    ? 'text-emerald-700 dark:text-emerald-400'
-                                    : m.status === 'confirmed'
-                                    ? adminTheme.accentTextClass
-                                    : m.status === 'cancelled'
-                                    ? 'text-stone-500 dark:text-stone-400'
-                                    : 'text-amber-700 dark:text-amber-300'
-                                }`}
-                              >
-                                {m.status === 'completed'
-                                  ? 'Selesai'
-                                  : m.status === 'confirmed'
-                                  ? 'Disahkan'
-                                  : m.status === 'cancelled'
-                                  ? 'Dibatalkan'
-                                  : 'Menunggu'}
-                              </span>
-                            </td>
-                            <td className="py-3.5 pl-2 pr-5 text-right">
-                              <RowActionMenu
-                                ariaLabel={`Tindakan untuk ${m.entrepreneurName}`}
-                                items={[
-                                  {
-                                    label: 'Set Menunggu',
-                                    disabled: m.status === 'pending',
-                                    onClick: () => handleDirectMentorshipStatus(m, 'pending')
-                                  },
-                                  {
-                                    label: 'Set Disahkan',
-                                    tone: 'accent',
-                                    disabled: m.status === 'confirmed',
-                                    onClick: () => handleDirectMentorshipStatus(m, 'confirmed')
-                                  },
-                                  {
-                                    label: 'Set Selesai',
-                                    disabled: m.status === 'completed',
-                                    onClick: () => handleDirectMentorshipStatus(m, 'completed')
-                                  },
-                                  {
-                                    label: 'Set Dibatalkan',
-                                    disabled: m.status === 'cancelled',
-                                    onClick: () => handleDirectMentorshipStatus(m, 'cancelled')
-                                  },
-                                  {
-                                    label: 'Edit Sesi Bimbingan',
-                                    dividerBefore: true,
-                                    onClick: () => {
-                                      setIsCreatingMentorship(false);
-                                      setEditingMentorship(m);
-                                    }
-                                  },
-                                  {
-                                    label: 'Padam Sesi',
-                                    tone: 'danger',
-                                    onClick: () =>
-                                      confirmDelete({
-                                        itemName: `${m.entrepreneurName} (${m.topic})`,
-                                        itemType: 'Sesi Bimbingan Mentor',
-                                        onConfirm: () => handleDeleteMentorship(m)
-                                      })
-                                  }
-                                ]}
-                              />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
+                      <div className={`w-10 h-10 rounded-xl shrink-0 border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
+                        <UserCheck className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0 flex-1 space-y-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC] leading-snug truncate kbelia-trim">
+                            {m.entrepreneurName}
+                          </p>
+                          <span className={`text-[11px] font-bold shrink-0 ${statusColor}`}>
+                            {statusLabel}
+                          </span>
+                        </div>
+                        <p className="text-xs text-stone-600 dark:text-stone-400 truncate tabular-nums">
+                          {m.businessName} · {m.mentorName} · {m.preferredDate}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+                leftFooter={
                   <PaginationBar
                     currentPage={adminMentorshipsPagination.currentPage}
                     totalItems={adminMentorshipsPagination.totalItems}
@@ -3771,9 +3667,141 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     itemLabel="pendaftaran bimbingan"
                     accent="amber"
                   />
-                </>
-              )}
-            </div>
+                }
+                rightContent={
+                  selectedMentorship ? (
+                    <div>
+                      <SidePreviewHeader
+                        role="admin"
+                        media={
+                          <div className={`w-12 h-12 rounded-xl border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
+                            <UserCheck className="w-5 h-5" />
+                          </div>
+                        }
+                        title={selectedMentorship.entrepreneurName}
+                        status={
+                          <span
+                            className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                              selectedMentorship.status === 'completed'
+                                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400'
+                                : selectedMentorship.status === 'confirmed'
+                                ? adminTheme.activeNavClass
+                                : selectedMentorship.status === 'cancelled'
+                                ? 'bg-stone-100 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                                : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300'
+                            }`}
+                          >
+                            {selectedMentorship.status === 'completed'
+                              ? 'Selesai'
+                              : selectedMentorship.status === 'confirmed'
+                              ? 'Disahkan'
+                              : selectedMentorship.status === 'cancelled'
+                              ? 'Dibatalkan'
+                              : 'Menunggu'}
+                          </span>
+                        }
+                        subtitle={`${selectedMentorship.businessName} · ${selectedMentorship.district}`}
+                        meta={
+                          <>
+                            <span>{selectedMentorship.preferredDate}</span>
+                            <span>·</span>
+                            <span>{normalizeMentorshipMode(selectedMentorship.mode)}</span>
+                          </>
+                        }
+                        actions={
+                          <>
+                            <button
+                              type="button"
+                              disabled={selectedMentorship.status === 'pending'}
+                              onClick={() => handleDirectMentorshipStatus(selectedMentorship, 'pending')}
+                              className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer disabled:opacity-40 ${adminTheme.secondaryButtonClass}`}
+                            >
+                              Set Menunggu
+                            </button>
+                            <button
+                              type="button"
+                              disabled={selectedMentorship.status === 'confirmed'}
+                              onClick={() => handleDirectMentorshipStatus(selectedMentorship, 'confirmed')}
+                              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer disabled:opacity-40 ${adminTheme.primaryButtonClass}`}
+                            >
+                              Set Disahkan
+                            </button>
+                            <button
+                              type="button"
+                              disabled={selectedMentorship.status === 'completed'}
+                              onClick={() => handleDirectMentorshipStatus(selectedMentorship, 'completed')}
+                              className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer disabled:opacity-40 ${adminTheme.secondaryButtonClass}`}
+                            >
+                              Set Selesai
+                            </button>
+                            <button
+                              type="button"
+                              disabled={selectedMentorship.status === 'cancelled'}
+                              onClick={() => handleDirectMentorshipStatus(selectedMentorship, 'cancelled')}
+                              className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer disabled:opacity-40 ${adminTheme.secondaryButtonClass}`}
+                            >
+                              Set Dibatalkan
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsCreatingMentorship(false);
+                                setEditingMentorship(selectedMentorship);
+                              }}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                              <span>Edit Sesi Bimbingan</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                confirmDelete({
+                                  itemName: `${selectedMentorship.entrepreneurName} (${selectedMentorship.topic})`,
+                                  itemType: 'Sesi Bimbingan Mentor',
+                                  onConfirm: () => handleDeleteMentorship(selectedMentorship)
+                                })
+                              }
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                              <span>Padam Sesi</span>
+                            </button>
+                          </>
+                        }
+                      />
+
+                      <div className="p-4 sm:p-5 space-y-4">
+                        <SidePreviewMetricsStrip
+                          role="admin"
+                          columns={3}
+                          items={[
+                            { label: 'Mentor', value: selectedMentorship.mentorName },
+                            { label: 'Tarikh Pilihan', value: selectedMentorship.preferredDate, mono: true },
+                            { label: 'Mod Sesi', value: normalizeMentorshipMode(selectedMentorship.mode), accent: true }
+                          ]}
+                        />
+
+                        <div className={`p-4 rounded-xl border space-y-1.5 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-stone-500 dark:text-stone-400 block">
+                            Topik Bimbingan
+                          </span>
+                          <p className="text-sm text-stone-800 dark:text-stone-200 leading-relaxed">
+                            {selectedMentorship.topic}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <SidePreviewEmptyState
+                      icon={<UserCheck className="w-10 h-10 text-stone-400" />}
+                      title="Tiada Sesi Bimbingan Dipilih"
+                      description="Pilih mana-mana pendaftaran sesi bimbingan di sebelah kiri untuk mengurus status dan butiran."
+                    />
+                  )
+                }
+              />
+            )}
           </div>
         </div>
       )}

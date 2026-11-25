@@ -180,7 +180,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
     <div className="w-full space-y-4">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
+        <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight kbelia-trim">
           Senarai Kiosk Belia Kelantan
         </h1>
         {!isReadOnly && onGoToManageBooking && (
@@ -427,12 +427,15 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
 
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-center gap-2 min-w-0">
-                          <h3 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
+                          <h3
+                            title={`${slot.code} · ${slot.name}`}
+                            className="font-bold text-black dark:text-white text-sm sm:text-base kbelia-clamp-1 kbelia-trim"
+                          >
                             {slot.code} · {slot.name}
                           </h3>
                           {statusTag}
                         </div>
-                        <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
+                        <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums kbelia-prose">
                           {slot.hubLocation} ({slot.district}) · Saiz {slot.size} · RM{slot.monthlyRate}/bulan (Subsidi {subsidyRate}%)
                           {slot.currentTenantBusinessName ? ` · Penyewa: ${slot.currentTenantBusinessName}` : ''}
                         </p>
@@ -449,7 +452,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                         title={isEn ? 'Open in Google Maps' : 'Buka lokasi di Google Maps'}
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
-                        <span>GPS</span>
+                        <span className="kbelia-acro">GPS</span>
                       </a>
 
                       {myBooking ? (

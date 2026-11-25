@@ -24,6 +24,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { useScrollReveal } from '../hooks/useMotion';
 import { showToast } from './ToastNotification';
 import { KBeliaLogo } from './KBeliaLogo';
+import { AcronymText } from './TypographyPrimitives';
 import heroArtisanImg from '../assets/images/kbelia_hero_kiosk_artisan_1795363091257.jpg';
 import communityHubImg from '../assets/images/kbelia_community_hub_1795363091755.jpg';
 
@@ -348,14 +349,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <KBeliaLogo size="md" tone={isEditorialDark ? 'onDark' : 'onLight'} />
           </a>
 
-          {/* Zone 2: Concise Single-Line Text Links */}
+          {/* Zone 2: Concise Single-Line Text Links (Zero-Jitter Reserved Bold Width) */}
           <nav
             aria-label={isBM ? 'Navigasi utama' : 'Primary navigation'}
             className={`hidden md:flex items-center gap-7 text-sm font-medium ${surfaceTextMuted}`}
           >
             <a
               href="#hero"
-              className={`whitespace-nowrap shrink-0 hover:underline underline-offset-4 transition-colors ${
+              data-reserved-text={isBM ? 'Utama' : 'Home'}
+              className={`kbelia-reserved-bold kbelia-trim kbelia-link whitespace-nowrap shrink-0 hover:font-bold transition-colors ${
                 isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
               }`}
             >
@@ -363,7 +365,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </a>
             <a
               href="#inisiatif"
-              className={`whitespace-nowrap shrink-0 hover:underline underline-offset-4 transition-colors ${
+              data-reserved-text={isBM ? 'Pendekatan' : 'Approach'}
+              className={`kbelia-reserved-bold kbelia-trim kbelia-link whitespace-nowrap shrink-0 hover:font-bold transition-colors ${
                 isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
               }`}
             >
@@ -371,7 +374,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </a>
             <a
               href="#kiosk"
-              className={`whitespace-nowrap shrink-0 hover:underline underline-offset-4 transition-colors ${
+              data-reserved-text={isBM ? 'Ruang Niaga' : 'Spaces'}
+              className={`kbelia-reserved-bold kbelia-trim kbelia-link whitespace-nowrap shrink-0 hover:font-bold transition-colors ${
                 isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
               }`}
             >
@@ -379,7 +383,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </a>
             <a
               href="#direktori"
-              className={`whitespace-nowrap shrink-0 hover:underline underline-offset-4 transition-colors ${
+              data-reserved-text={isBM ? 'Karya Belia' : 'Creators'}
+              className={`kbelia-reserved-bold kbelia-trim kbelia-link whitespace-nowrap shrink-0 hover:font-bold transition-colors ${
                 isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
               }`}
             >
@@ -475,18 +480,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </p>
 
               <h1
-                className={`font-display font-bold tracking-tight leading-[1.08] text-balance ${surfaceTextPrimary}`}
-                style={{ fontSize: 'clamp(2.25rem, 4vw, 3.65rem)' }}
+                className={`font-display text-fluid-hero font-bold tracking-tight text-balance kbelia-trim ${surfaceTextPrimary}`}
               >
                 {isBM
                   ? 'Ruang Nyata Untuk Generasi Niaga Belia Kelantan'
                   : 'A Living Ground for Young Kelantan Entrepreneurs'}
               </h1>
 
-              <p className={`text-base sm:text-[1.0625rem] leading-relaxed max-w-xl ${surfaceTextMuted}`}>
-                {isBM
-                  ? 'Dari tapak jualan fizikal hingga ke jaringan bimbingan komuniti, kami menghimpunkan keperluan asas agar anak muda lebih berani melangkah dalam dunia perniagaan.'
-                  : 'From welcoming physical storefronts to shared community guidance, we bring together everyday essentials so young founders can take their first step with confidence.'}
+              <p className={`text-fluid-lead max-w-xl kbelia-prose ${surfaceTextMuted}`}>
+                <AcronymText
+                  text={
+                    isBM
+                      ? 'Dari tapak jualan fizikal hingga ke jaringan bimbingan komuniti, kami menghimpunkan keperluan asas agar anak muda lebih berani melangkah dalam dunia perniagaan.'
+                      : 'From welcoming physical storefronts to shared community guidance, we bring together everyday essentials so young founders can take their first step with confidence.'
+                  }
+                />
               </p>
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -506,7 +514,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
                 <a
                   href="#kiosk"
-                  className={`inline-flex items-center gap-1.5 px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap shrink-0 hover:underline underline-offset-4 ${surfaceTextPrimary}`}
+                  className={`inline-flex items-center gap-1.5 px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap shrink-0 kbelia-link ${surfaceTextPrimary}`}
                 >
                   <span>{isBM ? 'Terokai Ruang Niaga' : 'Browse Spaces'}</span>
                   <ChevronRight className="w-4 h-4" />
@@ -588,11 +596,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="absolute bottom-0 inset-x-0 z-20 p-5 sm:p-7 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                   <div className="space-y-1.5 max-w-lg">
                     <p className="text-xs font-medium text-[#E5B85C]">{activeSlide.location}</p>
-                    <h2 className="font-display text-xl sm:text-2xl font-bold text-[#F4F1EA] leading-snug">
+                    <h2
+                      title={activeSlide.title}
+                      className="font-display text-fluid-card font-bold text-[#F4F1EA] kbelia-clamp-2 kbelia-trim"
+                    >
                       {activeSlide.title}
                     </h2>
-                    <p className="text-sm text-[#D6D2C9] line-clamp-2 leading-relaxed">
-                      {activeSlide.description}
+                    <p className="text-sm text-[#D6D2C9] kbelia-clamp-2 kbelia-prose leading-relaxed">
+                      <AcronymText text={activeSlide.description} />
                     </p>
                   </div>
 
@@ -679,7 +690,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 </div>
                 <div className="pt-2.5 px-0.5 space-y-0.5">
                   <div className={`text-xs ${surfaceTextMuted}`}>{item.meta}</div>
-                  <div className={`text-sm font-semibold truncate ${surfaceTextPrimary} group-hover:underline underline-offset-4`}>
+                  <div
+                    title={item.title}
+                    className={`text-sm font-semibold kbelia-clamp-1 ${surfaceTextPrimary} group-hover:underline`}
+                  >
                     {item.title}
                   </div>
                 </div>
@@ -701,16 +715,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 {isBM ? 'Pendekatan KBelia' : 'The KBelia Approach'}
               </p>
 
-              <h2 className={`font-display text-3xl sm:text-4xl font-bold leading-[1.15] text-balance ${surfaceTextPrimary}`}>
+              <h2 className={`font-display text-fluid-title font-bold text-balance kbelia-trim ${surfaceTextPrimary}`}>
                 {isBM
                   ? 'Mengapa Anak Muda Perlukan Lebih Daripada Sekadar Tapak'
                   : 'Why Young Founders Need More Than Just a Stall'}
               </h2>
 
-              <p className={`text-[0.95rem] sm:text-base leading-relaxed ${surfaceTextMuted}`}>
-                {isBM
-                  ? 'Memulakan perniagaan buat kali pertama sering mencabar. KBelia dibina untuk merapatkan jurang antara idea di atas kertas dengan realiti jualan harian melalui ruang fizikal, panduan tersusun, dan sokongan komuniti setempat.'
-                  : 'Starting a venture for the first time can feel daunting. KBelia bridges the space between an early sketch and an open shopfront through accessible booths, practical guidance, and a welcoming network.'}
+              <p className={`text-fluid-lead kbelia-prose ${surfaceTextMuted}`}>
+                <AcronymText
+                  text={
+                    isBM
+                      ? 'Memulakan perniagaan buat kali pertama sering mencabar. KBelia dibina untuk merapatkan jurang antara idea di atas kertas dengan realiti jualan harian melalui ruang fizikal, panduan tersusun, dan sokongan komuniti setempat.'
+                      : 'Starting a venture for the first time can feel daunting. KBelia bridges the space between an early sketch and an open shopfront through accessible booths, practical guidance, and a welcoming network.'
+                  }
+                />
               </p>
 
               <div className={`relative aspect-[16/10] rounded-2xl overflow-hidden border ${hairlineBorderStrong} mt-2`}>
@@ -752,11 +770,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       </span>
                     </div>
                     <div className="sm:col-span-10 space-y-2">
-                      <h3 className={`font-display text-xl sm:text-2xl font-bold ${surfaceTextPrimary}`}>
+                      <h3 className={`font-display text-fluid-card font-bold kbelia-trim ${surfaceTextPrimary}`}>
                         {chapter.title}
                       </h3>
-                      <p className={`text-[0.95rem] sm:text-base leading-relaxed ${surfaceTextMuted}`}>
-                        {chapter.body}
+                      <p className={`text-[0.95rem] sm:text-base leading-relaxed kbelia-prose ${surfaceTextMuted}`}>
+                        <AcronymText text={chapter.body} />
                       </p>
                     </div>
                   </article>
@@ -777,7 +795,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
                 {isBM ? 'Lokasi Tumpuan Negeri' : 'Featured Community Hubs'}
               </p>
-              <h2 className={`font-display text-3xl sm:text-4xl font-bold text-balance ${surfaceTextPrimary}`}>
+              <h2 className={`font-display text-fluid-title font-bold text-balance kbelia-trim ${surfaceTextPrimary}`}>
                 {isBM ? 'Ruang Niaga Sedia Diterokai' : 'Spaces Ready for Your Next Chapter'}
               </h2>
             </div>
@@ -785,7 +803,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button
               type="button"
               onClick={() => navigateToPage('login')}
-              className={`inline-flex items-center gap-2 text-sm font-semibold cursor-pointer whitespace-nowrap shrink-0 hover:underline underline-offset-4 ${
+              className={`inline-flex items-center gap-2 text-sm font-semibold cursor-pointer whitespace-nowrap shrink-0 kbelia-link ${
                 isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'
               }`}
             >
@@ -895,10 +913,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       <div className={`text-xs ${surfaceTextMuted}`}>
                         {slot.district} · {slot.size}
                       </div>
-                      <h3 className={`font-display text-lg font-bold leading-snug ${surfaceTextPrimary}`}>
+                      <h3
+                        title={slot.name}
+                        className={`font-display text-fluid-card font-bold kbelia-clamp-2 kbelia-trim ${surfaceTextPrimary}`}
+                      >
                         {slot.name}
                       </h3>
-                      <p className={`text-sm line-clamp-2 ${surfaceTextMuted}`}>
+                      <p className={`text-sm kbelia-clamp-2 kbelia-prose ${surfaceTextMuted}`}>
                         {slot.hubLocation}
                       </p>
                     </div>
@@ -938,10 +959,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
                 {isBM ? 'Jenama & Karya Tempatan' : 'Youth-Founded Brands'}
               </p>
-              <h2 className={`font-display text-3xl sm:text-4xl font-bold text-balance ${surfaceTextPrimary}`}>
+              <h2 className={`font-display text-fluid-title font-bold text-balance kbelia-trim ${surfaceTextPrimary}`}>
                 {isBM ? 'Kenali Pengasas Muda Kelantan' : 'Meet Local Youth Creators'}
               </h2>
-              <p className={`text-sm sm:text-base ${surfaceTextMuted}`}>
+              <p className={`text-fluid-lead kbelia-prose ${surfaceTextMuted}`}>
                 {isBM
                   ? 'Himpunan jenama ciptaan generasi belia untuk diterokai, dihubungi, dan disokong bersama.'
                   : 'Original local businesses built by young Kelantan founders, ready for you to discover and support.'}
@@ -986,16 +1007,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       />
                       <div className="min-w-0">
                         <div className={`text-xs truncate ${surfaceTextMuted}`}>
-                          {formatBusinessCategory(biz.category)} · {biz.district}
+                          <AcronymText text={formatBusinessCategory(biz.category)} /> · {biz.district}
                         </div>
-                        <h3 className={`font-display text-lg font-bold truncate ${surfaceTextPrimary}`}>
+                        <h3
+                          title={biz.businessName}
+                          className={`font-display text-fluid-card font-bold kbelia-clamp-2 kbelia-trim ${surfaceTextPrimary}`}
+                        >
                           {biz.businessName}
                         </h3>
                       </div>
                     </div>
 
-                    <p className={`text-sm sm:text-[0.9375rem] leading-relaxed line-clamp-2 ${surfaceTextMuted}`}>
-                      {biz.description || biz.tagline}
+                    <p className={`text-sm sm:text-[0.9375rem] leading-relaxed kbelia-clamp-2 kbelia-prose ${surfaceTextMuted}`}>
+                      <AcronymText text={biz.description || biz.tagline || ''} />
                     </p>
                   </div>
 
@@ -1028,15 +1052,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
                   {isBM ? 'Permulaan Yang Ringkas' : 'Simple Way to Begin'}
                 </p>
-                <h2 className={`font-display text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.12] text-balance ${surfaceTextPrimary}`}>
+                <h2 className={`font-display text-fluid-title font-bold text-balance kbelia-trim ${surfaceTextPrimary}`}>
                   {isBM
                     ? 'Langkah Pertama Anda Bermula Di Sini'
                     : 'Your Next Chapter Starts With One Step'}
                 </h2>
-                <p className={`text-base max-w-xl leading-relaxed ${surfaceTextMuted}`}>
-                  {isBM
-                    ? 'Sertai komuniti usahawan muda Kelantan untuk mengakses ruang niaga, jaringan bimbingan, dan peluang sokongan negeri.'
-                    : 'Join Kelantan youth entrepreneurs building authentic businesses with shared physical spaces and community support.'}
+                <p className={`text-fluid-lead max-w-xl kbelia-prose ${surfaceTextMuted}`}>
+                  <AcronymText
+                    text={
+                      isBM
+                        ? 'Sertai komuniti usahawan muda Kelantan untuk mengakses ruang niaga, jaringan bimbingan, dan peluang sokongan negeri.'
+                        : 'Join Kelantan youth entrepreneurs building authentic businesses with shared physical spaces and community support.'
+                    }
+                  />
                 </p>
               </div>
 
@@ -1129,22 +1157,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </h4>
             <ul className={`space-y-2 text-sm ${surfaceTextMuted}`}>
               <li>
-                <a href="#hero" className="hover:underline underline-offset-4">
+                <a href="#hero" className="kbelia-link">
                   {isBM ? 'Utama' : 'Home'}
                 </a>
               </li>
               <li>
-                <a href="#inisiatif" className="hover:underline underline-offset-4">
+                <a href="#inisiatif" className="kbelia-link">
                   {isBM ? 'Pendekatan KBelia' : 'Our Approach'}
                 </a>
               </li>
               <li>
-                <a href="#kiosk" className="hover:underline underline-offset-4">
+                <a href="#kiosk" className="kbelia-link">
                   {isBM ? 'Ruang Niaga' : 'Retail Spaces'}
                 </a>
               </li>
               <li>
-                <a href="#direktori" className="hover:underline underline-offset-4">
+                <a href="#direktori" className="kbelia-link">
                   {isBM ? 'Karya Belia' : 'Youth Creators'}
                 </a>
               </li>
@@ -1152,7 +1180,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => navigateToPage('login')}
-                  className="hover:underline underline-offset-4 cursor-pointer text-left"
+                  className="kbelia-link cursor-pointer text-left"
                 >
                   {isBM ? 'Log Masuk Portal' : 'Portal Sign In'}
                 </button>
@@ -1169,7 +1197,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('privacy')}
-                  className="hover:underline underline-offset-4 cursor-pointer text-left"
+                  className="kbelia-link cursor-pointer text-left"
                 >
                   {isBM ? 'Dasar Privasi' : 'Privacy Policy'}
                 </button>
@@ -1178,7 +1206,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('terms')}
-                  className="hover:underline underline-offset-4 cursor-pointer text-left"
+                  className="kbelia-link cursor-pointer text-left"
                 >
                   {isBM ? 'Terma & Syarat' : 'Terms & Conditions'}
                 </button>
@@ -1187,7 +1215,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('privacy')}
-                  className="hover:underline underline-offset-4 cursor-pointer text-left"
+                  className="kbelia-link cursor-pointer text-left"
                 >
                   {isBM ? 'Keselamatan Maklumat' : 'Data Protection'}
                 </button>
@@ -1298,12 +1326,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </button>
             </div>
 
-            <div className={`p-6 text-sm space-y-4 max-h-[60vh] overflow-y-auto leading-relaxed ${surfaceTextMuted}`}>
+            <div className={`p-6 text-sm space-y-4 max-h-[60vh] overflow-y-auto leading-relaxed kbelia-prose ${surfaceTextMuted}`}>
               {legalModalType === 'privacy' ? (
                 <>
                   <p className={`font-semibold ${surfaceTextPrimary}`}>1. Komitmen Privasi</p>
                   <p>
-                    Portal KBelia Negeri Kelantan komited untuk melindungi maklumat peribadi pengguna selaras dengan Akta Perlindungan Data Peribadi 2010 (PDPA).
+                    Portal KBelia Negeri Kelantan komited untuk melindungi maklumat peribadi pengguna selaras dengan Akta Perlindungan Data Peribadi 2010 (<span className="kbelia-acro">PDPA</span>).
                   </p>
                   <p className={`font-semibold ${surfaceTextPrimary}`}>2. Tujuan Penggunaan Maklumat</p>
                   <p>

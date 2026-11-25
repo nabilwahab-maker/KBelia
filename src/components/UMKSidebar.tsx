@@ -176,26 +176,21 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     if (onCloseMobile) onCloseMobile();
   };
 
-  const navBtnBase = isMentor
-    ? 'w-full flex items-center justify-between gap-2 px-3.5 py-2.25 text-[0.9rem] font-medium rounded-full border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A73E8]/35'
-    : 'w-full flex items-center justify-between gap-2 px-3 py-2.25 text-[0.9375rem] font-medium rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30';
+  const navBtnBase =
+    'w-full flex items-center justify-between gap-2 px-3 py-2.25 text-[0.9375rem] font-medium rounded-xl border transition-all duration-150 text-left cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30';
   const navBtnActive = roleTheme.activeNavClass;
-  const navBtnIdle = isMentor
-    ? 'border-transparent text-[#444746] dark:text-[#C4C7C5] hover:bg-[#F1F4F9] dark:hover:bg-[#28292C] hover:text-[#1F1F1F] dark:hover:text-[#E3E3E3]'
-    : 'border-transparent text-slate-700 dark:text-stone-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.05] hover:text-slate-950 dark:hover:text-white';
+  const navBtnIdle =
+    'border-transparent text-slate-700 dark:text-stone-300 hover:bg-black/[0.04] dark:hover:bg-white/[0.05] hover:text-slate-950 dark:hover:text-white';
 
-  const categoryHeaderClass = isMentor
-    ? 'text-[0.75rem] font-semibold tracking-wide text-[#5F6368] dark:text-[#9AA0A6] px-3 pb-1 whitespace-nowrap truncate'
-    : 'text-[0.78rem] font-semibold tracking-tight text-slate-500 dark:text-stone-400 px-2 pb-1 whitespace-nowrap truncate';
+  const categoryHeaderClass =
+    'text-[0.78rem] font-semibold tracking-tight text-slate-500 dark:text-stone-400 px-2 pb-1 whitespace-nowrap truncate';
   const categoryDividerClass = `pt-3 border-t space-y-1 ${roleTheme.dividerClass}`;
 
-  const miniBtnBase = isMentor
-    ? 'relative p-2.5 rounded-full border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A73E8]/35'
-    : 'relative p-2.5 rounded-xl border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30';
+  const miniBtnBase =
+    'relative p-2.5 rounded-xl border transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30';
   const miniBtnActive = roleTheme.activeMiniBtnClass;
-  const miniBtnIdle = isMentor
-    ? 'border-transparent text-[#444746] dark:text-[#C4C7C5] hover:bg-[#F1F4F9] dark:hover:bg-[#28292C] hover:text-[#1F1F1F] dark:hover:text-[#E3E3E3]'
-    : 'border-transparent text-slate-600 dark:text-stone-400 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:text-slate-950 dark:hover:text-white';
+  const miniBtnIdle =
+    'border-transparent text-slate-600 dark:text-stone-400 hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:text-slate-950 dark:hover:text-white';
   const miniDivider = <div className={`w-8 h-px my-0.5 border-t ${roleTheme.dividerClass}`} />;
 
   // =========================================================================
@@ -380,15 +375,15 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             {
               key: 'mentor:sessions',
               label: isMs ? 'Sesi Bimbingan' : 'Sessions',
-              keywords: 'sesi bimbingan kalendar temujanji mentee google meet sessions',
+              keywords: 'sesi bimbingan kalendar temujanji belia google meet sessions',
               icon: Calendar,
               isActive: activeTab === 'mentor' && mentorSubTab === 'sessions',
               onClick: () => goMentor('sessions', 'mentor:sessions')
             },
             {
               key: 'mentor:mentees',
-              label: isMs ? 'Senarai Mentee' : 'Mentee List',
-              keywords: 'senarai mentee usahawan bimbingan kedai ssm mentees',
+              label: isMs ? 'Senarai Belia' : 'Youth List',
+              keywords: 'senarai belia usahawan bimbingan kedai ssm youth',
               icon: Users,
               isActive: activeTab === 'mentor' && mentorSubTab === 'mentees',
               onClick: () => goMentor('mentees', 'mentor:mentees')
@@ -645,22 +640,14 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
         {/* 1. SEARCH SIDEBAR INPUT */}
         <div className="relative group">
           <Search
-            className={`w-4 h-4 absolute top-1/2 -translate-y-1/2 pointer-events-none ${
-              isMentor
-                ? 'left-3.5 text-[#5F6368] dark:text-[#9AA0A6]'
-                : 'right-3 text-black/70 dark:text-white/75'
-            }`}
+            className="w-4 h-4 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-black/70 dark:text-white/75"
           />
           <input
             type="text"
             placeholder={isMentor ? (isMs ? 'Cari menu bimbingan...' : 'Search workspace...') : t('search_sidebar')}
             value={sidebarSearch}
             onChange={(e) => setSidebarSearch(e.target.value)}
-            className={
-              isMentor
-                ? 'w-full pl-9 pr-8 py-2 text-[0.875rem] bg-[#F1F4F9] dark:bg-[#28292C] border border-transparent focus:border-[#1A73E8] dark:focus:border-[#8AB4F8] focus:bg-white dark:focus:bg-[#1E1F20] rounded-full text-[#1F1F1F] dark:text-[#E3E3E3] placeholder:text-[#5F6368] dark:placeholder:text-[#9AA0A6] focus:outline-none focus:ring-2 focus:ring-[#1A73E8]/20 transition-all duration-150'
-                : 'w-full pl-3.5 pr-8 py-2 text-[0.875rem] bg-black/[0.03] dark:bg-white/[0.04] border border-slate-300/80 dark:border-white/10 rounded-xl text-slate-900 dark:text-[#F5F3EE] placeholder:text-slate-500 dark:placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-current/25 transition-all duration-150'
-            }
+            className="w-full pl-3.5 pr-8 py-2 text-[0.875rem] bg-black/[0.03] dark:bg-white/[0.04] border border-slate-300/80 dark:border-white/10 rounded-xl text-slate-900 dark:text-[#F5F3EE] placeholder:text-slate-500 dark:placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-current/25 transition-all duration-150"
           />
           {sidebarSearch && (
             <button
@@ -682,7 +669,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             <button
               type="button"
               onClick={() => setSidebarSearch('')}
-              className="text-sm font-semibold text-black dark:text-white/80 hover:underline cursor-pointer"
+              className="text-sm font-semibold text-black dark:text-white/80 kbelia-link cursor-pointer"
             >
               {isMs ? 'Set Semula' : 'Reset'}
             </button>
@@ -709,16 +696,17 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
                       <div className="flex items-center gap-2.5 min-w-0">
                         <Icon
                           className={`w-4 h-4 shrink-0 ${
-                            isMentor
-                              ? item.isActive
-                                ? 'text-[#041E49] dark:text-[#C2E7FF]'
-                                : 'text-[#5F6368] dark:text-[#9AA0A6] group-hover:text-[#1F1F1F] dark:group-hover:text-[#E3E3E3]'
-                              : item.isActive
+                            item.isActive
                               ? 'text-black dark:text-white/75'
                               : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
                           }`}
                         />
-                        <span className="truncate whitespace-nowrap">{item.label}</span>
+                        <span
+                          data-reserved-text={item.label}
+                          className="kbelia-reserved-bold kbelia-reserved-bold-start kbelia-trim min-w-0 max-w-full truncate whitespace-nowrap"
+                        >
+                          {item.label}
+                        </span>
                       </div>
                       {renderCountBadge(getCount(item.key))}
                     </button>

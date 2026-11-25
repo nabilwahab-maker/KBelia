@@ -1,6 +1,7 @@
 import React from 'react';
 import { LucideIcon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useAnimatedMetric } from '../hooks/useMotion';
+import { AcronymText } from './TypographyPrimitives';
 
 interface SaaSKpiCardProps {
   title: string;
@@ -92,12 +93,15 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             {isLive && <span className="kbelia-live-dot" aria-hidden="true" />}
-            <span className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white block leading-snug tracking-tight break-words">
-              {title}
+            <span
+              title={title}
+              className="text-base sm:text-[1.0625rem] font-extrabold text-black dark:text-white block leading-snug tracking-tight kbelia-clamp-2 kbelia-trim"
+            >
+              <AcronymText text={title} />
             </span>
           </div>
           <div className="mt-2 flex items-center gap-2 flex-wrap">
-            <span className={`text-xl sm:text-[1.625rem] font-extrabold font-mono tabular-nums tracking-tight leading-tight break-words ${theme.valueText}`}>
+            <span className={`text-xl sm:text-[1.625rem] font-extrabold font-mono tabular-nums tracking-tight leading-tight break-words kbelia-trim ${theme.valueText}`}>
               {animatedValue}
             </span>
             {trendLabel && (
@@ -143,8 +147,8 @@ export const SaaSKpiCard: React.FC<SaaSKpiCardProps> = ({
 
       {/* Full-Width Wrapping Summary Subtitle */}
       <div>
-        <p className="text-[0.8125rem] text-black/80 dark:text-white/85 leading-snug break-words">
-          {subtitle}
+        <p className="text-[0.8125rem] text-black/80 dark:text-white/85 leading-snug kbelia-prose kbelia-clamp-2">
+          <AcronymText text={subtitle} />
         </p>
       </div>
     </div>

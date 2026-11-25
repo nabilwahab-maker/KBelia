@@ -246,10 +246,10 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         userTypeLabel: 'Panel Mentor',
         locationOrAgency: m.agency || 'Hab Usahawan KBelia',
         activitySummary: m.expertise.slice(0, 2).join(', ') || 'Bimbingan Keusahawanan',
-        metricDisplay: `${assignedSessions.length} Sesi (${completedSessions} Selesai)`,
-        statusLabel: m.availableDays ? 'Mentor' : 'Jadual Penuh',
-        statusTone: m.availableDays ? 'emerald' : 'amber',
-        detailLine: `Jadual: ${m.availableDays || 'Waktu Pejabat'} · Hubungan: ${m.email || m.phone}`,
+        metricDisplay: assignedSessions.length === 0 ? 'Belum Ada Sesi' : completedSessions === 0 ? `${assignedSessions.length} Sesi (Belum Selesai)` : `${assignedSessions.length} Sesi (${completedSessions} Selesai)`,
+        statusLabel: 'Mentor',
+        statusTone: 'emerald',
+        detailLine: `Bidang: ${m.expertise.slice(0, 2).join(', ') || 'Bimbingan'} · Hubungan: ${m.email || m.phone}`,
         modifiedMs: getModifiedTimestamp(m)
       });
     });
@@ -746,7 +746,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                     <th className="py-3 px-3">Lokasi / Agensi</th>
                     <th className="py-3 px-3">Ringkasan Aktiviti</th>
                     <th className="py-3 px-3 text-right">Catatan</th>
-                    <th className="py-3 px-3 text-center">Keadaan</th>
+                    <th className="py-3 px-3 text-center">Status</th>
                     <th className="py-3 pl-2 pr-4 w-12 text-right">
                       <span className="sr-only">Tindakan</span>
                     </th>

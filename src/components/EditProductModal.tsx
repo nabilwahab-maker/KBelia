@@ -266,7 +266,7 @@ export const EditProductModal: React.FC<EditProductModalProps> = ({
                 className={`w-full px-4 py-2.5 rounded-xl text-sm sm:text-[0.9375rem] focus:outline-none transition-all ${roleTheme.inputClass}`}
               />
               <div className="mt-1 text-[0.8125rem] text-black/60 dark:text-white/60 text-right tabular-nums">
-                {description.length}/1000 aksara
+                {description.length} aksara (maksimum 1000)
               </div>
             </div>
 

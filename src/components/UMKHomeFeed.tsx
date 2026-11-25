@@ -158,10 +158,10 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
       {/* 1. WELCOME HEADER */}
       <div className="bg-white/90 dark:bg-[#141D1A]/85 rounded-3xl p-6 sm:p-7 border border-[#E2DCCB] dark:border-[#24342D] relative overflow-hidden transition-all duration-300">
         <div className="relative z-10">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight text-black dark:text-white leading-snug">
+          <h1 className="font-display text-fluid-portal font-black tracking-tight text-black dark:text-white leading-snug kbelia-trim">
             {t('welcome_greeting')} <span className={roleTheme.accentTextClass}>{displayName}</span>
           </h1>
-          <p className="text-[0.9375rem] text-black/80 dark:text-white/85 mt-1 max-w-2xl leading-relaxed">
+          <p className="text-[0.9375rem] text-black/80 dark:text-white/85 mt-1 max-w-2xl leading-relaxed kbelia-prose">
             {t('home_subtitle')}
           </p>
         </div>

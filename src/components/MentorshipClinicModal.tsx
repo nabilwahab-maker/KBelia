@@ -409,7 +409,6 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                           <span className={`text-[0.8125rem] font-bold px-2.5 py-0.5 rounded-lg border ${roleTheme.activeMiniBtnClass}`}>
                             {mentor.agency}
                           </span>
-                          <span className="text-[0.8125rem] text-black/70 dark:text-white/75">&bull; {mentor.availableDays}</span>
                         </div>
                         
                         <h4 className="text-sm sm:text-base font-bold text-black dark:text-white">

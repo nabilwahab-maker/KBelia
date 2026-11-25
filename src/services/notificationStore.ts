@@ -52,7 +52,7 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
   {
     id: 'notif-mentor-1',
     title: 'Jadual Klinik Bimbingan Usahawan',
-    message: 'Slot perundingan strategi pemasaran dan pembungkusan produk telah dibuka untuk tempahan mentee usahawan.',
+    message: 'Slot perundingan strategi pemasaran dan pembungkusan produk telah dibuka untuk tempahan usahawan belia.',
     category: 'reminder',
     sender: 'Sistem Pengurusan Mentor',
     senderRole: 'system',

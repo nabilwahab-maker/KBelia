@@ -6,7 +6,12 @@ import {
   Save,
   Loader2,
   Users,
-  ArrowUpDown
+  Edit3,
+  Trash2,
+  CheckCircle2,
+  XCircle,
+  MapPin,
+  Clock
 } from 'lucide-react';
 import { EventBooking, KelantanDistrict, YouthEvent } from '../types';
 import {
@@ -23,11 +28,18 @@ import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
 import { resolveEventImage } from '../utils/visualAssets';
 import { ImageDropzone } from './ImageDropzone';
-import { ReferenceTableToolbar, RowActionMenu } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, compareText, sortRecords } from '../utils/sortUtils';
 import { ModernDatePicker, ModernTimePicker } from './ModernDateTimePicker';
 import { getRoleTheme } from '../utils/roleTheme';
+import {
+  GoogleWorkspaceSplitPane,
+  SidePreviewEmptyState,
+  SidePreviewHeader,
+  SidePreviewMetricsStrip,
+  WorkspaceHeaderCard,
+  getWorkspaceActiveRowClass
+} from './GoogleWorkspaceSplitPane';
 
 const adminTheme = getRoleTheme('admin');
 
@@ -78,14 +90,14 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
   const [catalogCategoryFilter, setCatalogCategoryFilter] = useState<'all' | YouthEvent['category']>('all');
   const [catalogDistrictFilter, setCatalogDistrictFilter] = useState<'all' | KelantanDistrict>('all');
   const [catalogSortPreset, setCatalogSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
-  const [catalogSortBy, setCatalogSortBy] = useState<'title' | 'category' | 'district' | 'booths'>('title');
-  const [catalogSortDir, setCatalogSortDir] = useState<'asc' | 'desc'>('asc');
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [mobileCatalogOpen, setMobileCatalogOpen] = useState(false);
 
   const [bookingSearch, setBookingSearch] = useState('');
   const [bookingStatusFilter, setBookingStatusFilter] = useState<'all' | 'booked' | 'cancelled'>('all');
   const [bookingSortPreset, setBookingSortPreset] = useState<string>(DEFAULT_SORT_VALUE);
-  const [bookingSortBy, setBookingSortBy] = useState<'userName' | 'eventTitle' | 'status'>('userName');
-  const [bookingSortDir, setBookingSortDir] = useState<'asc' | 'desc'>('asc');
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [mobileBookingOpen, setMobileBookingOpen] = useState(false);
 
   const catalogSortOptions = useMemo(
     () =>
@@ -143,17 +155,6 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
       );
     });
 
-    if (catalogSortPreset === 'table_column') {
-      return [...filtered].sort((a, b) => {
-        let cmp = 0;
-        if (catalogSortBy === 'category') cmp = a.category.localeCompare(b.category);
-        else if (catalogSortBy === 'district') cmp = a.district.localeCompare(b.district);
-        else if (catalogSortBy === 'booths') cmp = a.boothsAvailable - b.boothsAvailable;
-        else cmp = a.title.localeCompare(b.title);
-        return catalogSortDir === 'asc' ? cmp : -cmp;
-      });
-    }
-
     return sortRecords(filtered, {
       sortBy: catalogSortPreset,
       getName: (evt) => evt.title || '',
@@ -164,7 +165,7 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
         return null;
       }
     });
-  }, [events, catalogSearch, catalogCategoryFilter, catalogDistrictFilter, catalogSortPreset, catalogSortBy, catalogSortDir]);
+  }, [events, catalogSearch, catalogCategoryFilter, catalogDistrictFilter, catalogSortPreset]);
 
   const filteredSortedBookings = useMemo(() => {
     const q = bookingSearch.trim().toLowerCase();
@@ -178,16 +179,6 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
       );
     });
 
-    if (bookingSortPreset === 'table_column') {
-      return [...filtered].sort((a, b) => {
-        let cmp = 0;
-        if (bookingSortBy === 'eventTitle') cmp = a.eventTitle.localeCompare(b.eventTitle);
-        else if (bookingSortBy === 'status') cmp = a.status.localeCompare(b.status);
-        else cmp = (a.userName || '').localeCompare(b.userName || '');
-        return bookingSortDir === 'asc' ? cmp : -cmp;
-      });
-    }
-
     return sortRecords(filtered, {
       sortBy: bookingSortPreset,
       getName: (b) => b.userName || b.eventTitle || '',
@@ -197,15 +188,13 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
         return null;
       }
     });
-  }, [eventBookings, bookingSearch, bookingStatusFilter, bookingSortPreset, bookingSortBy, bookingSortDir]);
+  }, [eventBookings, bookingSearch, bookingStatusFilter, bookingSortPreset]);
 
   const catalogPagination = usePagination(filteredSortedEvents, 7, [
     catalogSearch,
     catalogCategoryFilter,
     catalogDistrictFilter,
     catalogSortPreset,
-    catalogSortBy,
-    catalogSortDir,
     filteredSortedEvents.length
   ]);
 
@@ -213,30 +202,46 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
     bookingSearch,
     bookingStatusFilter,
     bookingSortPreset,
-    bookingSortBy,
-    bookingSortDir,
     filteredSortedBookings.length
   ]);
 
-  const toggleCatalogSort = (col: 'title' | 'category' | 'district' | 'booths') => {
-    setCatalogSortPreset('table_column');
-    if (catalogSortBy === col) {
-      setCatalogSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setCatalogSortBy(col);
-      setCatalogSortDir('asc');
-    }
-  };
+  const categoryCounts = useMemo(
+    () => ({
+      all: events.length,
+      karnival: events.filter((e) => e.category === 'karnival').length,
+      bengkel: events.filter((e) => e.category === 'bengkel').length,
+      pitching: events.filter((e) => e.category === 'pitching').length,
+      expo: events.filter((e) => e.category === 'expo').length
+    }),
+    [events]
+  );
 
-  const toggleBookingSort = (col: 'userName' | 'eventTitle' | 'status') => {
-    setBookingSortPreset('table_column');
-    if (bookingSortBy === col) {
-      setBookingSortDir(prev => (prev === 'asc' ? 'desc' : 'asc'));
-    } else {
-      setBookingSortBy(col);
-      setBookingSortDir('asc');
-    }
-  };
+  const bookingCounts = useMemo(
+    () => ({
+      all: eventBookings.length,
+      booked: eventBookings.filter((b) => b.status === 'booked').length,
+      cancelled: eventBookings.filter((b) => b.status === 'cancelled').length
+    }),
+    [eventBookings]
+  );
+
+  const selectedEvent = useMemo(
+    () =>
+      filteredSortedEvents.find((e) => e.id === selectedEventId) ||
+      catalogPagination.paginatedItems[0] ||
+      filteredSortedEvents[0] ||
+      null,
+    [filteredSortedEvents, selectedEventId, catalogPagination.paginatedItems]
+  );
+
+  const selectedBooking = useMemo(
+    () =>
+      filteredSortedBookings.find((b) => b.id === selectedBookingId) ||
+      bookingsPagination.paginatedItems[0] ||
+      filteredSortedBookings[0] ||
+      null,
+    [filteredSortedBookings, selectedBookingId, bookingsPagination.paginatedItems]
+  );
 
   const openCreateEvent = () => {
     setEditingEvent(null);
@@ -343,418 +348,580 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
     }
   };
 
+  const hasCatalogFilters = Boolean(
+    catalogSearch.trim() ||
+      catalogCategoryFilter !== 'all' ||
+      catalogDistrictFilter !== 'all' ||
+      catalogSortPreset !== DEFAULT_SORT_VALUE
+  );
+
+  const hasBookingFilters = Boolean(
+    bookingSearch.trim() || bookingStatusFilter !== 'all' || bookingSortPreset !== DEFAULT_SORT_VALUE
+  );
+
   return (
     <div className="space-y-4 animate-dashboard-tab">
-      <div className={`p-4 sm:p-5 rounded-2xl border backdrop-blur-xs transition-colors ${adminTheme.surfaceClass}`}>
-        <div className="space-y-1">
-          <h3 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
-            Acara Usahawan Belia &amp; Tempahan Tapak
-          </h3>
-        </div>
-      </div>
-
-      {/* Sub-navigation switcher + Action */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setSubView('catalog')}
-            className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer inline-flex items-center gap-2 ${
-              subView === 'catalog'
-                ? adminTheme.segmentedActiveClass
-                : adminTheme.secondaryButtonClass
-            }`}
-          >
-            <Calendar className="w-4 h-4" />
-            <span>Senarai Acara</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setSubView('bookings')}
-            className={`px-4 py-2 rounded-xl text-sm font-bold transition-colors cursor-pointer inline-flex items-center gap-2 ${
-              subView === 'bookings'
-                ? adminTheme.segmentedActiveClass
-                : adminTheme.secondaryButtonClass
-            }`}
-          >
-            <Users className="w-4 h-4" />
-            <span>Tempahan Peserta</span>
-          </button>
-        </div>
-
-        <button
-          type="button"
-          onClick={openCreateEvent}
-          className={`px-4 py-2 text-sm inline-flex items-center gap-2 shadow-xs ${adminTheme.primaryButtonClass}`}
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tambah</span>
-        </button>
-      </div>
+      {subView === 'catalog' ? (
+        <WorkspaceHeaderCard
+          role="admin"
+          icon={<Calendar className="w-5 h-5" />}
+          title="Acara Usahawan Belia & Tempahan Tapak"
+          subtitle="Urus senarai acara, karnival, bengkel, serta kuota tapak jualan."
+          rightActions={
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSubView('catalog');
+                  setMobileCatalogOpen(false);
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.segmentedActiveClass}`}
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Senarai Acara</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSubView('bookings');
+                  setMobileBookingOpen(false);
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>Tempahan Peserta</span>
+              </button>
+              <button
+                type="button"
+                onClick={openCreateEvent}
+                className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 shadow-xs cursor-pointer ${adminTheme.primaryButtonClass}`}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah</span>
+              </button>
+            </div>
+          }
+          tabs={[
+            { id: 'all', label: 'Semua', count: categoryCounts.all },
+            { id: 'karnival', label: 'Karnival', count: categoryCounts.karnival },
+            { id: 'bengkel', label: 'Bengkel', count: categoryCounts.bengkel },
+            { id: 'pitching', label: 'Pitching', count: categoryCounts.pitching },
+            { id: 'expo', label: 'Ekspo', count: categoryCounts.expo }
+          ]}
+          activeTab={catalogCategoryFilter}
+          onTabChange={(id) => {
+            setCatalogCategoryFilter(id as 'all' | YouthEvent['category']);
+            setMobileCatalogOpen(false);
+          }}
+          searchValue={catalogSearch}
+          onSearchChange={setCatalogSearch}
+          searchPlaceholder="Cari tajuk acara atau daerah..."
+          extraControls={
+            <>
+              <select
+                value={catalogDistrictFilter}
+                onChange={(e) => setCatalogDistrictFilter(e.target.value as 'all' | KelantanDistrict)}
+                aria-label="Tapis daerah acara"
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+              >
+                <option value="all">Semua Daerah</option>
+                {DISTRICTS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+              <select
+                value={catalogSortPreset}
+                onChange={(e) => setCatalogSortPreset(e.target.value)}
+                aria-label="Susun acara belia"
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+              >
+                {catalogSortOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </>
+          }
+        />
+      ) : (
+        <WorkspaceHeaderCard
+          role="admin"
+          icon={<Users className="w-5 h-5" />}
+          title="Tempahan Tapak & Peserta Acara"
+          subtitle="Semak penyertaan peserta serta status tempahan tapak acara belia."
+          rightActions={
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setSubView('catalog');
+                  setMobileCatalogOpen(false);
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+              >
+                <Calendar className="w-3.5 h-3.5" />
+                <span>Senarai Acara</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSubView('bookings');
+                  setMobileBookingOpen(false);
+                }}
+                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.segmentedActiveClass}`}
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>Tempahan Peserta</span>
+              </button>
+              <button
+                type="button"
+                onClick={openCreateEvent}
+                className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1.5 shadow-xs cursor-pointer ${adminTheme.primaryButtonClass}`}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Tambah</span>
+              </button>
+            </div>
+          }
+          tabs={[
+            { id: 'all', label: 'Semua', count: bookingCounts.all },
+            { id: 'booked', label: 'Ditempah', count: bookingCounts.booked },
+            { id: 'cancelled', label: 'Dibatalkan', count: bookingCounts.cancelled }
+          ]}
+          activeTab={bookingStatusFilter}
+          onTabChange={(id) => {
+            setBookingStatusFilter(id as 'all' | 'booked' | 'cancelled');
+            setMobileBookingOpen(false);
+          }}
+          searchValue={bookingSearch}
+          onSearchChange={setBookingSearch}
+          searchPlaceholder="Cari peserta, acara atau ID..."
+          extraControls={
+            <select
+              value={bookingSortPreset}
+              onChange={(e) => setBookingSortPreset(e.target.value)}
+              aria-label="Susun tempahan peserta"
+              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+            >
+              {bookingSortOptions.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          }
+        />
+      )}
 
       {subView === 'catalog' ? (
-        <div key="catalog" className={`rounded-2xl border backdrop-blur-xs overflow-visible animate-dashboard-tab ${adminTheme.surfaceClass}`}>
-          <ReferenceTableToolbar
-            searchValue={catalogSearch}
-            onSearchChange={setCatalogSearch}
-            searchPlaceholder="Cari tajuk acara atau daerah..."
-            filterCount={
-              (catalogCategoryFilter !== 'all' ? 1 : 0) +
-              (catalogDistrictFilter !== 'all' ? 1 : 0) +
-              (catalogSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
-            }
-            onResetFilters={() => {
-              setCatalogCategoryFilter('all');
-              setCatalogDistrictFilter('all');
-              setCatalogSortPreset(DEFAULT_SORT_VALUE);
-            }}
-            sortOptions={
-              catalogSortPreset === 'table_column'
-                ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...catalogSortOptions]
-                : catalogSortOptions
-            }
-            sortValue={catalogSortPreset === 'table_column' ? '' : catalogSortPreset}
-            onSortChange={(val) => {
-              if (val) setCatalogSortPreset(val);
-            }}
-            filterContent={
-              <>
-                <div>
-                  <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
-                    Kategori Acara
-                  </label>
-                  <select
-                    value={catalogCategoryFilter}
-                    onChange={(e) => setCatalogCategoryFilter(e.target.value as 'all' | YouthEvent['category'])}
-                    className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+        filteredSortedEvents.length === 0 ? (
+          <div className={`rounded-2xl border backdrop-blur-xs p-10 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+            <Calendar className="w-8 h-8 text-black/35 dark:text-white/35 mx-auto" />
+            <p className="text-sm font-bold text-black dark:text-white kbelia-trim">
+              Tiada acara usahawan belia direkodkan bagi carian atau tapisan ini.
+            </p>
+            {hasCatalogFilters && (
+              <button
+                type="button"
+                onClick={() => {
+                  setCatalogSearch('');
+                  setCatalogCategoryFilter('all');
+                  setCatalogDistrictFilter('all');
+                  setCatalogSortPreset(DEFAULT_SORT_VALUE);
+                }}
+                className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
+              >
+                Set Semula Penapis
+              </button>
+            )}
+          </div>
+        ) : (
+          <GoogleWorkspaceSplitPane
+            role="admin"
+            mobileOpen={mobileCatalogOpen && Boolean(selectedEvent)}
+            onMobileClose={() => setMobileCatalogOpen(false)}
+            mobileTitle={selectedEvent?.title}
+            leftHeader={
+              <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-black/65 dark:text-white/70 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                <span>{filteredSortedEvents.length} acara dipaparkan</span>
+                {hasCatalogFilters && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCatalogSearch('');
+                      setCatalogCategoryFilter('all');
+                      setCatalogDistrictFilter('all');
+                      setCatalogSortPreset(DEFAULT_SORT_VALUE);
+                    }}
+                    className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
                   >
-                    <option value="all">Semua Kategori</option>
-                    <option value="karnival">Karnival Jualan</option>
-                    <option value="bengkel">Bengkel Pensijilan</option>
-                    <option value="pitching">Pitching &amp; Demo Day</option>
-                    <option value="expo">Ekspo &amp; Kraf</option>
-                  </select>
+                    Set Semula
+                  </button>
+                )}
+              </div>
+            }
+            leftContent={catalogPagination.paginatedItems.map((evt) => {
+              const isSelected = selectedEvent?.id === evt.id;
+              return (
+                <div
+                  key={evt.id}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    setSelectedEventId(evt.id);
+                    setMobileCatalogOpen(true);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setSelectedEventId(evt.id);
+                      setMobileCatalogOpen(true);
+                    }
+                  }}
+                  className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                    isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                  }`}
+                >
+                  <div className={`w-12 h-12 rounded-xl border overflow-hidden shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <PortalImage
+                      src={resolveEventImage(evt.category, evt.imageUrl)}
+                      alt={evt.title}
+                      fallbackType="event"
+                      fallbackLabel={evt.category}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="text-sm font-bold text-black dark:text-white leading-snug line-clamp-2 kbelia-trim">
+                        {evt.title}
+                      </p>
+                      <span className={`text-[11px] font-bold uppercase shrink-0 ${adminTheme.accentTextClass}`}>
+                        {evt.category}
+                      </span>
+                    </div>
+                    <div className="text-xs text-black/65 dark:text-white/65 truncate tabular-nums">
+                      {evt.district} · {evt.date} · Baki {evt.boothsAvailable} tapak
+                    </div>
+                  </div>
                 </div>
+              );
+            })}
+            leftFooter={
+              <PaginationBar
+                currentPage={catalogPagination.currentPage}
+                totalItems={catalogPagination.totalItems}
+                itemsPerPage={7}
+                onPageChange={catalogPagination.setCurrentPage}
+                itemLabel="acara belia"
+                accent="amber"
+              />
+            }
+            rightContent={
+              selectedEvent ? (
                 <div>
-                  <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
-                    Daerah
-                  </label>
-                  <select
-                    value={catalogDistrictFilter}
-                    onChange={(e) => setCatalogDistrictFilter(e.target.value as 'all' | KelantanDistrict)}
-                    className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                  >
-                    <option value="all">Semua Daerah</option>
-                    {DISTRICTS.map((d) => (
-                      <option key={d} value={d}>{d}</option>
-                    ))}
-                  </select>
+                  <SidePreviewHeader
+                    role="admin"
+                    title={selectedEvent.title}
+                    status={
+                      <span className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold uppercase ${adminTheme.activeNavClass}`}>
+                        {selectedEvent.category}
+                      </span>
+                    }
+                    subtitle={selectedEvent.organizer}
+                    meta={
+                      <>
+                        <span className="inline-flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5" />
+                          {selectedEvent.location} ({selectedEvent.district})
+                        </span>
+                        <span>·</span>
+                        <span className="inline-flex items-center gap-1 tabular-nums">
+                          <Clock className="w-3.5 h-3.5" />
+                          {selectedEvent.date}
+                        </span>
+                      </>
+                    }
+                    actions={
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => openEditEvent(selectedEvent)}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                          <span>Sunting</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            confirmDelete({
+                              itemName: selectedEvent.title,
+                              itemType: 'Acara Belia',
+                              onConfirm: () => handleDeleteEvent(selectedEvent)
+                            })
+                          }
+                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Padam</span>
+                        </button>
+                      </>
+                    }
+                  />
+
+                  <div className="p-4 sm:p-5 space-y-4">
+                    <div className={`w-full h-48 sm:h-56 rounded-xl overflow-hidden border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                      <PortalImage
+                        src={resolveEventImage(selectedEvent.category, selectedEvent.imageUrl)}
+                        alt={selectedEvent.title}
+                        fallbackType="event"
+                        fallbackLabel={selectedEvent.category}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <SidePreviewMetricsStrip
+                      role="admin"
+                      columns={3}
+                      items={[
+                        { label: 'Waktu Program', value: selectedEvent.time || '-' },
+                        {
+                          label: 'Kuota Tapak',
+                          value: `${selectedEvent.boothsAvailable} / ${selectedEvent.totalBooths} kosong`,
+                          accent: true
+                        },
+                        { label: 'Yuran / Tajaan', value: selectedEvent.fee || 'Percuma' }
+                      ]}
+                    />
+
+                    <div className={`p-4 rounded-xl border space-y-2 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                      <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-stone-400 block">
+                        Keterangan Acara
+                      </span>
+                      <p className="text-sm text-black/85 dark:text-white/90 leading-relaxed whitespace-pre-line kbelia-prose">
+                        {selectedEvent.description || 'Tiada keterangan acara direkodkan.'}
+                      </p>
+                      {selectedEvent.whatsappContact && (
+                        <p className="text-xs font-mono text-black/70 dark:text-white/75 pt-1">
+                          WhatsApp Urusetia: +{selectedEvent.whatsappContact}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </>
+              ) : (
+                <SidePreviewEmptyState
+                  icon={<Calendar className="w-10 h-10" />}
+                  title="Pilih acara belia"
+                  description="Klik mana-mana acara di senarai kiri untuk melihat poster, kuota tapak, dan pilihan suntingan."
+                />
+              )
             }
           />
-
-          {filteredSortedEvents.length === 0 ? (
-            <div className="p-10 text-center text-sm text-black/70 dark:text-white/75">
-              Tiada acara usahawan belia direkodkan bagi carian atau tapisan ini.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className={`${adminTheme.surfaceMutedClass} border-b ${adminTheme.dividerClass}`}>
-                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                      <button
-                        type="button"
-                        onClick={() => toggleCatalogSort('title')}
-                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
-                      >
-                        <span>Acara &amp; Lokasi</span>
-                        <ArrowUpDown className="w-3 h-3" />
-                      </button>
-                    </th>
-                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                      <button
-                        type="button"
-                        onClick={() => toggleCatalogSort('category')}
-                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
-                      >
-                        <span>Kategori</span>
-                        <ArrowUpDown className="w-3 h-3" />
-                      </button>
-                    </th>
-                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                      <button
-                        type="button"
-                        onClick={() => toggleCatalogSort('district')}
-                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
-                      >
-                        <span>Daerah</span>
-                        <ArrowUpDown className="w-3 h-3" />
-                      </button>
-                    </th>
-                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                      <button
-                        type="button"
-                        onClick={() => toggleCatalogSort('booths')}
-                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
-                      >
-                        <span>Tarikh &amp; Kuota</span>
-                        <ArrowUpDown className="w-3 h-3" />
-                      </button>
-                    </th>
-                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                      Yuran
-                    </th>
-                    <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                      <span className="sr-only">Tindakan</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className={`divide-y ${adminTheme.dividerClass} text-sm`}>
-                  {catalogPagination.paginatedItems.map((evt) => (
-                    <tr
-                      key={evt.id}
-                      className={`transition-colors ${adminTheme.rowHoverClass}`}
-                    >
-                      <td className="py-3.5 px-4 max-w-sm">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className={`w-14 h-14 rounded-lg border overflow-hidden shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
-                            <PortalImage
-                              src={resolveEventImage(evt.category, evt.imageUrl)}
-                              alt={evt.title}
-                              fallbackType="event"
-                              fallbackLabel={evt.category}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="min-w-0">
-                            <div className="font-bold text-black dark:text-white truncate">
-                              {evt.title}
-                            </div>
-                            <div className="text-[0.8125rem] text-black/65 dark:text-white/65 truncate">
-                              {evt.location}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        <span className={`text-[0.8125rem] font-bold uppercase ${adminTheme.accentTextClass}`}>
-                          {evt.category}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap">
-                        {evt.district}
-                      </td>
-                      <td className="py-3.5 px-4 text-black/80 dark:text-white/80 whitespace-nowrap tabular-nums">
-                        <div>{evt.date}</div>
-                        <div className="text-[0.8125rem] text-black/60 dark:text-white/60">
-                          Baki {evt.boothsAvailable} tapak
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 font-semibold text-black dark:text-white whitespace-nowrap">
-                        {evt.fee}
-                      </td>
-                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                        <RowActionMenu
-                          ariaLabel={`Tindakan untuk ${evt.title}`}
-                          items={[
-                            {
-                              label: 'Sunting',
-                              onClick: () => openEditEvent(evt)
-                            },
-                            {
-                              label: 'Padam',
-                              onClick: () =>
-                                confirmDelete({
-                                  itemName: evt.title,
-                                  itemType: 'Acara Belia',
-                                  onConfirm: () => handleDeleteEvent(evt)
-                                }),
-                              tone: 'danger',
-                              dividerBefore: true
-                            }
-                          ]}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {filteredSortedEvents.length > 0 && (
-            <PaginationBar
-              currentPage={catalogPagination.currentPage}
-              totalItems={catalogPagination.totalItems}
-              itemsPerPage={7}
-              onPageChange={catalogPagination.setCurrentPage}
-              itemLabel="acara belia"
-            />
+        )
+      ) : filteredSortedBookings.length === 0 ? (
+        <div className={`rounded-2xl border backdrop-blur-xs p-10 text-center space-y-2 ${adminTheme.surfaceClass}`}>
+          <Users className="w-8 h-8 text-black/35 dark:text-white/35 mx-auto" />
+          <p className="text-sm font-bold text-black dark:text-white kbelia-trim">
+            Belum ada rekod tempahan tapak acara bagi carian atau tapisan ini.
+          </p>
+          {hasBookingFilters && (
+            <button
+              type="button"
+              onClick={() => {
+                setBookingSearch('');
+                setBookingStatusFilter('all');
+                setBookingSortPreset(DEFAULT_SORT_VALUE);
+              }}
+              className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
+            >
+              Set Semula Penapis
+            </button>
           )}
         </div>
       ) : (
-        <div key="bookings" className={`rounded-2xl border backdrop-blur-xs overflow-visible animate-dashboard-tab ${adminTheme.surfaceClass}`}>
-          <ReferenceTableToolbar
-            searchValue={bookingSearch}
-            onSearchChange={setBookingSearch}
-            searchPlaceholder="Cari peserta, acara atau ID..."
-            filterCount={
-              (bookingStatusFilter !== 'all' ? 1 : 0) +
-              (bookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
-            }
-            onResetFilters={() => {
-              setBookingStatusFilter('all');
-              setBookingSortPreset(DEFAULT_SORT_VALUE);
-            }}
-            sortOptions={
-              bookingSortPreset === 'table_column'
-                ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...bookingSortOptions]
-                : bookingSortOptions
-            }
-            sortValue={bookingSortPreset === 'table_column' ? '' : bookingSortPreset}
-            onSortChange={(val) => {
-              if (val) setBookingSortPreset(val);
-            }}
-            filterContent={
-              <div>
-                <label className="block text-[0.8125rem] font-bold text-black/70 dark:text-white/75 mb-1.5">
-                  Status Tempahan
-                </label>
-                <select
-                  value={bookingStatusFilter}
-                  onChange={(e) => setBookingStatusFilter(e.target.value as 'all' | 'booked' | 'cancelled')}
-                  className={`w-full px-3 py-2 rounded-xl text-sm cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+        <GoogleWorkspaceSplitPane
+          role="admin"
+          mobileOpen={mobileBookingOpen && Boolean(selectedBooking)}
+          onMobileClose={() => setMobileBookingOpen(false)}
+          mobileTitle={selectedBooking?.userName || selectedBooking?.eventTitle}
+          leftHeader={
+            <div className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-semibold text-black/65 dark:text-white/70 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+              <span>{filteredSortedBookings.length} tempahan dipaparkan</span>
+              {hasBookingFilters && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBookingSearch('');
+                    setBookingStatusFilter('all');
+                    setBookingSortPreset(DEFAULT_SORT_VALUE);
+                  }}
+                  className={`font-bold hover:underline cursor-pointer ${adminTheme.accentTextClass}`}
                 >
-                  <option value="all">Semua Status</option>
-                  <option value="booked">Ditempah (Aktif)</option>
-                  <option value="cancelled">Dibatalkan</option>
-                </select>
-              </div>
-            }
-          />
-
-          {filteredSortedBookings.length === 0 ? (
-            <div className="p-10 text-center text-sm text-black/70 dark:text-white/75">
-              Belum ada rekod tempahan tapak acara bagi carian atau tapisan ini.
+                  Set Semula
+                </button>
+              )}
             </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className={`${adminTheme.surfaceMutedClass} border-b ${adminTheme.dividerClass}`}>
-                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                      <button
-                        type="button"
-                        onClick={() => toggleBookingSort('userName')}
-                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
-                      >
-                        <span>Peserta</span>
-                        <ArrowUpDown className="w-3 h-3" />
-                      </button>
-                    </th>
-                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                      <button
-                        type="button"
-                        onClick={() => toggleBookingSort('eventTitle')}
-                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
-                      >
-                        <span>Acara</span>
-                        <ArrowUpDown className="w-3 h-3" />
-                      </button>
-                    </th>
-                    <th className="py-3 px-4 text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                      <button
-                        type="button"
-                        onClick={() => toggleBookingSort('status')}
-                        className="inline-flex items-center gap-1 hover:text-black dark:hover:text-white cursor-pointer"
-                      >
-                        <span>Status</span>
-                        <ArrowUpDown className="w-3 h-3" />
-                      </button>
-                    </th>
-                    <th className="py-3 px-4 w-14 text-right text-[0.8125rem] font-semibold text-black/60 dark:text-white/65">
-                      <span className="sr-only">Tindakan</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className={`divide-y ${adminTheme.dividerClass} text-sm`}>
-                  {bookingsPagination.paginatedItems.map((b) => (
-                    <tr
-                      key={b.id}
-                      className={`transition-colors ${adminTheme.rowHoverClass}`}
+          }
+          leftContent={bookingsPagination.paginatedItems.map((b) => {
+            const isSelected = selectedBooking?.id === b.id;
+            return (
+              <div
+                key={b.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => {
+                  setSelectedBookingId(b.id);
+                  setMobileBookingOpen(true);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedBookingId(b.id);
+                    setMobileBookingOpen(true);
+                  }
+                }}
+                className={`px-4 py-3.5 cursor-pointer transition-colors flex items-start gap-3 ${
+                  isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
+                  <Users className="w-4 h-4" />
+                </div>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-bold text-black dark:text-white leading-snug truncate kbelia-trim">
+                      {b.userName || 'Usahawan Belia'}
+                    </p>
+                    <span
+                      className={`text-[11px] font-bold shrink-0 px-2 py-0.5 rounded-lg ${
+                        b.status === 'booked'
+                          ? 'bg-emerald-500/12 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-rose-500/12 text-rose-700 dark:text-rose-300'
+                      }`}
                     >
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-3 min-w-0">
-                          <div className={`w-9 h-9 rounded-lg border flex items-center justify-center shrink-0 ${adminTheme.activeMiniBtnClass}`}>
-                            <Users className="w-4 h-4" />
-                          </div>
-                          <div className="min-w-0">
-                            <div className="font-bold text-black dark:text-white truncate">
-                              {b.userName || 'Usahawan Belia'}
-                            </div>
-                            <div className="text-[0.8125rem] text-black/60 dark:text-white/60 font-mono truncate">
-                              ID: {b.userId}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3.5 px-4 text-black/80 dark:text-white/80">
-                        {b.eventTitle}
-                      </td>
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        <span
-                          className={`text-[0.8125rem] font-bold ${
-                            b.status === 'booked'
-                              ? 'text-emerald-700 dark:text-emerald-400'
-                              : 'text-rose-700 dark:text-rose-400'
-                          }`}
-                        >
-                          {b.status === 'booked' ? 'Ditempah' : 'Dibatalkan'}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                        <RowActionMenu
-                          ariaLabel={`Tindakan untuk tempahan ${b.userName || b.eventTitle}`}
-                          items={[
-                            {
-                              label: b.status === 'booked' ? 'Batal' : 'Aktifkan',
-                              onClick: () =>
-                                handleBookingStatusChange(b, b.status === 'booked' ? 'cancelled' : 'booked'),
-                              tone: 'accent'
-                            },
-                            {
-                              label: 'Padam',
-                              onClick: () =>
-                                confirmDelete({
-                                  itemName: `${b.userName || 'Peserta'} - ${b.eventTitle}`,
-                                  itemType: 'Tempahan Tapak Acara',
-                                  onConfirm: () => handleDeleteBooking(b)
-                                }),
-                              tone: 'danger',
-                              dividerBefore: true
-                            }
-                          ]}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-
-          {filteredSortedBookings.length > 0 && (
+                      {b.status === 'booked' ? 'Ditempah' : 'Dibatalkan'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-black/65 dark:text-white/65 truncate">
+                    {b.eventTitle} · <span className="font-mono">{b.userId}</span>
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+          leftFooter={
             <PaginationBar
               currentPage={bookingsPagination.currentPage}
               totalItems={bookingsPagination.totalItems}
               itemsPerPage={7}
               onPageChange={bookingsPagination.setCurrentPage}
               itemLabel="tempahan peserta"
+              accent="amber"
             />
-          )}
-        </div>
+          }
+          rightContent={
+            selectedBooking ? (
+              <div>
+                <SidePreviewHeader
+                  role="admin"
+                  media={
+                    <div className={`w-11 h-11 rounded-xl border flex items-center justify-center ${adminTheme.activeMiniBtnClass}`}>
+                      <Users className="w-5 h-5" />
+                    </div>
+                  }
+                  title={selectedBooking.userName || 'Usahawan Belia'}
+                  status={
+                    <span
+                      className={`px-2.5 py-0.5 rounded-lg text-[11px] font-bold ${
+                        selectedBooking.status === 'booked'
+                          ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                          : 'bg-rose-500/15 text-rose-700 dark:text-rose-300'
+                      }`}
+                    >
+                      {selectedBooking.status === 'booked' ? 'Ditempah' : 'Dibatalkan'}
+                    </span>
+                  }
+                  subtitle={selectedBooking.eventTitle}
+                  meta={<span className="font-mono">ID Peserta: {selectedBooking.userId}</span>}
+                  actions={
+                    <>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleBookingStatusChange(
+                            selectedBooking,
+                            selectedBooking.status === 'booked' ? 'cancelled' : 'booked'
+                          )
+                        }
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer ${
+                          selectedBooking.status === 'booked'
+                            ? adminTheme.secondaryButtonClass
+                            : adminTheme.primaryButtonClass
+                        }`}
+                      >
+                        {selectedBooking.status === 'booked' ? (
+                          <>
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>Batal</span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span>Aktifkan</span>
+                          </>
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          confirmDelete({
+                            itemName: `${selectedBooking.userName || 'Peserta'} - ${selectedBooking.eventTitle}`,
+                            itemType: 'Tempahan Tapak Acara',
+                            onConfirm: () => handleDeleteBooking(selectedBooking)
+                          })
+                        }
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${adminTheme.dangerOutlineButtonClass}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Padam</span>
+                      </button>
+                    </>
+                  }
+                />
+
+                <div className="p-4 sm:p-5 space-y-4">
+                  <SidePreviewMetricsStrip
+                    role="admin"
+                    columns={3}
+                    items={[
+                      { label: 'Nama Peserta', value: selectedBooking.userName || 'Usahawan Belia' },
+                      { label: 'ID Akaun', value: selectedBooking.userId, mono: true },
+                      {
+                        label: 'Status Tempahan',
+                        value: selectedBooking.status === 'booked' ? 'Ditempah (Aktif)' : 'Dibatalkan',
+                        accent: selectedBooking.status === 'booked'
+                      }
+                    ]}
+                  />
+
+                  <div className={`p-4 rounded-xl border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 dark:text-stone-400 block mb-1">
+                      Acara Ditempah
+                    </span>
+                    <p className="text-sm font-semibold text-black dark:text-white kbelia-trim">
+                      {selectedBooking.eventTitle}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <SidePreviewEmptyState
+                icon={<Users className="w-10 h-10" />}
+                title="Pilih tempahan peserta"
+                description="Klik mana-mana rekod tempahan di senarai kiri untuk mengurus pengaktifan atau pembatalan."
+              />
+            )
+          }
+        />
       )}
 
       {/* Add / Edit Youth Event Modal */}

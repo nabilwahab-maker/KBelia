@@ -13,6 +13,7 @@ import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { AcronymText } from './TypographyPrimitives';
 
 interface DirectorySectionProps {
   businesses?: BusinessListing[];
@@ -109,7 +110,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
       
       {/* Section Header */}
       <div>
-        <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
+        <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight kbelia-trim">
           {t('directory_title')}
         </h1>
       </div>
@@ -228,13 +229,18 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
 
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex items-center gap-2 min-w-0">
-                          <h3 className="font-bold text-black dark:text-white text-sm sm:text-base truncate">
+                          <h3
+                            title={biz.businessName}
+                            className="font-bold text-black dark:text-white text-sm sm:text-base kbelia-clamp-1 kbelia-trim"
+                          >
                             {biz.businessName}
                           </h3>
                           {biz.ssmNumber ? (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.8125rem] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-300 dark:border-emerald-700 shrink-0">
                               <ShieldCheck className="w-3 h-3" />
-                              <span>SSM Sah</span>
+                              <span>
+                                <span className="kbelia-acro">SSM</span> Sah
+                              </span>
                             </span>
                           ) : (
                             <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[0.8125rem] font-bold bg-slate-100 dark:bg-zinc-800 text-black dark:text-white border border-slate-200 dark:border-zinc-700 shrink-0">
@@ -242,8 +248,10 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums">
-                          {formatBusinessCategory(biz.category)} · {biz.district}, Kelantan{biz.tagline ? ` · ${biz.tagline}` : ''}
+                        <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums kbelia-prose">
+                          <AcronymText
+                            text={`${formatBusinessCategory(biz.category)} · ${biz.district}, Kelantan${biz.tagline ? ` · ${biz.tagline}` : ''}`}
+                          />
                         </p>
                       </div>
                     </div>

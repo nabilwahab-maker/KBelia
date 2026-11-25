@@ -20,6 +20,7 @@ import { ReferenceTableToolbar } from './ReferenceTableKit';
 import { PaginationBar, usePagination } from './PaginationBar';
 import { ToolbarSortOption } from '../utils/sortUtils';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { AcronymText } from './TypographyPrimitives';
 
 interface NewsPageProps {
   newsItems: PortalNews[];
@@ -171,7 +172,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
       {/* Page Intro */}
       <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700">
         <div className="space-y-1">
-          <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight text-balance">
+          <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight text-balance kbelia-trim">
             Berita Terkini Ekosistem KBelia Kelantan
           </h1>
         </div>
@@ -242,12 +243,15 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                     )}
                   </div>
 
-                  <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance leading-snug">
-                    {featuredArticle.title}
+                  <h2
+                    title={featuredArticle.title}
+                    className="font-display text-fluid-title font-black text-black dark:text-white tracking-tight text-balance kbelia-trim"
+                  >
+                    <AcronymText text={featuredArticle.title} />
                   </h2>
 
-                  <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed line-clamp-3">
-                    {featuredArticle.summary}
+                  <p className="text-[0.9375rem] text-black/75 dark:text-white/75 leading-relaxed line-clamp-3 kbelia-prose">
+                    <AcronymText text={featuredArticle.summary} />
                   </p>
                 </div>
 
@@ -321,12 +325,15 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                           )}
                         </div>
 
-                        <h3 className="text-base font-bold text-black dark:text-white leading-snug line-clamp-2">
-                          {article.title}
+                        <h3
+                          title={article.title}
+                          className="text-base font-bold text-black dark:text-white leading-snug kbelia-clamp-2 kbelia-trim"
+                        >
+                          <AcronymText text={article.title} />
                         </h3>
 
-                        <p className="text-sm text-black/75 dark:text-white/75 leading-relaxed line-clamp-2">
-                          {article.summary}
+                        <p className="text-sm text-black/75 dark:text-white/75 leading-relaxed kbelia-clamp-2 kbelia-prose">
+                          <AcronymText text={article.summary} />
                         </p>
                       </div>
 
@@ -453,8 +460,11 @@ export const NewsPage: React.FC<NewsPageProps> = ({
 
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex items-center gap-2 min-w-0">
-                        <h3 className="text-sm sm:text-base font-bold text-black dark:text-white truncate">
-                          {article.title}
+                        <h3
+                          title={article.title}
+                          className="text-sm sm:text-base font-bold text-black dark:text-white kbelia-clamp-1 kbelia-trim"
+                        >
+                          <AcronymText text={article.title} />
                         </h3>
                         {article.isPinned && (
                           <span className="text-[0.8125rem] font-bold text-amber-700 dark:text-amber-400 shrink-0">
@@ -555,8 +565,8 @@ export const NewsPage: React.FC<NewsPageProps> = ({
 
             <div className="p-5 sm:p-8 space-y-6">
               <div className="space-y-2.5">
-                <h2 className="text-xl sm:text-2xl font-black text-black dark:text-white tracking-tight text-balance leading-snug">
-                  {selectedArticle.title}
+                <h2 className="font-display text-fluid-title font-black text-black dark:text-white tracking-tight text-balance kbelia-trim">
+                  <AcronymText text={selectedArticle.title} />
                 </h2>
               </div>
 
@@ -564,14 +574,14 @@ export const NewsPage: React.FC<NewsPageProps> = ({
                 <NewsImage src={selectedArticle.imageUrl} alt={selectedArticle.title} />
               </div>
 
-              <p className="text-sm sm:text-base font-semibold text-black dark:text-white leading-relaxed border-b border-slate-300 dark:border-zinc-600 pb-5">
-                {selectedArticle.summary}
+              <p className="text-sm sm:text-base font-semibold text-black dark:text-white leading-relaxed border-b border-slate-300 dark:border-zinc-600 pb-5 kbelia-prose">
+                <AcronymText text={selectedArticle.summary} />
               </p>
 
-              <div className="space-y-4 text-sm text-black dark:text-white leading-relaxed">
+              <div className="space-y-4 text-sm text-black dark:text-white leading-relaxed kbelia-prose">
                 {selectedArticle.content.split(/\n\s*\n/).map((para, idx) => (
                   <p key={idx} className="whitespace-pre-line">
-                    {para}
+                    <AcronymText text={para} />
                   </p>
                 ))}
               </div>

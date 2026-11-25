@@ -613,7 +613,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
 
     // Mentor Portal & Metrics
     mentor_hub_title: 'Mentor Command & Coaching Hub',
-    mentor_hub_desc: 'Track mentees, schedule coaching clinics, and record action plans.',
+    mentor_hub_desc: 'Track youth entrepreneurs, schedule coaching clinics, and record action plans.',
     total_registrations: 'Total Registrations',
     total_registrations_desc: 'All enrolled entrepreneurs',
     pending_status: 'Pending Confirmation',
@@ -621,7 +621,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     confirmed_status: 'Sessions Confirmed',
     confirmed_desc: 'Active coaching schedule',
     completed_status: 'Guidance Completed',
-    completed_desc: 'Mentees finished program',
+    completed_desc: 'Youth entrepreneurs finished program',
     cancelled_status: 'Cancelled',
     cancelled_desc: 'Cancelled sessions',
     all_mentees_filter: 'All Registrations',
@@ -645,7 +645,7 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     manage_business_btn: 'Manage Business',
     register_business_btn: 'Manage Business',
     mentor_review_mode_title: 'Mentor Review Mode',
-    mentor_review_mode_desc: 'Logged in as Mentor. Review mentee profiles and products for coaching.',
+    mentor_review_mode_desc: 'Logged in as Mentor. Review youth entrepreneur profiles and products for coaching.',
     view_catalog_btn: 'View Profile',
     no_businesses_found: 'No Businesses Found',
     no_businesses_desc: 'Try adjusting your search query or category filters.',

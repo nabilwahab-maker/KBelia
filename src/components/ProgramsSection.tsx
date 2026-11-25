@@ -29,6 +29,7 @@ import {
   sortRecords
 } from '../utils/sortUtils';
 import { getDashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { AcronymText } from './TypographyPrimitives';
 
 interface ProgramsSectionProps {
   programs: YouthProgram[];
@@ -478,13 +479,17 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight">
+          <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight kbelia-trim">
             {isEn ? 'Youth Grants & Programs' : 'Geran & Program Belia'}
           </h1>
-          <p className="text-sm text-black/65 dark:text-white/70 mt-1 max-w-2xl">
-            {isEn
-              ? 'Explore active business funding schemes, hands-on workshops, expos, and startup pitching tracks across Kelantan.'
-              : 'Terokai skim pembiayaan perniagaan belia, bengkel kemahiran, ekspo jualan, dan program inkubasi usahawan di seluruh Kelantan.'}
+          <p className="text-sm text-black/65 dark:text-white/70 mt-1 max-w-2xl kbelia-prose">
+            <AcronymText
+              text={
+                isEn
+                  ? 'Explore active business funding schemes, hands-on workshops, expos, and startup pitching tracks across Kelantan.'
+                  : 'Terokai skim pembiayaan perniagaan belia, bengkel kemahiran, ekspo jualan, dan program inkubasi usahawan di seluruh Kelantan.'
+              }
+            />
           </p>
         </div>
       </div>
@@ -597,16 +602,21 @@ export const ProgramsSection: React.FC<ProgramsSectionProps> = ({
 
                 <h2
                   onClick={() => setDetailProgram(spotlightProgram)}
-                  className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight leading-snug text-balance cursor-pointer hover:opacity-85 transition-opacity"
+                  title={spotlightProgram.title}
+                  className="font-display text-fluid-title font-extrabold text-black dark:text-white tracking-tight text-balance kbelia-trim cursor-pointer hover:opacity-85 transition-opacity"
                 >
-                  {spotlightProgram.title}
+                  <AcronymText text={spotlightProgram.title} />
                 </h2>
 
-                <p className="text-sm sm:text-base text-black/70 dark:text-white/75 leading-relaxed line-clamp-3">
-                  {spotlightProgram.description ||
-                    (isEn
-                      ? 'Official youth entrepreneurship initiative open for eligible Kelantan youth founders.'
-                      : 'Inisiatif rasmi keusahawanan belia yang dibuka kepada usahawan muda Kelantan yang layak.')}
+                <p className="text-sm sm:text-base text-black/70 dark:text-white/75 leading-relaxed line-clamp-3 kbelia-prose">
+                  <AcronymText
+                    text={
+                      spotlightProgram.description ||
+                      (isEn
+                        ? 'Official youth entrepreneurship initiative open for eligible Kelantan youth founders.'
+                        : 'Inisiatif rasmi keusahawanan belia yang dibuka kepada usahawan muda Kelantan yang layak.')
+                    }
+                  />
                 </p>
 
                 <div className="pt-3 border-t border-slate-100 dark:border-zinc-800 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs sm:text-sm text-black/70 dark:text-white/75 tabular-nums">

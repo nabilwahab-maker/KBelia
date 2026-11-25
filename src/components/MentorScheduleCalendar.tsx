@@ -611,9 +611,9 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
         {/* =================================================================== */}
         <aside className="w-full lg:w-[300px] shrink-0 space-y-3 lg:sticky lg:top-4">
           {/* 1. MINI MONTHLY CALENDAR */}
-          <div className={`rounded-2xl border p-4 ${mentorTheme.surfaceClass}`}>
+          <div className={`rounded-2xl border backdrop-blur-xs p-4 ${mentorTheme.surfaceClass}`}>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-bold text-[#1F1F1F] dark:text-[#E3E3E3] tracking-tight">
+              <h3 className="font-display text-sm font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
                 {(isEn ? EN_MONTHS_FULL : MALAY_MONTHS_FULL)[miniMonthDate.getMonth()]}{' '}
                 {miniMonthDate.getFullYear()}
               </h3>
@@ -624,7 +624,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     setMiniMonthDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1))
                   }
                   aria-label={isEn ? 'Previous month' : 'Bulan sebelumnya'}
-                  className={`p-1.5 rounded-full text-[#5F6368] dark:text-[#9AA0A6] transition-colors cursor-pointer ${mentorTheme.rowHoverClass}`}
+                  className={`p-1.5 rounded-xl text-slate-600 dark:text-slate-400 transition-colors cursor-pointer ${mentorTheme.rowHoverClass}`}
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -634,7 +634,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     setMiniMonthDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1))
                   }
                   aria-label={isEn ? 'Next month' : 'Bulan seterusnya'}
-                  className={`p-1.5 rounded-full text-[#5F6368] dark:text-[#9AA0A6] transition-colors cursor-pointer ${mentorTheme.rowHoverClass}`}
+                  className={`p-1.5 rounded-xl text-slate-600 dark:text-slate-400 transition-colors cursor-pointer ${mentorTheme.rowHoverClass}`}
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
@@ -645,7 +645,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
               {(isEn ? EN_WEEKDAYS_INITIALS : MALAY_WEEKDAYS_INITIALS).map((dayChar, idx) => (
                 <div
                   key={idx}
-                  className="text-[11px] font-semibold text-[#5F6368] dark:text-[#9AA0A6] py-1"
+                  className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 py-1"
                 >
                   {dayChar}
                 </div>
@@ -659,21 +659,21 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     key={cell.iso}
                     type="button"
                     onClick={() => handleJumpToDate(cell.date)}
-                    className={`relative mx-auto w-8 h-8 rounded-full text-xs font-semibold tabular-nums flex flex-col items-center justify-center transition-colors cursor-pointer ${
+                    className={`relative mx-auto w-8 h-8 rounded-xl text-xs font-semibold tabular-nums flex flex-col items-center justify-center transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-[#1A73E8] text-white dark:bg-[#8AB4F8] dark:text-[#062E6F] font-bold'
+                        ? 'bg-[#1D4ED8] text-white dark:bg-[#3B82F6] dark:text-[#081226] font-bold'
                         : isToday
-                        ? 'bg-[#D3E3FD] text-[#041E49] dark:bg-[#004A77] dark:text-[#C2E7FF] font-bold'
+                        ? 'bg-[#1D4ED8]/14 text-[#1D4ED8] dark:bg-[#3B82F6]/22 dark:text-[#93C5FD] font-bold'
                         : cell.inCurrentMonth
-                        ? `text-[#1F1F1F] dark:text-[#E3E3E3] ${mentorTheme.rowHoverClass}`
-                        : 'text-[#9AA0A6] dark:text-[#5F6368] hover:bg-black/5 dark:hover:bg-white/5'
+                        ? `text-slate-900 dark:text-[#F1F5F9] ${mentorTheme.rowHoverClass}`
+                        : 'text-slate-400 dark:text-slate-600 hover:bg-black/5 dark:hover:bg-white/5'
                     }`}
                   >
                     <span>{cell.date.getDate()}</span>
                     {hasEvents && !isSelected && (
                       <span
                         aria-hidden="true"
-                        className="absolute bottom-1 w-1 h-1 rounded-full bg-[#1A73E8] dark:bg-[#8AB4F8]"
+                        className="absolute bottom-1 w-1 h-1 rounded-full bg-[#1D4ED8] dark:bg-[#60A5FA]"
                       />
                     )}
                   </button>
@@ -682,8 +682,8 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
             </div>
           </div>
 
-          {/* 2. FEATURED GOOGLE WORKSPACE REMINDER CARD */}
-          <div className="bg-gradient-to-br from-[#1A73E8] to-[#0B57D0] dark:from-[#004A77] dark:to-[#062E6F] text-white rounded-2xl border border-[#1A73E8]/40 dark:border-[#8AB4F8]/25 p-4 space-y-3">
+          {/* 2. FEATURED EDITORIAL REMINDER CARD */}
+          <div className="bg-gradient-to-br from-[#1D4ED8] to-[#1E40AF] dark:from-[#1E3A8A] dark:to-[#0F172A] text-white rounded-2xl border border-[#1D4ED8]/40 dark:border-[#3B82F6]/30 p-4 space-y-3">
             {activeReminder ? (
               <>
                 <div className="flex items-start justify-between gap-2">
@@ -983,27 +983,27 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
             </div>
           </div>
 
-          {/* Google Calendar Color Legend */}
+          {/* Editorial Calendar Legend */}
           <div className={`px-4 sm:px-5 py-2.5 border-b flex flex-wrap items-center justify-between gap-2 text-xs ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-              <span className="inline-flex items-center gap-1.5 font-medium text-[#1F1F1F] dark:text-[#E3E3E3]">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#1A73E8] dark:bg-[#8AB4F8]" />
+              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-200">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#1D4ED8] dark:bg-[#60A5FA]" />
                 <span>{isEn ? 'Confirmed' : 'Disahkan'}</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 font-medium text-[#1F1F1F] dark:text-[#E3E3E3]">
+              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-200">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
                 <span>{isEn ? 'Pending' : 'Menunggu'}</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 font-medium text-[#1F1F1F] dark:text-[#E3E3E3]">
+              <span className="inline-flex items-center gap-1.5 font-medium text-slate-800 dark:text-slate-200">
                 <span className="w-2.5 h-2.5 rounded-full bg-teal-600 dark:bg-teal-400" />
                 <span>{isEn ? 'Open Slot' : 'Slot Terbuka'}</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 font-medium text-[#5F6368] dark:text-[#9AA0A6]">
+              <span className="inline-flex items-center gap-1.5 font-medium text-slate-500 dark:text-slate-400">
                 <span className="w-2.5 h-2.5 rounded-full bg-slate-400" />
                 <span>{isEn ? 'Completed' : 'Selesai'}</span>
               </span>
             </div>
-            <span className="text-[11px] font-medium text-[#5F6368] dark:text-[#9AA0A6]">
+            <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
               {filteredEvents.length} {isEn ? 'events visible' : 'acara dipaparkan'}
             </span>
           </div>
@@ -1047,10 +1047,10 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                         <div
                           className={`mt-0.5 text-lg font-extrabold tabular-nums leading-tight ${
                             isTodayDay
-                              ? 'inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#1A73E8] text-white dark:bg-[#8AB4F8] dark:text-[#062E6F]'
+                              ? 'inline-flex items-center justify-center w-8 h-8 rounded-xl bg-[#1D4ED8] text-white dark:bg-[#3B82F6] dark:text-[#081226]'
                               : isSelectedDay
                               ? mentorTheme.accentTextClass
-                              : 'text-[#1F1F1F] dark:text-[#E3E3E3]'
+                              : 'text-slate-900 dark:text-[#F1F5F9]'
                           }`}
                         >
                           {dayDt.getDate()}
@@ -1327,14 +1327,14 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                     >
                       <div className="flex items-center justify-between">
                         <span
-                          className={`text-xs font-bold tabular-nums w-6 h-6 rounded-full inline-flex items-center justify-center ${
+                          className={`text-xs font-bold tabular-nums w-6 h-6 rounded-lg inline-flex items-center justify-center ${
                             isToday
-                              ? 'bg-[#1A73E8] text-white dark:bg-[#8AB4F8] dark:text-[#062E6F]'
+                              ? 'bg-[#1D4ED8] text-white dark:bg-[#3B82F6] dark:text-[#081226]'
                               : isSelected
-                              ? 'bg-[#D3E3FD] text-[#041E49] dark:bg-[#004A77] dark:text-[#C2E7FF]'
+                              ? 'bg-[#1D4ED8]/14 text-[#1D4ED8] dark:bg-[#3B82F6]/22 dark:text-[#93C5FD]'
                               : cell.inCurrentMonth
-                              ? 'text-[#1F1F1F] dark:text-[#E3E3E3]'
-                              : 'text-[#9AA0A6] dark:text-[#5F6368]'
+                              ? 'text-slate-900 dark:text-[#F1F5F9]'
+                              : 'text-slate-400 dark:text-slate-600'
                           }`}
                         >
                           {cell.date.getDate()}

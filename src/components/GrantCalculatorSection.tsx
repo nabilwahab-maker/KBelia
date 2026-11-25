@@ -86,7 +86,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
       {/* Header Banner */}
       <div className="rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 border border-slate-200 dark:border-zinc-700">
         <div className="max-w-2xl">
-          <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-black dark:text-white">
+          <h1 className="font-display text-fluid-portal font-extrabold tracking-tight text-black dark:text-white kbelia-trim">
             {isEn ? 'Grant & Micro-Finance Eligibility Calculator' : 'Semak Kelayakan Geran & Bantuan Modal'}
           </h1>
         </div>
