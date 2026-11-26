@@ -63,7 +63,7 @@ service cloud.firestore {
           'businessStage', 'businessHours', 'businessAddress', 'businessStatus', 'facebook',
           'instagram', 'tiktok', 'bankName', 'bankAccountNumber', 'bankAccountHolder',
           'notifyWhatsApp', 'notifyEmail', 'hidePhonePublic', 'department', 'expertise',
-          'designation', 'institution', 'createdAt', 'updatedAt'
+          'designation', 'institution', 'passwordHash', 'passwordUpdatedAt', 'createdAt', 'updatedAt'
         ]) &&
         validStr(data.userId, 128) &&
         validStr(data.fullName, 120) &&
@@ -97,6 +97,8 @@ service cloud.firestore {
         (!('expertise' in data) || validStr(data.expertise, 300)) &&
         (!('designation' in data) || validStr(data.designation, 150)) &&
         (!('institution' in data) || validStr(data.institution, 150)) &&
+        (!('passwordHash' in data) || validStr(data.passwordHash, 128)) &&
+        (!('passwordUpdatedAt' in data) || validStr(data.passwordUpdatedAt, 50)) &&
         (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
         (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
@@ -204,7 +206,10 @@ service cloud.firestore {
           'id', 'programId', 'programTitle', 'grantAmount', 'amount', 'applicantId',
           'applicantName', 'applicantEmail', 'applicantPhone', 'businessName',
           'businessCategory', 'district', 'ssmNumber', 'bankName',
-          'bankAccountNumber', 'fundPurpose', 'status', 'adminNotes', 'createdAt', 'updatedAt'
+          'bankAccountNumber', 'fundPurpose', 'status', 'adminNotes',
+          'mentorEndorsed', 'endorsedByMentorId', 'endorsedByMentorName',
+          'endorsementId', 'endorsementCode', 'mentorEndorsedAt', 'mentorSupportNotes',
+          'createdAt', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.programTitle, 200) &&
@@ -224,6 +229,13 @@ service cloud.firestore {
         (!('bankAccountNumber' in data) || validStr(data.bankAccountNumber, 40)) &&
         (!('fundPurpose' in data) || validStr(data.fundPurpose, 2000)) &&
         (!('adminNotes' in data) || validStr(data.adminNotes, 1000)) &&
+        (!('mentorEndorsed' in data) || data.mentorEndorsed is bool) &&
+        (!('endorsedByMentorId' in data) || validStr(data.endorsedByMentorId, 128)) &&
+        (!('endorsedByMentorName' in data) || validStr(data.endorsedByMentorName, 120)) &&
+        (!('endorsementId' in data) || validStr(data.endorsementId, 128)) &&
+        (!('endorsementCode' in data) || validStr(data.endorsementCode, 80)) &&
+        (!('mentorEndorsedAt' in data) || validStr(data.mentorEndorsedAt, 50)) &&
+        (!('mentorSupportNotes' in data) || validStr(data.mentorSupportNotes, 1000)) &&
         (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
         (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
@@ -359,7 +371,7 @@ service cloud.firestore {
           'id', 'endorsementCode', 'mentorId', 'mentorName', 'mentorAgency',
           'mentorDesignation', 'menteeId', 'menteeName', 'menteePhone',
           'businessName', 'businessCategory', 'district', 'recommendedAmount',
-          'grantProgramTitle', 'justification', 'businessReadinessRemark',
+          'grantProgramTitle', 'grantApplicationId', 'justification', 'businessReadinessRemark',
           'issuedAt', 'status', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
@@ -377,6 +389,7 @@ service cloud.firestore {
         (!('district' in data) || validStr(data.district, 50)) &&
         (!('recommendedAmount' in data) || validStr(data.recommendedAmount, 40)) &&
         (!('grantProgramTitle' in data) || validStr(data.grantProgramTitle, 200)) &&
+        (!('grantApplicationId' in data) || validStr(data.grantApplicationId, 128)) &&
         (!('justification' in data) || validStr(data.justification, 2000)) &&
         (!('businessReadinessRemark' in data) || validStr(data.businessReadinessRemark, 1000)) &&
         (!('issuedAt' in data) || validStr(data.issuedAt, 50)) &&
@@ -698,18 +711,35 @@ service cloud.firestore {
       allow delete: if isAdmin() && isValidId(bookingId);
     }
 
-    // 6. Grant Applications Collection (Admin + Youth Applicant ONLY — Mentors Blocked)
+    // 6. Grant Applications Collection (Youth Applies -> Mentor Endorses -> Admin Approves)
     match /grant_applications/{grantId} {
-      allow get: if isValidId(grantId) && (isAdmin() || (isSignedIn() && existing().applicantId == request.auth.uid));
-      allow list: if isAdmin() || (isSignedIn() && existing().applicantId == request.auth.uid);
+      allow get: if isValidId(grantId) && (
+        isAdmin() || isMentor() || (isSignedIn() && existing().applicantId == request.auth.uid)
+      );
+      allow list: if isAdmin() || isMentor() || (isSignedIn() && existing().applicantId == request.auth.uid);
       allow create: if isSignedIn() && isValidId(grantId) && isValidGrantApplication(incoming()) && (
-        isAdmin() || (
+        (isAdmin() && (incoming().status != 'approved' || incoming().get('mentorEndorsed', false) == true)) || (
           incoming().applicantId == request.auth.uid &&
-          incoming().status == 'pending'
+          incoming().status == 'pending' &&
+          (!('mentorEndorsed' in incoming()) || incoming().mentorEndorsed == false)
         )
       );
       allow update: if isSignedIn() && isValidId(grantId) && isValidGrantApplication(incoming()) && (
-        isAdmin() || (
+        (
+          isAdmin() &&
+          (incoming().status != 'approved' || incoming().get('mentorEndorsed', false) == true)
+        ) || (
+          isMentor() &&
+          existing().status == 'pending' &&
+          incoming().status == 'pending' &&
+          incoming().applicantId == existing().applicantId &&
+          incoming().mentorEndorsed == true &&
+          incoming().endorsedByMentorId == getMentorId() &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'mentorEndorsed', 'endorsedByMentorId', 'endorsedByMentorName',
+            'endorsementId', 'endorsementCode', 'mentorEndorsedAt', 'mentorSupportNotes', 'updatedAt'
+          ])
+        ) || (
           existing().applicantId == request.auth.uid &&
           incoming().applicantId == existing().applicantId &&
           existing().status == 'pending' &&

@@ -33,6 +33,8 @@ export interface UserProfile {
   expertise?: string;
   designation?: string;
   institution?: string;
+  passwordHash?: string;
+  passwordUpdatedAt?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -189,6 +191,13 @@ export interface GrantApplication {
   fundPurpose: string;
   status: 'pending' | 'approved' | 'rejected' | 'cancelled';
   adminNotes?: string;
+  mentorEndorsed?: boolean;
+  endorsedByMentorId?: string;
+  endorsedByMentorName?: string;
+  endorsementId?: string;
+  endorsementCode?: string;
+  mentorEndorsedAt?: string;
+  mentorSupportNotes?: string;
   createdAt: string;
   updatedAt?: string;
 }
@@ -480,10 +489,11 @@ export interface GrantEndorsementLetter {
   businessName: string;
   businessCategory: string;
   district: KelantanDistrict;
-  recommendedAmount: 'RM3,000' | 'RM5,000' | 'RM10,000';
+  recommendedAmount: string;
   grantProgramTitle: string;
   justification: string;
   businessReadinessRemark: string;
+  grantApplicationId?: string;
   issuedAt: string;
   status: 'active' | 'revoked';
   updatedAt?: string;

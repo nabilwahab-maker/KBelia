@@ -183,3 +183,40 @@ export function exportToJSON(filename: string, data: unknown): void {
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+/**
+ * Hashes portal passwords using salted SHA-256 (with deterministic fallback for non-secure contexts)
+ */
+export async function hashPortalPassword(raw: string): Promise<string> {
+  const salted = `kbelia_2026_salt::${raw}`;
+  try {
+    if (typeof crypto !== 'undefined' && crypto.subtle) {
+      const encoded = new TextEncoder().encode(salted);
+      const buf = await crypto.subtle.digest('SHA-256', encoded);
+      return Array.from(new Uint8Array(buf))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+  } catch {
+    // Fallback below when crypto.subtle is unavailable
+  }
+  let hash = 2166136261;
+  for (let i = 0; i < salted.length; i++) {
+    hash ^= salted.charCodeAt(i);
+    hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+  }
+  return `fnv_${(hash >>> 0).toString(16)}`;
+}
+
+/**
+ * Generates an easy-to-read temporary password for Admin-created Mentor or User accounts
+ */
+export function generateRandomMentorPassword(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let result = 'KB-';
+  for (let i = 0; i < 6; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+

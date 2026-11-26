@@ -488,6 +488,11 @@ export const EditGrantModal: React.FC<EditGrantModalProps> = ({
       return;
     }
 
+    if (status === 'approved' && !grant?.mentorEndorsed) {
+      setError('Permohonan geran ini wajib disokong oleh Mentor dahulu sebelum status Diluluskan boleh dipilih.');
+      return;
+    }
+
     try {
       setIsSaving(true);
       const saved = await updateGrantApplicationRecord({
@@ -511,8 +516,12 @@ export const EditGrantModal: React.FC<EditGrantModalProps> = ({
         adminNotes: adminNotes.trim()
       });
       onSaved(saved);
-    } catch {
-      setError('Gagal menyimpan rekod permohonan geran.');
+    } catch (err: any) {
+      if (err?.message === 'MENTOR_ENDORSEMENT_REQUIRED') {
+        setError('Permohonan geran ini wajib mendapat sokongan Mentor terlebih dahulu sebelum diluluskan.');
+      } else {
+        setError('Gagal menyimpan rekod permohonan geran.');
+      }
     } finally {
       setIsSaving(false);
     }
@@ -596,7 +605,9 @@ export const EditGrantModal: React.FC<EditGrantModalProps> = ({
                 className={`${inputClass} cursor-pointer font-semibold`}
               >
                 <option value="pending">Menunggu Semakan</option>
-                <option value="approved">Diluluskan</option>
+                <option value="approved" disabled={!grant?.mentorEndorsed}>
+                  {grant?.mentorEndorsed ? 'Diluluskan' : 'Diluluskan (Perlu Sokongan Mentor)'}
+                </option>
                 <option value="rejected">Ditolak</option>
                 <option value="cancelled">Dibatalkan</option>
               </select>

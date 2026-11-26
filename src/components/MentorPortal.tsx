@@ -47,6 +47,7 @@ import {
   KelantanDistrict, 
   MentorSubTab, 
   GrantEndorsementLetter, 
+  GrantApplication,
   MentoringLogEntry,
   MenteeGrantCheck,
   BusinessListing,
@@ -58,6 +59,7 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { auth, db } from '../lib/firebase';
 import {
   deleteMentoringLogRecord,
+  endorseGrantApplicationRecord,
   getDeletedIds,
   isProductionAuthenticated,
   saveGrantEndorsementRecord,
@@ -227,8 +229,10 @@ interface MentorPortalProps {
   mentors: MentorProfile[];
   registrations: MentorshipRegistration[];
   businesses?: BusinessListing[];
+  grantApplications?: GrantApplication[];
   onUpdateRegistration: (updated: MentorshipRegistration) => void;
   onUpdateMentor?: (updatedMentor: MentorProfile) => void;
+  onRefresh?: () => void;
   activeSubTab?: MentorSubTab;
   onSelectSubTab?: (subTab: MentorSubTab) => void;
 }
@@ -352,8 +356,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   mentors,
   registrations,
   businesses = [],
+  grantApplications = [],
   onUpdateRegistration,
   onUpdateMentor,
+  onRefresh,
   activeSubTab = 'overview',
   onSelectSubTab
 }) => {
@@ -595,6 +601,8 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
   // New Grant Endorsement Modal
   const [isNewEndorsementModalOpen, setIsNewEndorsementModalOpen] = useState(false);
   const [selectedEndorsementForView, setSelectedEndorsementForView] = useState<GrantEndorsementLetter | null>(null);
+  const [activeEndorsementGrantId, setActiveEndorsementGrantId] = useState<string | null>(null);
+  const [grantReviewFilterTab, setGrantReviewFilterTab] = useState<'pending_endorsement' | 'endorsed' | 'all'>('pending_endorsement');
   const [newEndorsementMenteeName, setNewEndorsementMenteeName] = useState('');
   const [newEndorsementBusinessName, setNewEndorsementBusinessName] = useState('');
   const [newEndorsementCategory, setNewEndorsementCategory] = useState('Makanan & Minuman (F&B)');
@@ -1210,8 +1218,42 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     }));
   };
 
+  const activeEndorsementGrant = React.useMemo(
+    () => (activeEndorsementGrantId ? grantApplications.find(g => g.id === activeEndorsementGrantId) || null : null),
+    [activeEndorsementGrantId, grantApplications]
+  );
+
+  const openEndorseGrantModal = (grant: GrantApplication) => {
+    const rawAmount = (grant.grantAmount || grant.amount || 'RM3,000').replace(/\s+/g, '');
+    const grantTier: 'RM3,000' | 'RM5,000' | 'RM10,000' =
+      rawAmount.includes('10,000') || rawAmount.includes('10000')
+        ? 'RM10,000'
+        : rawAmount.includes('5,000') || rawAmount.includes('5000')
+        ? 'RM5,000'
+        : 'RM3,000';
+
+    setActiveEndorsementGrantId(grant.id);
+    setNewEndorsementMenteeName(grant.applicantName || '');
+    setNewEndorsementBusinessName(grant.businessName || '');
+    setNewEndorsementCategory(grant.businessCategory || 'Makanan & Minuman (F&B)');
+    setNewEndorsementDistrict((grant.district as KelantanDistrict) || 'Kota Bharu');
+    setNewEndorsementGrantType(grantTier);
+    setNewEndorsementJustification(
+      grant.fundPurpose
+        ? `Permohonan disemak dan disokong berdasarkan cadangan penggunaan dana pemohon: ${grant.fundPurpose}`
+        : ''
+    );
+    setNewEndorsementReadiness(
+      grant.ssmNumber
+        ? `No. SSM: ${grant.ssmNumber}. Perniagaan beroperasi aktif di ${grant.district || 'Kelantan'} dan layak dipertimbangkan oleh Pentadbir.`
+        : `Perniagaan beroperasi aktif di ${grant.district || 'Kelantan'} dan layak dipertimbangkan untuk kelulusan Pentadbir.`
+    );
+    setIsEndorsementConfirmed(false);
+    setIsNewEndorsementModalOpen(true);
+  };
+
   // Issue New Grant Endorsement
-  const handleCreateGrantEndorsement = (e: React.FormEvent) => {
+  const handleCreateGrantEndorsement = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEndorsementMenteeName || !newEndorsementBusinessName || !newEndorsementJustification) {
       triggerToast('Sila lengkapkan nama usahawan, nama perniagaan dan ulasan justifikasi perakuan.', 'error');
@@ -1222,14 +1264,17 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
       return;
     }
 
+    const linkedGrant = activeEndorsementGrant;
     const matchedMentee = mentorRegistrations.find(
-      r => r.entrepreneurName.toLowerCase() === newEndorsementMenteeName.trim().toLowerCase() ||
-           r.businessName.toLowerCase() === newEndorsementBusinessName.trim().toLowerCase()
+      r =>
+        (linkedGrant?.applicantId && r.applicantId === linkedGrant.applicantId) ||
+        r.entrepreneurName.toLowerCase() === newEndorsementMenteeName.trim().toLowerCase() ||
+        r.businessName.toLowerCase() === newEndorsementBusinessName.trim().toLowerCase()
     );
 
     const currentYear = new Date().getFullYear();
     const uniqueCode = `PERAKUAN-KBELIA-${currentYear}-${Math.floor(1000 + Math.random() * 9000)}`;
-    const programTitle = newEndorsementGrantType === 'RM3,000' 
+    const defaultProgramTitle = newEndorsementGrantType === 'RM3,000'
       ? 'Geran Permulaan Usahawan Belia Kelantan (RM3,000)'
       : newEndorsementGrantType === 'RM5,000'
       ? 'Geran Pemangkin Usahawan Belia Kelantan (RM5,000)'
@@ -1238,17 +1283,19 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     const newEndorsement: GrantEndorsementLetter = {
       id: `end-${Date.now()}`,
       endorsementCode: uniqueCode,
+      ...(linkedGrant?.id ? { grantApplicationId: linkedGrant.id } : {}),
       mentorId: currentMentor.id,
       mentorName: currentMentor.name,
       mentorAgency: currentMentor.agency,
       mentorDesignation: currentMentor.title,
-      menteeId: matchedMentee?.applicantId || `mentee-${Date.now()}`,
+      menteeId: linkedGrant?.applicantId || matchedMentee?.applicantId || `mentee-${Date.now()}`,
       menteeName: newEndorsementMenteeName,
+      menteePhone: linkedGrant?.applicantPhone || matchedMentee?.entrepreneurPhone || '',
       businessName: newEndorsementBusinessName,
       businessCategory: newEndorsementCategory,
       district: newEndorsementDistrict,
-      recommendedAmount: newEndorsementGrantType,
-      grantProgramTitle: programTitle,
+      recommendedAmount: linkedGrant?.grantAmount || newEndorsementGrantType,
+      grantProgramTitle: linkedGrant?.programTitle || defaultProgramTitle,
       justification: newEndorsementJustification,
       businessReadinessRemark: newEndorsementReadiness || 'Telah dinilai secara profesional dalam sesi bimbingan mentor Hab Usahawan.',
       issuedAt: new Date().toISOString().split('T')[0],
@@ -1256,23 +1303,52 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
     };
 
     saveEndorsements([newEndorsement, ...endorsements]);
-    void saveGrantEndorsementRecord(newEndorsement).catch(console.error);
-    if (matchedMentee?.applicantId) {
+    await saveGrantEndorsementRecord(newEndorsement).catch(console.error);
+
+    if (linkedGrant) {
+      try {
+        await endorseGrantApplicationRecord(
+          linkedGrant.id,
+          newEndorsement,
+          newEndorsementJustification,
+          linkedGrant
+        );
+      } catch (err) {
+        console.error('Gagal mengemas kini status sokongan permohonan geran:', err);
+      }
+    }
+
+    const targetYouthId = linkedGrant?.applicantId || matchedMentee?.applicantId;
+    if (targetYouthId) {
       emitAdminOrMentorNotification({
-        title: `Perakuan Geran Mentor Dikeluarkan (${newEndorsementGrantType})`,
-        message: `${currentMentor.name} telah mengeluarkan Surat Perakuan Rasmi (${uniqueCode}) untuk ${newEndorsementBusinessName}.`,
+        title: `Sokongan Mentor Diluluskan (${newEndorsement.recommendedAmount})`,
+        message: `${currentMentor.name} telah mengesahkan sokongan & menjana Surat Perakuan (${uniqueCode}) bagi ${newEndorsementBusinessName}. Permohonan kini sedia untuk kelulusan Pentadbir.`,
         type: 'grant',
         senderRole: 'mentor',
         targetRole: 'youth',
-        targetUserId: matchedMentee.applicantId,
+        targetUserId: targetYouthId,
         sender: currentMentor.name,
         actionTab: 'merchant'
       });
     }
+
+    emitAdminOrMentorNotification({
+      title: `Geran Disokong Mentor: ${newEndorsementBusinessName}`,
+      message: `${currentMentor.name} telah menyokong permohonan ${newEndorsement.grantProgramTitle} (${uniqueCode}). Sedia untuk semakan & kelulusan akhir Pentadbir.`,
+      type: 'grant',
+      senderRole: 'mentor',
+      targetRole: 'admin',
+      targetUserId: '',
+      sender: currentMentor.name,
+      actionTab: 'admin'
+    });
+
+    onRefresh?.();
     setIsNewEndorsementModalOpen(false);
+    setActiveEndorsementGrantId(null);
     setSelectedEndorsementId(newEndorsement.id);
     setSelectedEndorsementForView(newEndorsement);
-    showToast(`Surat Perakuan Rasmi ${uniqueCode} berjaya dikeluarkan!`);
+    showToast(`Sokongan Mentor & Surat Perakuan ${uniqueCode} berjaya dijana!`);
 
     // Reset form
     setNewEndorsementMenteeName('');
@@ -3348,8 +3424,197 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
           { name: 'Belum Disemak', value: readinessStats.unreviewed, color: '#94A3B8', secondaryLabel: readinessStats.unreviewed > 0 ? `${readinessStats.unreviewed} belia` : 'Tiada' }
         ];
 
+        const activeYouthGrants = grantApplications.filter(g => g.status !== 'cancelled');
+        const pendingMentorGrants = activeYouthGrants.filter(g => g.status === 'pending' && !g.mentorEndorsed);
+        const endorsedYouthGrants = activeYouthGrants.filter(g => Boolean(g.mentorEndorsed));
+        const visibleYouthGrants = activeYouthGrants.filter((g) => {
+          if (grantReviewFilterTab === 'pending_endorsement') return g.status === 'pending' && !g.mentorEndorsed;
+          if (grantReviewFilterTab === 'endorsed') return Boolean(g.mentorEndorsed);
+          return true;
+        });
+
         return (
           <div key="readiness" className="space-y-4 animate-dashboard-tab">
+            {/* Queue Permohonan Geran Belia Untuk Sokongan Mentor (Langkah 1 sebelum Kelulusan Admin) */}
+            <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden ${mentorTheme.surfaceClass}`}>
+              <div className={`p-4 sm:p-5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
+                <div className="flex items-start gap-2.5">
+                  <Award className={`w-5 h-5 shrink-0 mt-0.5 ${mentorTheme.accentTextClass}`} />
+                  <div>
+                    <h3 className="font-display text-base sm:text-lg font-bold text-slate-900 dark:text-[#F1F5F9] tracking-tight">
+                      Permohonan Geran Belia Untuk Sokongan Mentor
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                      Semak permohonan geran daripada usahawan belia dan keluarkan Surat Sokongan sebelum Pentadbir membuat kelulusan akhir.
+                    </p>
+                  </div>
+                </div>
+
+                <div className={`inline-flex items-center p-1 rounded-xl border self-start sm:self-center ${mentorTheme.surfaceClass} ${mentorTheme.dividerClass}`}>
+                  {(
+                    [
+                      { id: 'pending_endorsement', label: `Perlu Sokongan (${pendingMentorGrants.length})` },
+                      { id: 'endorsed', label: `Sudah Disokong (${endorsedYouthGrants.length})` },
+                      { id: 'all', label: `Semua (${activeYouthGrants.length})` }
+                    ] as const
+                  ).map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setGrantReviewFilterTab(tab.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold cursor-pointer whitespace-nowrap transition-colors ${
+                        grantReviewFilterTab === tab.id
+                          ? mentorTheme.segmentedActiveClass
+                          : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-[#F1F5F9]'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {visibleYouthGrants.length === 0 ? (
+                <div className="p-8 text-center space-y-2">
+                  <FileCheck className="w-8 h-8 text-slate-400 dark:text-slate-500 mx-auto opacity-60" />
+                  <p className="text-sm font-semibold text-slate-900 dark:text-[#F1F5F9]">
+                    {grantReviewFilterTab === 'pending_endorsement'
+                      ? 'Tiada permohonan geran baharu menunggu sokongan mentor.'
+                      : 'Tiada rekod permohonan geran dalam kategori ini.'}
+                  </p>
+                </div>
+              ) : (
+                <div className={`divide-y ${mentorTheme.dividerClass}`}>
+                  {visibleYouthGrants.map((grant) => {
+                    const matchedEndorsement = endorsements.find(
+                      (e) =>
+                        e.id === grant.endorsementId ||
+                        e.endorsementCode === grant.endorsementCode ||
+                        e.grantApplicationId === grant.id
+                    );
+                    const isEndorsed = Boolean(grant.mentorEndorsed);
+
+                    return (
+                      <div key={grant.id} className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div className="min-w-0 space-y-1.5 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`px-2 py-0.5 rounded-lg text-xs font-bold font-mono tabular-nums ${mentorTheme.activeNavClass}`}>
+                              {grant.grantAmount || grant.amount || 'RM3,000'}
+                            </span>
+                            <span
+                              className={`px-2 py-0.5 rounded-lg text-xs font-semibold ${
+                                grant.status === 'approved'
+                                  ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                  : grant.status === 'rejected'
+                                  ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'
+                                  : isEndorsed
+                                  ? 'bg-blue-50 text-[#1D4ED8] dark:bg-blue-950/50 dark:text-blue-300'
+                                  : 'bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300'
+                              }`}
+                            >
+                              {grant.status === 'approved'
+                                ? 'Diluluskan Admin'
+                                : grant.status === 'rejected'
+                                ? 'Ditolak Admin'
+                                : isEndorsed
+                                ? 'Disokong Mentor · Menunggu Admin'
+                                : 'Perlu Sokongan Mentor'}
+                            </span>
+                            {grant.endorsementCode && (
+                              <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
+                                {grant.endorsementCode}
+                              </span>
+                            )}
+                          </div>
+
+                          <h4 className="font-display text-sm sm:text-base font-bold text-slate-900 dark:text-[#F1F5F9]">
+                            {grant.businessName} — {grant.programTitle}
+                          </h4>
+                          <p className="text-xs text-slate-600 dark:text-slate-400">
+                            Pemohon: <strong className="text-slate-800 dark:text-slate-200">{grant.applicantName}</strong> &middot; {grant.district || 'Kelantan'} &middot; {grant.businessCategory}
+                            {grant.ssmNumber ? ` · SSM: ${grant.ssmNumber}` : ''}
+                          </p>
+                          {grant.fundPurpose && (
+                            <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 line-clamp-2 kbelia-prose">
+                              {grant.fundPurpose}
+                            </p>
+                          )}
+                          {isEndorsed && grant.endorsedByMentorName && (
+                            <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                              Disokong oleh {grant.endorsedByMentorName}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-2 shrink-0">
+                          {isEndorsed ? (
+                            <>
+                              {matchedEndorsement && (
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedEndorsementForView(matchedEndorsement)}
+                                  className={`px-3.5 py-2 text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${mentorTheme.secondaryButtonClass}`}
+                                >
+                                  <Eye className="w-3.5 h-3.5" />
+                                  <span>Lihat Surat</span>
+                                </button>
+                              )}
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  const letterPayload: GrantEndorsementLetter = matchedEndorsement || {
+                                    id: grant.endorsementId || `end-${grant.id}`,
+                                    endorsementCode: grant.endorsementCode || `PERAKUAN-${grant.id.slice(0, 8).toUpperCase()}`,
+                                    grantApplicationId: grant.id,
+                                    mentorId: grant.endorsedByMentorId || currentMentor.id,
+                                    mentorName: grant.endorsedByMentorName || currentMentor.name,
+                                    mentorAgency: currentMentor.agency,
+                                    mentorDesignation: currentMentor.title,
+                                    menteeId: grant.applicantId,
+                                    menteeName: grant.applicantName,
+                                    menteePhone: grant.applicantPhone,
+                                    businessName: grant.businessName,
+                                    businessCategory: grant.businessCategory,
+                                    district: (grant.district as KelantanDistrict) || 'Kota Bharu',
+                                    recommendedAmount: grant.grantAmount || grant.amount || 'RM3,000',
+                                    grantProgramTitle: grant.programTitle,
+                                    justification: grant.mentorSupportNotes || grant.fundPurpose || 'Permohonan geran disokong oleh panel mentor KBelia.',
+                                    businessReadinessRemark: 'Disemak dan diperakui oleh Mentor Bertauliah KBelia.',
+                                    issuedAt: (grant.mentorEndorsedAt || grant.updatedAt || new Date().toISOString()).split('T')[0],
+                                    status: 'active'
+                                  };
+                                  const html = generateMentorEndorsementOfficialHtml(letterPayload);
+                                  const ok = await downloadHtmlAsPdf(html, `Surat_Sokongan_Geran_${letterPayload.endorsementCode}`);
+                                  if (ok) {
+                                    triggerToast('Surat Sokongan Geran berjaya dimuat turun sebagai PDF.', 'success');
+                                  } else {
+                                    triggerToast('Gagal menjana PDF Surat Sokongan Geran.', 'error');
+                                  }
+                                }}
+                                className={`px-3.5 py-2 text-xs font-semibold inline-flex items-center gap-1.5 cursor-pointer ${mentorTheme.primaryButtonClass}`}
+                              >
+                                <Download className="w-3.5 h-3.5" />
+                                <span>Muat Turun Surat Sokongan (PDF)</span>
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => openEndorseGrantModal(grant)}
+                              className={`px-4 py-2 text-xs sm:text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer ${mentorTheme.primaryButtonClass}`}
+                            >
+                              <Award className="w-4 h-4" />
+                              <span>Sahkan Sokongan &amp; Jana Surat</span>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
             {/* Top Summary Strip (55%) + Readiness Donut Chart (45%) */}
             <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,55fr)_minmax(0,45fr)] gap-4 items-stretch">
               <div className={`rounded-2xl border backdrop-blur-xs p-5 flex flex-col justify-between gap-4 ${mentorTheme.surfaceClass}`}>
@@ -3757,7 +4022,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               rightActions={
                 <button
                   type="button"
-                  onClick={() => setIsNewEndorsementModalOpen(true)}
+                  onClick={() => {
+                    setActiveEndorsementGrantId(null);
+                    setIsNewEndorsementModalOpen(true);
+                  }}
                   className={`px-4 py-2 text-xs sm:text-sm font-semibold inline-flex items-center gap-1.5 shrink-0 ${mentorTheme.primaryButtonClass}`}
                 >
                   <Plus className="w-4 h-4" />
@@ -5236,7 +5504,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               </div>
               <button
                 type="button"
-                onClick={() => setIsNewEndorsementModalOpen(false)}
+                onClick={() => {
+                  setIsNewEndorsementModalOpen(false);
+                  setActiveEndorsementGrantId(null);
+                }}
                 className={`p-1.5 rounded-xl text-slate-500 dark:text-slate-400 transition-colors cursor-pointer ${mentorTheme.rowHoverClass}`}
               >
                 <X className="w-4 h-4" />
@@ -5244,7 +5515,18 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
             </div>
 
             <form onSubmit={handleCreateGrantEndorsement} className="px-6 sm:px-7 pb-6 sm:pb-7 pt-4 space-y-3.5">
-              {menteeDirectory.length > 0 && (
+              {activeEndorsementGrant && (
+                <div className="p-3 rounded-xl border border-blue-200 bg-blue-50/70 dark:border-blue-800/60 dark:bg-blue-950/35 text-xs text-slate-700 dark:text-slate-200 space-y-0.5">
+                  <div className="font-bold text-[#1D4ED8] dark:text-blue-300">
+                    Permohonan Geran Berpaut: {activeEndorsementGrant.programTitle} ({activeEndorsementGrant.grantAmount})
+                  </div>
+                  <p>
+                    Setelah perakuan dijana, permohonan ini akan ditanda <strong>Disokong Mentor</strong> dan dibuka kepada Pentadbir untuk kelulusan akhir.
+                  </p>
+                </div>
+              )}
+
+              {menteeDirectory.length > 0 && !activeEndorsementGrant && (
                 <div>
                   <label className="block text-sm font-semibold text-slate-800 dark:text-slate-200 mb-1">
                     Pilih Belia Sedia Ada (Isi Pantas)
@@ -5454,7 +5736,10 @@ export const MentorPortal: React.FC<MentorPortalProps> = ({
               <div className={`pt-3 border-t flex items-center justify-end gap-2 ${mentorTheme.dividerClass}`}>
                 <button
                   type="button"
-                  onClick={() => setIsNewEndorsementModalOpen(false)}
+                  onClick={() => {
+                    setIsNewEndorsementModalOpen(false);
+                    setActiveEndorsementGrantId(null);
+                  }}
                   className={`px-4 py-2 text-sm font-semibold cursor-pointer ${mentorTheme.secondaryButtonClass}`}
                 >
                   Batal

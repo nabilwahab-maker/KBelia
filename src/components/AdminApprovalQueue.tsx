@@ -18,10 +18,13 @@ import {
   Edit3,
   Trash2,
   Plus,
-  Clock
+  Clock,
+  Download,
+  Lock
 } from 'lucide-react';
-import { CapsuleBooking, GrantApplication, CapsuleSlot, KelantanDistrict, YouthProgram, MaintenanceTicket, BookingStatus } from '../types';
-import { formatDisplayDate, calculateOperationEndDate } from '../utils/printUtils';
+import { CapsuleBooking, GrantApplication, GrantEndorsement, CapsuleSlot, KelantanDistrict, YouthProgram, MaintenanceTicket, BookingStatus } from '../types';
+import { formatDisplayDate, calculateOperationEndDate, generateMentorEndorsementOfficialHtml } from '../utils/printUtils';
+import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
 import { OfficialApprovalReportModal } from './OfficialApprovalReportModal';
 import {
   saveCapsuleSlot,
@@ -68,6 +71,7 @@ const adminTheme = getRoleTheme('admin');
 interface AdminApprovalQueueProps {
   bookings: CapsuleBooking[];
   grantApplications: GrantApplication[];
+  grantEndorsements?: GrantEndorsement[];
   slots: CapsuleSlot[];
   maintenanceTickets?: MaintenanceTicket[];
   onApproveBooking: (bookingId: string, notes?: string) => Promise<void>;
@@ -82,6 +86,7 @@ interface AdminApprovalQueueProps {
 export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   bookings,
   grantApplications,
+  grantEndorsements = [],
   slots,
   maintenanceTickets = [],
   onApproveBooking,
@@ -339,10 +344,67 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
     }
   };
 
+  const findMatchingEndorsement = (grant: GrantApplication): GrantEndorsement | null => {
+    return (
+      grantEndorsements.find(
+        (e) =>
+          (grant.endorsementId && e.id === grant.endorsementId) ||
+          (grant.endorsementCode && e.endorsementCode === grant.endorsementCode) ||
+          (e.grantApplicationId && e.grantApplicationId === grant.id) ||
+          (grant.endorsedByMentorId &&
+            e.mentorId === grant.endorsedByMentorId &&
+            e.businessName?.trim().toLowerCase() === grant.businessName?.trim().toLowerCase())
+      ) || null
+    );
+  };
+
+  const handleDownloadGrantEndorsementPdf = async (grant: GrantApplication) => {
+    const matched = findMatchingEndorsement(grant);
+    const letterPayload: GrantEndorsement = matched || {
+      id: grant.endorsementId || `end-${grant.id}`,
+      endorsementCode: grant.endorsementCode || `PERAKUAN-${grant.id.slice(0, 8).toUpperCase()}`,
+      grantApplicationId: grant.id,
+      mentorId: grant.endorsedByMentorId || 'mentor-1',
+      mentorName: grant.endorsedByMentorName || 'Panel Mentor KBelia',
+      mentorAgency: 'Hab Usahawan KBelia',
+      mentorDesignation: 'Panel Penilai & Pembimbing Mentor',
+      menteeId: grant.applicantId,
+      menteeName: grant.applicantName,
+      menteePhone: grant.applicantPhone,
+      businessName: grant.businessName,
+      businessCategory: grant.businessCategory,
+      district: (grant.district as KelantanDistrict) || 'Kota Bharu',
+      recommendedAmount: grant.grantAmount || grant.amount || 'RM3,000',
+      grantProgramTitle: grant.programTitle,
+      justification: grant.mentorSupportNotes || grant.fundPurpose || 'Permohonan ini telah disemak dan disokong oleh Mentor bertauliah KBelia.',
+      businessReadinessRemark: 'Disahkan layak melalui semakan kesediaan operasi Mentor.',
+      issuedAt: (grant.mentorEndorsedAt || grant.updatedAt || new Date().toISOString()).split('T')[0],
+      status: 'active'
+    };
+    const html = generateMentorEndorsementOfficialHtml(letterPayload);
+    const ok = await downloadHtmlAsPdf(html, `Surat_Sokongan_Mentor_${letterPayload.endorsementCode}`);
+    if (ok) {
+      showToast('Surat Sokongan Mentor berjaya dimuat turun sebagai PDF.', 'success');
+    } else {
+      showToast('Gagal menjana PDF Surat Sokongan Mentor.', 'error');
+    }
+  };
+
   const handleApproveGrant = async (id: string) => {
+    const targetGrant = grantApplications.find((g) => g.id === id);
+    if (!targetGrant?.mentorEndorsed) {
+      showToast('Sokongan Mentor diperlukan terlebih dahulu sebelum Pentadbir boleh meluluskan geran ini.', 'warning');
+      return;
+    }
     setActionLoading(id);
     try {
       await onApproveGrant(id, adminNoteInput[id] || 'Bantuan dana geran diluluskan oleh panel penilai Hab Usahawan KBelia.');
+    } catch (err: any) {
+      if (err?.message === 'MENTOR_ENDORSEMENT_REQUIRED') {
+        showToast('Sokongan Mentor wajib diterima dahulu sebelum kelulusan Pentadbir.', 'warning');
+      } else {
+        showToast('Gagal meluluskan permohonan geran.', 'error');
+      }
     } finally {
       setActionLoading(null);
     }
@@ -406,13 +468,21 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
   };
 
   const handleDirectGrantStatus = async (grant: GrantApplication, nextStatus: GrantApplication['status']) => {
+    if (nextStatus === 'approved' && !grant.mentorEndorsed) {
+      showToast('Permohonan geran ini wajib disokong Mentor terlebih dahulu sebelum diluluskan.', 'warning');
+      return;
+    }
     setActionLoading(grant.id);
     try {
       await updateGrantApplicationStatus(grant.id, nextStatus, grant.adminNotes || '', grant);
       showToast(`Status permohonan geran ${grant.businessName} dikemas kini.`, 'success');
       onRefresh?.();
-    } catch {
-      showToast('Gagal menukar status permohonan geran.', 'error');
+    } catch (err: any) {
+      if (err?.message === 'MENTOR_ENDORSEMENT_REQUIRED') {
+        showToast('Permohonan geran belum mendapat sokongan Mentor.', 'warning');
+      } else {
+        showToast('Gagal menukar status permohonan geran.', 'error');
+      }
     } finally {
       setActionLoading(null);
     }
@@ -811,8 +881,19 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           </div>
                           <h5 className="text-sm font-bold text-stone-900 dark:text-[#F5F2EC]">{g.programTitle}</h5>
                           <p className="text-[0.9375rem] text-stone-600 dark:text-stone-300">{g.applicantName} ({g.businessName})</p>
+                          <p className={`text-xs font-semibold mt-0.5 ${
+                            g.mentorEndorsed
+                              ? 'text-emerald-700 dark:text-emerald-300'
+                              : 'text-amber-700 dark:text-amber-300'
+                          }`}>
+                            {g.mentorEndorsed
+                              ? `Disokong Mentor: ${g.endorsedByMentorName || 'Panel Mentor'}${g.endorsementCode ? ` (${g.endorsementCode})` : ''}`
+                              : 'Menunggu Sokongan Mentor'}
+                          </p>
                         </div>
-                        <span className="text-[0.8125rem] font-semibold text-amber-700 dark:text-amber-300 shrink-0">Menunggu</span>
+                        <span className="text-[0.8125rem] font-semibold text-amber-700 dark:text-amber-300 shrink-0">
+                          {g.mentorEndorsed ? 'Sedia Lulus' : 'Semakan Mentor'}
+                        </span>
                       </div>
 
                       <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
@@ -825,6 +906,16 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
+                          {g.mentorEndorsed && (
+                            <button
+                              type="button"
+                              onClick={() => void handleDownloadGrantEndorsementPdf(g)}
+                              className={`p-1.5 rounded-xl border cursor-pointer transition-colors ${adminTheme.secondaryButtonClass}`}
+                              title="Muat Turun Surat Sokongan Mentor (PDF)"
+                            >
+                              <Download className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                           <button
                             type="button"
                             onClick={() =>
@@ -851,10 +942,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           </button>
                           <button
                             type="button"
+                            disabled={!g.mentorEndorsed || actionLoading === g.id}
+                            title={g.mentorEndorsed ? 'Luluskan permohonan geran' : 'Wajib disokong Mentor terlebih dahulu'}
                             onClick={() => handleApproveGrant(g.id)}
-                            className={`px-3 py-1 rounded-xl text-sm font-bold flex items-center gap-1 ${adminTheme.primaryButtonClass}`}
+                            className={`px-3 py-1 rounded-xl text-sm font-bold flex items-center gap-1 disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.primaryButtonClass}`}
                           >
-                            <Check className="w-3.5 h-3.5" />
+                            {g.mentorEndorsed ? <Check className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
                             <span>Lulus</span>
                           </button>
                         </div>
@@ -1466,6 +1559,15 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                       <p className="text-xs text-stone-500 dark:text-stone-400 truncate tabular-nums">
                         {grant.applicantName} · {grant.programTitle} · <strong className="font-mono">{grant.grantAmount}</strong>
                       </p>
+                      <p className={`text-[11px] font-semibold truncate ${
+                        grant.mentorEndorsed
+                          ? 'text-emerald-700 dark:text-emerald-300'
+                          : 'text-amber-700 dark:text-amber-300'
+                      }`}>
+                        {grant.mentorEndorsed
+                          ? `Sokongan Mentor Sah (${grant.endorsedByMentorName || 'Mentor'})`
+                          : 'Menunggu Sokongan Mentor'}
+                      </p>
                     </div>
                   </div>
                 );
@@ -1533,11 +1635,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         <>
                           <button
                             type="button"
-                            disabled={actionLoading === selectedGrant.id || selectedGrant.status === 'approved'}
+                            disabled={actionLoading === selectedGrant.id || selectedGrant.status === 'approved' || !selectedGrant.mentorEndorsed}
+                            title={selectedGrant.mentorEndorsed ? 'Luluskan permohonan geran' : 'Wajib menerima sokongan Mentor dahulu sebelum diluluskan'}
                             onClick={() => handleApproveGrant(selectedGrant.id)}
                             className={`px-3 py-1.5 rounded-xl text-xs font-bold inline-flex items-center gap-1 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.primaryButtonClass}`}
                           >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            {selectedGrant.mentorEndorsed ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
                             <span>Lulus</span>
                           </button>
                           <button
@@ -1595,6 +1698,51 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                     />
 
                     <div className="p-4 sm:p-5 space-y-4">
+                      {/* 2-Step Approval Workflow Status: Mentor Endorsement -> Admin Approval */}
+                      <div
+                        className={`p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                          selectedGrant.mentorEndorsed
+                            ? 'bg-emerald-50/80 border-emerald-200 dark:bg-emerald-950/35 dark:border-emerald-800/60'
+                            : 'bg-amber-50/80 border-amber-200 dark:bg-amber-950/35 dark:border-amber-800/60'
+                        }`}
+                      >
+                        <div className="space-y-1 min-w-0">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-stone-900 dark:text-[#F5F2EC]">
+                            {selectedGrant.mentorEndorsed ? (
+                              <ShieldCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
+                            ) : (
+                              <AlertCircle className="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0" />
+                            )}
+                            <span>
+                              {selectedGrant.mentorEndorsed
+                                ? `Disokong Oleh Mentor: ${selectedGrant.endorsedByMentorName || 'Panel Mentor'}`
+                                : 'Menunggu Sokongan Mentor (Langkah 1 Wajib)'}
+                            </span>
+                          </div>
+                          {selectedGrant.mentorEndorsed ? (
+                            <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed">
+                              {selectedGrant.endorsementCode ? `Kod Perakuan: ${selectedGrant.endorsementCode} · ` : ''}
+                              {selectedGrant.mentorSupportNotes || 'Sokongan Mentor telah disahkan. Pentadbir kini boleh meluluskan geran ini.'}
+                            </p>
+                          ) : (
+                            <p className="text-xs text-stone-700 dark:text-stone-300 leading-relaxed">
+                              Butang <strong>Lulus</strong> dikunci sehingga pihak Mentor menyemak dan mengeluarkan Surat Sokongan Geran.
+                            </p>
+                          )}
+                        </div>
+
+                        {selectedGrant.mentorEndorsed && (
+                          <button
+                            type="button"
+                            onClick={() => void handleDownloadGrantEndorsementPdf(selectedGrant)}
+                            className={`px-3.5 py-2 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shrink-0 cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>Muat Turun Surat Sokongan (PDF)</span>
+                          </button>
+                        )}
+                      </div>
+
                       <SidePreviewMetricsStrip
                         role="admin"
                         columns={3}
@@ -1631,11 +1779,12 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                           <div className="flex items-center gap-2 shrink-0">
                             <button
                               type="button"
-                              disabled={actionLoading === selectedGrant.id}
+                              disabled={actionLoading === selectedGrant.id || selectedGrant.status === 'approved' || !selectedGrant.mentorEndorsed}
+                              title={selectedGrant.mentorEndorsed ? 'Luluskan permohonan geran' : 'Wajib menerima sokongan Mentor dahulu sebelum diluluskan'}
                               onClick={() => handleApproveGrant(selectedGrant.id)}
-                              className={`py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1 cursor-pointer ${adminTheme.primaryButtonClass}`}
+                              className={`py-2 px-3.5 rounded-xl text-xs sm:text-sm font-bold inline-flex items-center gap-1 cursor-pointer disabled:opacity-45 disabled:cursor-not-allowed ${adminTheme.primaryButtonClass}`}
                             >
-                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              {selectedGrant.mentorEndorsed ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />}
                               <span>Lulus</span>
                             </button>
                             <button

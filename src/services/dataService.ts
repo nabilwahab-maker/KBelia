@@ -849,6 +849,33 @@ export async function updateGrantApplicationStatus(
       ? 'Status dikembalikan kepada menunggu semakan.'
       : 'Permohonan ditolak.');
 
+  const resolvedGrant = baseGrant;
+  if (status === 'approved') {
+    let isEndorsed = Boolean(resolvedGrant?.mentorEndorsed);
+    if (!isEndorsed && isProductionAuthenticated()) {
+      try {
+        const snapCheck = await getDoc(doc(db, 'grant_applications', grantId));
+        if (snapCheck.exists()) {
+          isEndorsed = Boolean((snapCheck.data() as GrantApplication).mentorEndorsed);
+        }
+      } catch {
+        // ignore lookup fallback
+      }
+    }
+    if (!isEndorsed) {
+      try {
+        const existingLocal: GrantApplication[] = JSON.parse(localStorage.getItem('kbelia_demo_grants') || '[]');
+        const found = existingLocal.find(g => g.id === grantId);
+        if (found?.mentorEndorsed) isEndorsed = true;
+      } catch {
+        // ignore
+      }
+    }
+    if (!isEndorsed) {
+      throw new Error('MENTOR_ENDORSEMENT_REQUIRED');
+    }
+  }
+
   if (!isProductionAuthenticated()) {
     let updatedGrant: GrantApplication | undefined = baseGrant
       ? { ...baseGrant, status, adminNotes: notes, updatedAt: now }
@@ -889,6 +916,79 @@ export async function updateGrantApplicationStatus(
       syncedPayload = { id: grantId, status, adminNotes: notes, updatedAt: now };
     }
     await publishDemoSyncRecord('grant', grantId, syncedPayload);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, 'grant_applications');
+    throw error;
+  }
+}
+
+export async function endorseGrantApplicationRecord(
+  grantId: string,
+  endorsement: GrantEndorsement,
+  supportNotes?: string,
+  baseGrant?: GrantApplication
+): Promise<GrantApplication | undefined> {
+  const now = new Date().toISOString();
+  const patch = {
+    mentorEndorsed: true,
+    endorsedByMentorId: endorsement.mentorId,
+    endorsedByMentorName: endorsement.mentorName,
+    endorsementId: endorsement.id,
+    endorsementCode: endorsement.endorsementCode,
+    mentorEndorsedAt: now,
+    mentorSupportNotes: (supportNotes || endorsement.justification || '').trim().slice(0, 1000),
+    updatedAt: now
+  };
+
+  if (!isProductionAuthenticated()) {
+    let updatedGrant: GrantApplication | undefined = baseGrant ? { ...baseGrant, ...patch } : undefined;
+    try {
+      const key = 'kbelia_demo_grants';
+      const existing: GrantApplication[] = JSON.parse(localStorage.getItem(key) || '[]');
+      let foundLocal = false;
+      const next = existing.map(g => {
+        if (g.id === grantId) {
+          foundLocal = true;
+          updatedGrant = { ...g, ...patch };
+          return updatedGrant;
+        }
+        return g;
+      });
+      if (!foundLocal && updatedGrant) {
+        next.unshift(updatedGrant);
+      }
+      localStorage.setItem(key, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('grant', grantId, updatedGrant || { id: grantId, ...patch });
+    return updatedGrant;
+  }
+
+  try {
+    const grantRef = doc(db, 'grant_applications', grantId);
+    const snap = await getDoc(grantRef);
+    let syncedPayload: GrantApplication;
+    if (snap.exists()) {
+      await setDocWithUpdatedAtFallback(grantRef, patch, true);
+      syncedPayload = { ...(snap.data() as GrantApplication), ...patch };
+    } else if (baseGrant) {
+      syncedPayload = { ...baseGrant, ...patch };
+    } else {
+      syncedPayload = { id: grantId, ...patch } as GrantApplication;
+    }
+    try {
+      const key = 'kbelia_demo_grants';
+      const existing: GrantApplication[] = JSON.parse(localStorage.getItem(key) || '[]');
+      const next = existing.some(g => g.id === grantId)
+        ? existing.map(g => (g.id === grantId ? { ...g, ...patch } : g))
+        : [syncedPayload, ...existing];
+      localStorage.setItem(key, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('grant', grantId, syncedPayload);
+    return syncedPayload;
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, 'grant_applications');
     throw error;
@@ -2108,6 +2208,10 @@ export async function updateGrantApplicationRecord(
 ): Promise<GrantApplication> {
   const id = grant.id || `grant-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
   const now = new Date().toISOString();
+  if ((grant.status || 'pending') === 'approved' && !grant.mentorEndorsed) {
+    throw new Error('MENTOR_ENDORSEMENT_REQUIRED');
+  }
+
   const full: GrantApplication = {
     id,
     programId: grant.programId || '',
@@ -2127,6 +2231,13 @@ export async function updateGrantApplicationRecord(
     fundPurpose: grant.fundPurpose || '',
     status: grant.status || 'pending',
     adminNotes: grant.adminNotes || '',
+    ...(grant.mentorEndorsed ? { mentorEndorsed: true } : {}),
+    ...(grant.endorsedByMentorId ? { endorsedByMentorId: grant.endorsedByMentorId } : {}),
+    ...(grant.endorsedByMentorName ? { endorsedByMentorName: grant.endorsedByMentorName } : {}),
+    ...(grant.endorsementId ? { endorsementId: grant.endorsementId } : {}),
+    ...(grant.endorsementCode ? { endorsementCode: grant.endorsementCode } : {}),
+    ...(grant.mentorEndorsedAt ? { mentorEndorsedAt: grant.mentorEndorsedAt } : {}),
+    ...(grant.mentorSupportNotes ? { mentorSupportNotes: grant.mentorSupportNotes } : {}),
     createdAt: grant.createdAt || now,
     updatedAt: now
   };
@@ -2677,6 +2788,105 @@ export function loadLocalPortalUsers(): UserProfile[] {
   }
 }
 
+const MENTOR_CREDENTIALS_STORAGE_KEY = 'kbelia_mentor_credentials_v1';
+
+export interface MentorCredentialEntry {
+  mentorId: string;
+  email: string;
+  passwordHash: string;
+  updatedAt: string;
+}
+
+export function saveMentorCredentialHash(mentorId: string, email: string, passwordHash: string): void {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  if (!cleanEmail || !passwordHash) return;
+  try {
+    const existing: MentorCredentialEntry[] = JSON.parse(localStorage.getItem(MENTOR_CREDENTIALS_STORAGE_KEY) || '[]');
+    const entry: MentorCredentialEntry = {
+      mentorId,
+      email: cleanEmail,
+      passwordHash,
+      updatedAt: new Date().toISOString()
+    };
+    const filtered = existing.filter(
+      (c) => c.mentorId !== mentorId && c.email.toLowerCase() !== cleanEmail
+    );
+    localStorage.setItem(MENTOR_CREDENTIALS_STORAGE_KEY, JSON.stringify([entry, ...filtered]));
+  } catch {
+    // ignore
+  }
+}
+
+export function getMentorCredentialHash(mentorId?: string, email?: string): string | null {
+  const cleanEmail = (email || '').trim().toLowerCase();
+  try {
+    const existing: MentorCredentialEntry[] = JSON.parse(localStorage.getItem(MENTOR_CREDENTIALS_STORAGE_KEY) || '[]');
+    const match = existing.find(
+      (c) => (mentorId && c.mentorId === mentorId) || (cleanEmail && c.email.toLowerCase() === cleanEmail)
+    );
+    if (match?.passwordHash) return match.passwordHash;
+  } catch {
+    // ignore
+  }
+  try {
+    const regRaw = localStorage.getItem(REGISTERED_USERS_STORAGE_KEY);
+    if (regRaw && cleanEmail) {
+      const regList = JSON.parse(regRaw);
+      if (Array.isArray(regList)) {
+        const regMatch = regList.find(
+          (r: any) => r.email?.toLowerCase() === cleanEmail && r.passwordHash
+        );
+        if (regMatch?.passwordHash) return regMatch.passwordHash;
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+}
+
+export function saveLocalAccountCredentialHash(account: {
+  userId: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  district?: string;
+  businessName?: string;
+  role: UserProfile['role'];
+  mentorId?: string;
+  passwordHash: string;
+  avatarUrl?: string;
+  createdAt?: string;
+}): void {
+  const cleanEmail = (account.email || '').trim().toLowerCase();
+  if (!cleanEmail || !account.passwordHash) return;
+  try {
+    const regRaw = localStorage.getItem(REGISTERED_USERS_STORAGE_KEY);
+    const existing: any[] = regRaw ? JSON.parse(regRaw) : [];
+    const now = new Date().toISOString();
+    const record = {
+      userId: account.userId,
+      fullName: account.fullName,
+      email: cleanEmail,
+      phone: account.phone || '',
+      district: account.district || 'Kota Bharu',
+      businessName: account.businessName || '',
+      role: account.role,
+      mentorId: account.mentorId || '',
+      passwordHash: account.passwordHash,
+      avatarUrl: account.avatarUrl || '',
+      createdAt: account.createdAt || now,
+      updatedAt: now
+    };
+    const filtered = existing.filter(
+      (r: any) => r.userId !== account.userId && r.email?.toLowerCase() !== cleanEmail
+    );
+    localStorage.setItem(REGISTERED_USERS_STORAGE_KEY, JSON.stringify([record, ...filtered]));
+  } catch {
+    // ignore
+  }
+}
+
 function buildSanitizedFirestoreUser(profile: UserProfile): Record<string, any> {
   const allowedKeys: (keyof UserProfile)[] = [
     'userId', 'fullName', 'email', 'phone', 'whatsapp', 'district', 'role', 'mentorId',
@@ -2684,7 +2894,7 @@ function buildSanitizedFirestoreUser(profile: UserProfile): Record<string, any> 
     'businessStage', 'businessHours', 'businessAddress', 'businessStatus', 'facebook',
     'instagram', 'tiktok', 'bankName', 'bankAccountNumber', 'bankAccountHolder',
     'notifyWhatsApp', 'notifyEmail', 'hidePhonePublic', 'department', 'expertise',
-    'designation', 'institution', 'createdAt', 'updatedAt'
+    'designation', 'institution', 'passwordHash', 'passwordUpdatedAt', 'createdAt', 'updatedAt'
   ];
   const out: Record<string, any> = {};
   for (const k of allowedKeys) {

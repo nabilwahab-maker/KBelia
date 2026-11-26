@@ -273,7 +273,7 @@ export const LoginModal: React.FC = () => {
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="block text-sm font-semibold text-black dark:text-white">
-                    {activeRoleTab === 'mentor' ? 'PIN Keselamatan Mentor' : 'Kata Laluan'}
+                    {activeRoleTab === 'mentor' ? 'Kata Laluan Mentor' : 'Kata Laluan'}
                   </label>
                   <button
                     type="button"
@@ -290,7 +290,7 @@ export const LoginModal: React.FC = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder={activeRoleTab === 'mentor' ? 'Masukkan PIN keselamatan' : 'Masukkan kata laluan'}
+                    placeholder={activeRoleTab === 'mentor' ? 'Masukkan kata laluan mentor' : 'Masukkan kata laluan'}
                     className="w-full pl-9 pr-10 py-2.5 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 dark:focus:border-blue-500"
                   />
                 </div>
@@ -305,7 +305,7 @@ export const LoginModal: React.FC = () => {
                 <span>{isSubmitting ? 'Memproses...' : 'Log Masuk'}</span>
               </button>
 
-              {activeRoleTab === 'user' && (
+              {activeRoleTab === 'user' ? (
                 <button
                   type="button"
                   onClick={handleGoogleLogin}
@@ -320,6 +320,12 @@ export const LoginModal: React.FC = () => {
                   </svg>
                   <span>Akaun Google</span>
                 </button>
+              ) : (
+                <p className="text-center text-xs text-black/65 dark:text-white/65 leading-relaxed">
+                  {activeRoleTab === 'mentor'
+                    ? 'Akaun Mentor didaftarkan dan diberi kata laluan oleh Pentadbir KBelia.'
+                    : 'Akaun Pentadbir diurus secara dalaman tanpa pendaftaran awam.'}
+                </p>
               )}
             </form>
           )}

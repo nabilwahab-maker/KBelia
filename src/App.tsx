@@ -1087,9 +1087,14 @@ function MainApp() {
       }
 
       if (isMentor) {
-        // Mentors never see bookings, grants, tickets, or cashflow
+        // Mentors never see bookings, tickets, or cashflow; grants are visible strictly for mentor endorsement review
         setBookings([]);
-        setGrantApplications([]);
+        setGrantApplications(
+          mergeUniqueById<GrantApplication>(
+            prodAuth ? [prodGrants, demoSyncGrants, demoGrantsLocal] : [demoSyncGrants, demoGrantsLocal],
+            grantDeleted
+          )
+        );
         setMaintenanceTickets([]);
         setCashflowRecords([]);
         const mentorSessionSource = mergeUniqueById<MentorshipRegistration>(
@@ -1247,6 +1252,15 @@ function MainApp() {
           (err) => console.error('Mentor endorsements admin listener error:', err)
         );
       } else if (isMentor && userProfile?.mentorId) {
+        unsubGrants = onSnapshot(
+          collection(db, 'grant_applications'),
+          (snap) => {
+            prodGrants = snap.docs.map(d => ({ id: d.id, ...d.data() } as GrantApplication));
+            recomputeProtectedState();
+          },
+          (err) => console.error('Grants mentor listener error:', err)
+        );
+
         unsubMentorSessions = onSnapshot(
           query(collection(db, 'mentor_sessions'), where('mentorId', '==', userProfile.mentorId)),
           (snap) => {
@@ -1330,15 +1344,15 @@ function MainApp() {
     let unsubDemoEndorsements = () => {};
 
     if (auth.currentUser || user) {
+      unsubDemoGrants = subscribeDemoSyncCollection<GrantApplication>('grant', (items, delIds) => {
+        demoSyncGrants = items;
+        demoSyncDeletedGrants = delIds;
+        recomputeProtectedState();
+      });
       if (!isMentor) {
         unsubDemoBookings = subscribeDemoSyncCollection<CapsuleBooking>('booking', (items, delIds) => {
           demoSyncBookings = items;
           demoSyncDeletedBookings = delIds;
-          recomputeProtectedState();
-        });
-        unsubDemoGrants = subscribeDemoSyncCollection<GrantApplication>('grant', (items, delIds) => {
-          demoSyncGrants = items;
-          demoSyncDeletedGrants = delIds;
           recomputeProtectedState();
         });
         unsubDemoTickets = subscribeDemoSyncCollection<MaintenanceTicket>('ticket', (items, delIds) => {
@@ -1876,6 +1890,7 @@ function MainApp() {
                     bookings={bookings}
                     programs={programs}
                     grantApplications={grantApplications}
+                    grantEndorsements={grantEndorsements}
                     mentorshipRegistrations={mentorshipRegistrations}
                     mentors={mentors}
                     maintenanceTickets={maintenanceTickets}
@@ -1900,8 +1915,10 @@ function MainApp() {
                     mentors={mentors}
                     registrations={scopedMentorRegistrations}
                     businesses={businesses}
+                    grantApplications={grantApplications}
                     onUpdateRegistration={handleUpdateMentorshipRegistration}
                     onUpdateMentor={handleUpdateMentorProfile}
+                    onRefresh={triggerRefresh}
                     activeSubTab={mentorSubTab}
                     onSelectSubTab={(sub) => {
                       setMentorSubTab(sub);
@@ -1920,6 +1937,7 @@ function MainApp() {
                     myBookings={myBookings}
                     slots={enrichedSlots}
                     grantApplications={myYouthGrants}
+                    grantEndorsements={grantEndorsements}
                     cashflowRecords={cashflowRecords}
                     maintenanceTickets={maintenanceTickets}
                     mentorshipRegistrations={scopedMentorRegistrations}
@@ -2223,6 +2241,7 @@ function MainApp() {
                   bookings={bookings}
                   programs={programs}
                   grantApplications={grantApplications}
+                  grantEndorsements={grantEndorsements}
                   mentorshipRegistrations={mentorshipRegistrations}
                   mentors={mentors}
                   maintenanceTickets={maintenanceTickets}
@@ -2274,8 +2293,10 @@ function MainApp() {
                   mentors={mentors}
                   registrations={scopedMentorRegistrations}
                   businesses={businesses}
+                  grantApplications={grantApplications}
                   onUpdateRegistration={handleUpdateMentorshipRegistration}
                   onUpdateMentor={handleUpdateMentorProfile}
+                  onRefresh={triggerRefresh}
                   activeSubTab={mentorSubTab}
                   onSelectSubTab={(sub) => {
                     setMentorSubTab(sub);
@@ -2345,6 +2366,7 @@ function MainApp() {
                   myBookings={myBookings}
                   slots={enrichedSlots}
                   grantApplications={myYouthGrants}
+                  grantEndorsements={grantEndorsements}
                   cashflowRecords={cashflowRecords}
                   maintenanceTickets={maintenanceTickets}
                   mentorshipRegistrations={scopedMentorRegistrations}

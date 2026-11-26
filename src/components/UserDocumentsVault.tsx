@@ -11,12 +11,13 @@ import {
   ShieldCheck,
   FolderCheck
 } from 'lucide-react';
-import { CapsuleBooking, GrantApplication } from '../types';
+import { CapsuleBooking, GrantApplication, GrantEndorsement, KelantanDistrict } from '../types';
 import {
   formatDisplayDate,
   calculateOperationEndDate,
   openAndPrintDocument,
   generateGrantApprovalOfficialHtml,
+  generateMentorEndorsementOfficialHtml,
   generateYouthCertificateOfficialHtml
 } from '../utils/printUtils';
 import { downloadHtmlAsPdf } from '../utils/pdfGenerator';
@@ -37,6 +38,7 @@ import {
 interface UserDocumentsVaultProps {
   bookings: CapsuleBooking[];
   grantApplications: GrantApplication[];
+  grantEndorsements?: GrantEndorsement[];
   onViewOfferLetter: (booking: CapsuleBooking) => void;
   onOpenTenancyAgreement?: (booking: CapsuleBooking) => void;
   onOpenVerification?: (refCode?: string) => void;
@@ -227,6 +229,7 @@ const DocumentCoverArtwork: React.FC<{ category: CoverCategory; locked?: boolean
 export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
   bookings,
   grantApplications,
+  grantEndorsements = [],
   onViewOfferLetter,
   onOpenTenancyAgreement,
   onOpenVerification,
@@ -239,6 +242,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
   const beliaTheme = getRoleTheme('belia');
   const approvedBookings = bookings.filter(b => b.status === 'approved');
   const approvedGrants = grantApplications.filter(g => g.status === 'approved');
+  const endorsedGrants = grantApplications.filter(g => Boolean(g.mentorEndorsed));
   const certYear = new Date().getFullYear();
   const certCode = `REG-${certYear}-BELIA`;
   const resolvedName =
@@ -434,7 +438,102 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
     });
   }
 
-  // 4. Surat Kelulusan Geran
+  // 4. Surat Sokongan Geran Mentor (Langkah 1 sebelum Kelulusan Admin)
+  const resolvedMentorEndorsements: GrantEndorsement[] = [
+    ...grantEndorsements.filter(e => e.status === 'active'),
+    ...endorsedGrants
+      .filter(
+        (g) =>
+          !grantEndorsements.some(
+            (e) =>
+              (g.endorsementId && e.id === g.endorsementId) ||
+              (g.endorsementCode && e.endorsementCode === g.endorsementCode) ||
+              (e.grantApplicationId && e.grantApplicationId === g.id)
+          )
+      )
+      .map((g) => ({
+        id: g.endorsementId || `end-${g.id}`,
+        endorsementCode: g.endorsementCode || `PERAKUAN-${g.id.slice(0, 8).toUpperCase()}`,
+        grantApplicationId: g.id,
+        mentorId: g.endorsedByMentorId || 'mentor-1',
+        mentorName: g.endorsedByMentorName || 'Panel Mentor KBelia',
+        mentorAgency: 'Hab Usahawan KBelia',
+        mentorDesignation: 'Panel Penilai & Pembimbing Mentor',
+        menteeId: g.applicantId,
+        menteeName: g.applicantName,
+        menteePhone: g.applicantPhone,
+        businessName: g.businessName,
+        businessCategory: g.businessCategory,
+        district: (g.district as KelantanDistrict) || 'Kota Bharu',
+        recommendedAmount: g.grantAmount || g.amount || 'RM3,000',
+        grantProgramTitle: g.programTitle,
+        justification: g.mentorSupportNotes || g.fundPurpose || 'Permohonan geran disokong oleh panel mentor KBelia.',
+        businessReadinessRemark: 'Disahkan layak untuk pertimbangan kelulusan Pentadbir KBelia.',
+        issuedAt: (g.mentorEndorsedAt || g.updatedAt || new Date().toISOString()).split('T')[0],
+        status: 'active' as const
+      }))
+  ];
+
+  if (resolvedMentorEndorsements.length > 0) {
+    resolvedMentorEndorsements.forEach((end) => {
+      cards.push({
+        id: `endorsement-${end.id}`,
+        category: 'grant',
+        coverTag: 'Sokongan',
+        kicker: 'Sokongan Mentor',
+        kickerColorClass: 'text-[#1D4ED8] dark:text-[#60A5FA]',
+        refCode: end.endorsementCode,
+        title: `Surat Sokongan Geran Mentor · ${end.endorsementCode}`,
+        description: `${end.grantProgramTitle} (${end.recommendedAmount}) · Disokong oleh ${end.mentorName}`,
+        primaryLabel: 'Cetak Surat',
+        primaryIcon: 'printer',
+        onPrimary: () =>
+          void runPrintAction(
+            `endorsement-${end.id}`,
+            generateMentorEndorsementOfficialHtml(end),
+            `Surat_Sokongan_Mentor_${end.endorsementCode}`
+          ),
+        secondaryActions: [
+          {
+            id: `endorsement-pdf-${end.id}`,
+            label: 'Muat Turun PDF Surat Sokongan',
+            shortLabel: 'PDF',
+            icon: 'download',
+            onClick: () =>
+              void runPdfAction(
+                `endorsement-pdf-${end.id}`,
+                generateMentorEndorsementOfficialHtml(end),
+                `Surat_Sokongan_Mentor_${end.endorsementCode}.pdf`,
+                `Surat Sokongan Geran Mentor (${end.endorsementCode})`
+              )
+          },
+          {
+            id: `endorsement-qr-${end.id}`,
+            label: 'Semak & Jana Kod QR Sokongan',
+            shortLabel: 'Kod QR',
+            icon: 'qr',
+            onClick: () => handleTriggerQr(end.endorsementCode)
+          }
+        ]
+      });
+    });
+  } else {
+    cards.push({
+      id: 'endorsement-locked',
+      category: 'grant',
+      coverTag: 'Sokongan',
+      kicker: 'Sokongan Mentor',
+      kickerColorClass: 'text-slate-500 dark:text-slate-400',
+      refCode: 'MENUNGGU-MENTOR',
+      title: 'Surat Sokongan Geran Mentor',
+      description: 'Tersedia selepas Mentor menyemak dan mengesahkan sokongan bagi permohonan geran anda.',
+      locked: true,
+      primaryLabel: 'Menunggu Sokongan Mentor',
+      primaryIcon: 'lock'
+    });
+  }
+
+  // 5. Surat Kelulusan Geran (Langkah 2 oleh Pentadbir)
   if (approvedGrants.length > 0) {
     approvedGrants.forEach((g) => {
       const refCode = g.id.slice(0, 8).toUpperCase();
@@ -488,7 +587,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
       kickerColorClass: 'text-slate-500 dark:text-slate-400',
       refCode: 'BELUM-SAH',
       title: 'Surat Kelulusan Geran Perniagaan',
-      description: 'Tersedia selepas permohonan geran perniagaan anda diluluskan oleh pentadbir.',
+      description: 'Tersedia selepas permohonan geran disokong Mentor dan diluluskan oleh Pentadbir.',
       locked: true,
       primaryLabel: 'Belum Tersedia',
       primaryIcon: 'lock'

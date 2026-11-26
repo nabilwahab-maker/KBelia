@@ -6,12 +6,12 @@ import firebaseConfig from '../../firebase-applet-config.json';
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// CRITICAL: Bind to configured firestoreDatabaseId and force HTTP long-polling so
-// sandboxed/proxied iframe environments do not fail on initial WebChannel streaming attempts.
+// CRITICAL: Bind to configured firestoreDatabaseId and auto-detect long-polling only
+// when WebChannel streaming is blocked, avoiding 10s forced long-polling proxy stalls.
 export const db = initializeFirestore(
   app,
   {
-    experimentalForceLongPolling: true,
+    experimentalAutoDetectLongPolling: true,
     ignoreUndefinedProperties: true
   },
   firebaseConfig.firestoreDatabaseId
@@ -89,5 +89,10 @@ export async function testConnection() {
   }
 }
 
-// Run connection check in background
+// Run connection check in background and re-check when network returns
 testConnection().catch(() => {});
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    testConnection().catch(() => {});
+  });
+}

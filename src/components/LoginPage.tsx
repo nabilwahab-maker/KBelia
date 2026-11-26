@@ -469,7 +469,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                 )}
 
                 {/* BOTTOM TOGGLE TO SIGN UP */}
-                {activeRole === 'user' && (
+                {activeRole === 'user' ? (
                   <div className="pt-2 text-center text-sm text-black/70 dark:text-white/75">
                     <span>{isEn ? "Don't have an account? " : "Belum ada akaun? "}</span>
                     <button
@@ -484,6 +484,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                       {isEn ? 'Sign Up' : 'Daftar Sekarang'}
                     </button>
                   </div>
+                ) : (
+                  <p className="pt-2 text-center text-xs text-black/65 dark:text-white/65 leading-relaxed">
+                    {activeRole === 'mentor'
+                      ? (isEn
+                          ? 'Mentor accounts are registered by the KBelia Administrator using an assigned email and password.'
+                          : 'Akaun Mentor didaftarkan oleh Pentadbir KBelia. Sila log masuk menggunakan emel dan kata laluan yang ditetapkan.')
+                      : (isEn
+                          ? 'Administrator accounts are provisioned internally without public self-registration.'
+                          : 'Akaun Pentadbir diurus secara dalaman tanpa pendaftaran awam.')}
+                  </p>
                 )}
 
               </form>

@@ -466,9 +466,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ================================================================= */}
       <section id="hero" className={`relative pt-10 pb-14 sm:pt-14 sm:pb-20 border-b ${hairlineBorder}`}>
         <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            {/* Left Editorial Narrative (5 columns) */}
-            <div className="lg:col-span-5 space-y-6">
+          <div className="flex flex-col gap-8 lg:gap-10">
+            {/* Top Centered Editorial Narrative */}
+            <div className="max-w-3xl w-full mx-auto text-center space-y-5 flex flex-col items-center">
               <p className={`text-xs sm:text-sm font-semibold tracking-wide ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
                 {isBM
                   ? 'Kelantan · Portal Usahawan Belia'
@@ -479,11 +479,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 className={`font-display text-fluid-hero font-bold tracking-tight text-balance kbelia-trim ${surfaceTextPrimary}`}
               >
                 {isBM
-                  ? 'Sewa Kiosk, Mohon Geran & Bina Bisnes Belia Kelantan'
-                  : 'Rent Kiosks, Apply for Grants & Grow Your Youth Business'}
+                  ? 'Portal Rasmi Usahawan Belia Kelantan'
+                  : 'Official Kelantan Youth Business Portal'}
               </h1>
 
-              <p className={`text-fluid-lead max-w-xl kbelia-prose ${surfaceTextMuted}`}>
+              <p className={`text-fluid-lead max-w-2xl mx-auto kbelia-prose ${surfaceTextMuted}`}>
                 <AcronymText
                   text={
                     isBM
@@ -493,7 +493,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 />
               </p>
 
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div className="flex flex-wrap items-center justify-center gap-4 pt-1">
                 <button
                   type="button"
                   id="landing-register-nav-btn"
@@ -507,18 +507,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <span>{isBM ? 'Daftar Sekarang' : 'Get Started'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
-
-                <a
-                  href="#kiosk"
-                  className={`inline-flex items-center gap-1.5 px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap shrink-0 kbelia-link ${surfaceTextPrimary}`}
-                >
-                  <span>{isBM ? 'Lihat Lokasi Kiosk' : 'See Kiosk Locations'}</span>
-                  <ChevronRight className="w-4 h-4" />
-                </a>
               </div>
 
               {/* Clean Typographic Context Strip (Unboxed) */}
-              <div className={`pt-6 border-t ${hairlineBorder} flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm ${surfaceTextMuted}`}>
+              <div className={`pt-5 border-t ${hairlineBorder} w-full flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs sm:text-sm ${surfaceTextMuted}`}>
                 <span>{isBM ? 'Seluruh Negeri Kelantan' : 'Across Kelantan'}</span>
                 <span aria-hidden="true">·</span>
                 <span>{isBM ? 'Sewa Kiosk Berpatutan' : 'Affordable Kiosks'}</span>
@@ -527,16 +519,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </div>
             </div>
 
-            {/* Right Full-Bleed Visual Showcase Carousel (7 columns) */}
+            {/* Bottom Full-Bleed Compact Visual Showcase Carousel */}
             <div
-              className="lg:col-span-7"
+              className="w-full"
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
             >
               <div
                 className={`relative rounded-2xl overflow-hidden border ${hairlineBorderStrong} shadow-2xl group`}
               >
-                <div className="relative aspect-[16/11] sm:aspect-[16/10] w-full overflow-hidden bg-[#15201C]">
+                <div className="relative aspect-[16/9] sm:aspect-[21/9] lg:max-h-[440px] w-full overflow-hidden bg-[#15201C]">
                   {heroSlides.map((slide, index) => (
                     <div
                       key={slide.id}

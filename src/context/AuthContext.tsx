@@ -23,6 +23,8 @@ import { auth, db, googleProvider } from '../lib/firebase';
 import { MentorProfile, UserProfile } from '../types';
 import { INITIAL_MENTOR_PROFILES } from '../data/mentorData';
 import { showToast } from '../components/ToastNotification';
+import { hashPortalPassword } from '../utils/securityUtils';
+import { getMentorCredentialHash, loadLocalPortalUsers } from '../services/dataService';
 
 export interface AuthUser {
   uid: string;
@@ -143,21 +145,7 @@ async function ensureDemoFirebaseAuth(): Promise<void> {
 }
 
 async function hashSecret(raw: string): Promise<string> {
-  const salted = `kbelia_2026_salt::${raw}`;
-  if (typeof crypto !== 'undefined' && crypto.subtle) {
-    const data = new TextEncoder().encode(salted);
-    const digest = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(digest))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('');
-  }
-  // Deterministic fallback when WebCrypto subtle is unavailable
-  let h = 2166136261;
-  for (let i = 0; i < salted.length; i++) {
-    h ^= salted.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return `fnv_${(h >>> 0).toString(16)}`;
+  return hashPortalPassword(raw);
 }
 
 const DEMO_MENTOR_PINS: Record<string, string> = {
@@ -410,16 +398,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             saveSession(authUserObj, prof);
           } else {
             const isUserAdmin = checkIsAdminEmail(currentUser.email);
-            const matchedMentor = !isUserAdmin && currentUser.emailVerified
-              ? await findMentorByEmail(currentUser.email)
-              : null;
             const newProfile: UserProfile = {
               userId: currentUser.uid,
-              fullName: matchedMentor?.name || currentUser.displayName || 'Belia Kelantan',
+              fullName: currentUser.displayName || 'Belia Kelantan',
               email: currentUser.email || '',
-              role: isUserAdmin ? 'admin' : matchedMentor ? 'mentor' : 'user',
-              ...(matchedMentor ? { mentorId: matchedMentor.id, phone: matchedMentor.phone } : {}),
-              avatarUrl: matchedMentor?.avatarUrl || currentUser.photoURL || '/assets/generated/avatar_youth_male_1793924250192.jpg',
+              role: isUserAdmin ? 'admin' : 'user',
+              avatarUrl: currentUser.photoURL || '/assets/generated/avatar_youth_male_1793924250192.jpg',
               district: 'Kota Bharu',
               createdAt: new Date().toISOString()
             };
@@ -508,16 +492,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(authUserData);
 
       const isUserAdmin = checkIsAdminEmail(loggedUser.email);
-      const matchedMentor = !isUserAdmin && loggedUser.emailVerified
-        ? await findMentorByEmail(loggedUser.email)
-        : null;
       let profile: UserProfile = {
         userId: loggedUser.uid,
-        fullName: matchedMentor?.name || loggedUser.displayName || 'Belia Kelantan',
+        fullName: loggedUser.displayName || 'Belia Kelantan',
         email: loggedUser.email || '',
-        role: isUserAdmin ? 'admin' : matchedMentor ? 'mentor' : 'user',
-        ...(matchedMentor ? { mentorId: matchedMentor.id, phone: matchedMentor.phone } : {}),
-        avatarUrl: matchedMentor?.avatarUrl || loggedUser.photoURL || '/assets/generated/avatar_youth_male_1793924250192.jpg',
+        role: isUserAdmin ? 'admin' : 'user',
+        avatarUrl: loggedUser.photoURL || '/assets/generated/avatar_youth_male_1793924250192.jpg',
         district: 'Kota Bharu',
         createdAt: new Date().toISOString()
       };
@@ -578,47 +558,108 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { success: false, error: msg };
       }
 
-      // 1. MENTOR LOGIN (Strict email match - NO fallback to mentorList[0])
+      // 1. MENTOR LOGIN (Email & Admin-Assigned Password Verification)
       if (targetRole === 'mentor') {
-        let mentorList = INITIAL_MENTOR_PROFILES;
+        let mentorList: MentorProfile[] = [...INITIAL_MENTOR_PROFILES];
         try {
           const cached = localStorage.getItem('kbelia_mentor_profiles');
-          if (cached) mentorList = JSON.parse(cached);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed)) {
+              const seen = new Set(parsed.map((m: MentorProfile) => m.id));
+              mentorList = [...parsed, ...INITIAL_MENTOR_PROFILES.filter(m => !seen.has(m.id))];
+            }
+          }
         } catch {
           // ignore
         }
 
-        const matchedMentor = mentorList.find(m => m.email.toLowerCase() === cleanEmail);
+        let matchedMentor = mentorList.find(m => m.email?.trim().toLowerCase() === cleanEmail) || null;
         if (!matchedMentor) {
-          const msg = `Emel "${cleanEmail}" tidak didaftarkan sebagai Mentor. Gunakan butang Demo Mentor di bawah untuk ujian pembangunan.`;
+          matchedMentor = await findMentorByEmail(cleanEmail);
+        }
+
+        const portalUsers = loadLocalPortalUsers();
+        const matchedMentorUser = portalUsers.find(
+          u => u.role === 'mentor' && u.email?.trim().toLowerCase() === cleanEmail
+        );
+
+        if (!matchedMentor && !matchedMentorUser) {
+          const msg = `Emel "${cleanEmail}" tidak didaftarkan sebagai Mentor. Sila hubungi Pentadbir KBelia untuk pendaftaran akaun mentor.`;
           setAuthError(msg);
           return { success: false, error: msg };
         }
 
-        const expectedPin = DEMO_MENTOR_PINS[matchedMentor.id] || matchedMentor.pin;
-        if (!expectedPin || pass !== expectedPin) {
-          const msg = 'PIN keselamatan Mentor tidak tepat. Untuk ujian pantas, gunakan butang Demo Mentor di bawah.';
-          setAuthError(msg);
-          return { success: false, error: msg };
+        const resolvedMentorId = matchedMentor?.id || matchedMentorUser?.mentorId || 'mentor-1';
+        const resolvedMentorName = matchedMentor?.name || matchedMentorUser?.fullName || 'Mentor KBelia';
+        const resolvedMentorEmail = matchedMentor?.email || matchedMentorUser?.email || cleanEmail;
+        const resolvedMentorPhone = matchedMentor?.phone || matchedMentorUser?.phone || '';
+        const resolvedMentorAvatar =
+          matchedMentor?.avatarUrl || matchedMentorUser?.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg';
+
+        const storedHash =
+          getMentorCredentialHash(resolvedMentorId, cleanEmail) || matchedMentorUser?.passwordHash || null;
+        const legacyPin = (matchedMentor && (DEMO_MENTOR_PINS[matchedMentor.id] || matchedMentor.pin)) || null;
+        const incomingHash = await hashSecret(pass);
+
+        let isVerified = false;
+        if (storedHash) {
+          isVerified = incomingHash === storedHash;
+        } else if (legacyPin) {
+          isVerified = pass === legacyPin;
         }
 
-        const userId = `mentor-${matchedMentor.id}`;
+        if (!isVerified) {
+          try {
+            const cred = await signInWithEmailAndPassword(auth, cleanEmail, pass);
+            const fbUser = cred.user;
+            const authUserData: AuthUser = {
+              uid: fbUser.uid,
+              displayName: resolvedMentorName,
+              email: fbUser.email || resolvedMentorEmail,
+              photoURL: resolvedMentorAvatar,
+              isDemo: false
+            };
+            const userProf: UserProfile = {
+              userId: fbUser.uid,
+              fullName: resolvedMentorName,
+              email: fbUser.email || resolvedMentorEmail,
+              role: 'mentor',
+              mentorId: resolvedMentorId,
+              phone: resolvedMentorPhone,
+              district: 'Kota Bharu',
+              avatarUrl: resolvedMentorAvatar,
+              createdAt: new Date().toISOString()
+            };
+            setUser(authUserData);
+            setUserProfile(userProf);
+            saveSession(authUserData, userProf);
+            setIsLoginModalOpen(false);
+            return { success: true };
+          } catch {
+            const msg = 'Emel atau kata laluan Mentor tidak tepat. Sila semak dengan Pentadbir KBelia atau gunakan butang Demo Mentor di bawah.';
+            setAuthError(msg);
+            return { success: false, error: msg };
+          }
+        }
+
+        const userId = matchedMentorUser?.userId || `mentor-${resolvedMentorId}`;
         const authUserData: AuthUser = {
           uid: userId,
-          displayName: matchedMentor.name,
-          email: matchedMentor.email,
-          photoURL: matchedMentor.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg',
+          displayName: resolvedMentorName,
+          email: resolvedMentorEmail,
+          photoURL: resolvedMentorAvatar,
           isDemo: true
         };
         const userProf: UserProfile = {
           userId,
-          fullName: matchedMentor.name,
-          email: matchedMentor.email,
+          fullName: resolvedMentorName,
+          email: resolvedMentorEmail,
           role: 'mentor',
-          mentorId: matchedMentor.id,
-          phone: matchedMentor.phone,
+          mentorId: resolvedMentorId,
+          phone: resolvedMentorPhone,
           district: 'Kota Bharu',
-          avatarUrl: authUserData.photoURL || undefined,
+          avatarUrl: resolvedMentorAvatar,
           createdAt: new Date().toISOString()
         };
 

@@ -48,6 +48,7 @@ import {
   MaintenanceTicket,
   PortalSettings,
   GrantApplication,
+  GrantEndorsement,
   PortalNews,
   CommunityPost,
   ProductItem,
@@ -140,6 +141,7 @@ interface AdminDashboardProps {
   bookings: CapsuleBooking[];
   programs: YouthProgram[];
   grantApplications?: GrantApplication[];
+  grantEndorsements?: GrantEndorsement[];
   mentorshipRegistrations?: MentorshipRegistration[];
   mentors?: MentorProfile[];
   maintenanceTickets?: MaintenanceTicket[];
@@ -172,6 +174,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   bookings = [],
   programs = [],
   grantApplications = [],
+  grantEndorsements = [],
   mentorshipRegistrations = [],
   mentors = INITIAL_MENTOR_PROFILES,
   maintenanceTickets = [],
@@ -1682,6 +1685,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <AdminApprovalQueue
           bookings={safeBookings}
           grantApplications={grantApplications || []}
+          grantEndorsements={grantEndorsements || []}
           slots={safeSlots}
           maintenanceTickets={maintenanceTickets || []}
           onApproveBooking={async (bId, notes) => {
@@ -1694,8 +1698,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           }}
           onApproveGrant={async (gId, notes) => {
             const targetGrant = (grantApplications || []).find(g => g.id === gId);
-            await updateGrantApplicationStatus(gId, 'approved', notes, targetGrant);
-            if (targetGrant) {
+            if (!targetGrant?.mentorEndorsed) {
+              showToast('Permohonan geran ini wajib menerima sokongan Mentor dahulu sebelum diluluskan.', 'warning');
+              return;
+            }
+            try {
+              await updateGrantApplicationStatus(gId, 'approved', notes, targetGrant);
               emitAdminOrMentorNotification({
                 title: `Geran Belia Diluluskan: ${targetGrant.grantAmount}`,
                 message: `Tahniah! Permohonan ${targetGrant.programTitle} bagi ${targetGrant.businessName} telah diluluskan rasmi.`,
@@ -1706,9 +1714,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 sender: 'Admin KBelia',
                 actionTab: 'merchant'
               });
+              confetti({ particleCount: 50 });
+              onRefresh();
+            } catch (err: any) {
+              if (err?.message === 'MENTOR_ENDORSEMENT_REQUIRED') {
+                showToast('Permohonan geran ini belum disokong oleh Mentor.', 'warning');
+              } else {
+                showToast('Gagal meluluskan permohonan geran.', 'error');
+              }
             }
-            confetti({ particleCount: 50 });
-            onRefresh();
           }}
           onRejectGrant={async (gId, notes) => {
             const targetGrant = (grantApplications || []).find(g => g.id === gId);

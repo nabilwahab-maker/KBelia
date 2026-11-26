@@ -7,14 +7,21 @@ import {
   Loader2,
   AlertCircle,
   Edit3,
-  Trash2
+  Trash2,
+  Eye,
+  EyeOff,
+  KeyRound
 } from 'lucide-react';
 import { KelantanDistrict, UserProfile, UserRole } from '../types';
 import {
   savePortalUserRecord,
   deletePortalUserRecord,
-  subscribePortalUsers
+  subscribePortalUsers,
+  saveMentorCredentialHash,
+  saveLocalAccountCredentialHash,
+  saveMentorProfileRecord
 } from '../services/dataService';
+import { generateRandomMentorPassword, hashPortalPassword } from '../utils/securityUtils';
 import { useAuth } from '../context/AuthContext';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { showToast } from './ToastNotification';
@@ -79,6 +86,8 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
   const [institution, setInstitution] = useState('');
   const [designation, setDesignation] = useState('');
   const [mentorId, setMentorId] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+  const [showUserPassword, setShowUserPassword] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -172,6 +181,8 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
     setInstitution('');
     setDesignation('');
     setMentorId('');
+    setUserPassword('');
+    setShowUserPassword(false);
     setFormError(null);
     setShowUserModal(true);
   };
@@ -188,6 +199,8 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
     setInstitution(u.institution || '');
     setDesignation(u.designation || '');
     setMentorId(u.mentorId || '');
+    setUserPassword('');
+    setShowUserPassword(false);
     setFormError(null);
     setShowUserModal(true);
   };
@@ -206,13 +219,35 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
       ? 'mentor'
       : 'user';
 
+    const trimmedPass = userPassword.trim();
+    if (!editingUser && trimmedPass.length < 6) {
+      setFormError('Sila tetapkan kata laluan sekurang-kurangnya 6 aksara.');
+      return;
+    }
+    if (editingUser && trimmedPass.length > 0 && trimmedPass.length < 6) {
+      setFormError('Kata laluan baharu mestilah sekurang-kurangnya 6 aksara.');
+      return;
+    }
+
     setIsSaving(true);
     try {
+      const cleanEmail = email.trim().toLowerCase();
+      const nowIso = new Date().toISOString();
+      const resolvedMentorId =
+        effectiveRole === 'mentor'
+          ? mentorId.trim() || editingUser?.mentorId || `mentor-${Date.now()}`
+          : undefined;
+      const resolvedUserId =
+        editingUser?.userId ||
+        (effectiveRole === 'mentor' && resolvedMentorId ? `user-${resolvedMentorId}` : `user-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`);
+
+      const passwordHash = trimmedPass.length >= 6 ? await hashPortalPassword(trimmedPass) : editingUser?.passwordHash;
+
       await savePortalUserRecord({
         ...(editingUser || {}),
-        userId: editingUser?.userId,
+        userId: resolvedUserId,
         fullName: fullName.trim(),
-        email: email.trim(),
+        email: cleanEmail,
         phone: phone.trim(),
         district,
         role: effectiveRole,
@@ -220,8 +255,48 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
         ssmNumber: ssmNumber.trim(),
         institution: institution.trim(),
         designation: designation.trim(),
-        mentorId: effectiveRole === 'mentor' ? mentorId.trim() || editingUser?.mentorId || 'mentor-1' : undefined
+        mentorId: resolvedMentorId,
+        ...(passwordHash ? { passwordHash, passwordUpdatedAt: nowIso } : {})
       });
+
+      if (passwordHash) {
+        saveLocalAccountCredentialHash({
+          userId: resolvedUserId,
+          fullName: fullName.trim(),
+          email: cleanEmail,
+          phone: phone.trim(),
+          district,
+          businessName: businessName.trim(),
+          role: effectiveRole,
+          mentorId: resolvedMentorId,
+          passwordHash,
+          avatarUrl:
+            effectiveRole === 'mentor'
+              ? '/assets/generated/avatar_mentor_umk_1793924250411.jpg'
+              : '/assets/generated/avatar_youth_male_1793924250192.jpg',
+          createdAt: editingUser?.createdAt || nowIso
+        });
+        if (effectiveRole === 'mentor' && resolvedMentorId) {
+          saveMentorCredentialHash(resolvedMentorId, cleanEmail, passwordHash);
+        }
+      }
+
+      if (effectiveRole === 'mentor' && resolvedMentorId && !editingUser) {
+        await saveMentorProfileRecord({
+          id: resolvedMentorId,
+          name: fullName.trim(),
+          title: designation.trim() || 'Mentor Keusahawanan Belia KBelia',
+          agency: institution.trim() || 'Hab Usahawan KBelia (Mentor Dalaman)',
+          expertise: ['Bimbingan Keusahawanan', 'Pengurusan Perniagaan'],
+          avatarUrl: '/assets/generated/avatar_mentor_umk_1793924250411.jpg',
+          email: cleanEmail,
+          phone: phone.trim() || '60190000000',
+          bio: 'Mentor bertauliah yang didaftarkan oleh Pentadbir Portal KBelia.',
+          availableDays: 'Isnin - Khamis (9:00 PG - 4:30 PTG)',
+          activeMenteesCount: 0
+        }).catch(() => {});
+      }
+
       showToast(
         editingUser ? 'Maklumat akaun pengguna berjaya dikemas kini!' : 'Akaun pengguna baharu berjaya ditambah!',
         'success'
@@ -716,12 +791,51 @@ export const AdminUsersManager: React.FC<AdminUsersManagerProps> = ({ onRefresh 
                         type="text"
                         value={mentorId}
                         onChange={(e) => setMentorId(e.target.value)}
-                        placeholder="mentor-1"
+                        placeholder="Biarkan kosong untuk jana automatik"
                         className={`w-full px-3.5 py-2.5 rounded-xl text-sm font-mono focus:outline-none ${adminTheme.inputClass}`}
                       />
                     </div>
                   </>
                 )}
+
+                <div className="sm:col-span-2">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-sm font-semibold text-black dark:text-white inline-flex items-center gap-1.5">
+                      <KeyRound className="w-3.5 h-3.5" />
+                      <span>
+                        Kata Laluan Log Masuk {!editingUser ? '*' : '(Pilihan — isi untuk tukar)'}
+                      </span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setUserPassword(generateRandomMentorPassword());
+                        setShowUserPassword(true);
+                      }}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer ${adminTheme.secondaryButtonClass}`}
+                    >
+                      Jana Kata Laluan
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showUserPassword ? 'text' : 'password'}
+                      required={!editingUser}
+                      value={userPassword}
+                      onChange={(e) => setUserPassword(e.target.value)}
+                      placeholder={!editingUser ? 'Minimum 6 aksara' : 'Biarkan kosong jika kekal kata laluan semasa'}
+                      className={`w-full pl-3.5 pr-10 py-2.5 rounded-xl text-sm font-mono focus:outline-none ${adminTheme.inputClass}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowUserPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-black/65 dark:text-white/70 hover:text-black dark:hover:text-white cursor-pointer"
+                      aria-label={showUserPassword ? 'Sembunyi kata laluan' : 'Papar kata laluan'}
+                    >
+                      {showUserPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
               </div>
 
               <div className={`flex flex-col-reverse sm:flex-row justify-end items-center gap-3 pt-4 border-t ${adminTheme.dividerClass}`}>

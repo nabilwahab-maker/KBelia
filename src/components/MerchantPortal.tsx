@@ -50,6 +50,7 @@ import {
   BusinessCategory, 
   KelantanDistrict,
   GrantApplication,
+  GrantEndorsement,
   KioskDailySale,
   MaintenanceTicket,
   MentorshipRegistration,
@@ -154,6 +155,7 @@ interface MerchantPortalProps {
   myBookings?: CapsuleBooking[];
   slots?: CapsuleSlot[];
   grantApplications?: GrantApplication[];
+  grantEndorsements?: GrantEndorsement[];
   cashflowRecords?: KioskDailySale[];
   maintenanceTickets?: MaintenanceTicket[];
   mentorshipRegistrations?: MentorshipRegistration[];
@@ -198,6 +200,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   myBookings = [],
   slots = [],
   grantApplications = [],
+  grantEndorsements = [],
   cashflowRecords = [],
   maintenanceTickets = [],
   mentorshipRegistrations = [],
@@ -1049,7 +1052,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               category: 'Geran Belia',
               title: g.programTitle,
               subtitle: `${g.businessName} · ${g.grantAmount || g.amount || 'Dalam Semakan'}`,
-              statusLabel: 'Dalam Semakan',
+              statusLabel: g.mentorEndorsed ? 'Disokong Mentor · Menunggu Admin' : 'Menunggu Sokongan Mentor',
               dateLabel: g.createdAt ? formatDisplayDate(g.createdAt.split('T')[0]) : 'Baharu',
               createdAt: g.createdAt || '',
               actionLabel: 'Lihat',
@@ -2486,6 +2489,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           <UserDocumentsVault
             bookings={safeBookings}
             grantApplications={grantApplications}
+            grantEndorsements={grantEndorsements}
             ownerName={userProfile?.fullName || user.displayName || ''}
             ownerEmail={user.email || userProfile?.email || ''}
             businessName={myBusiness?.businessName || userProfile?.businessName}

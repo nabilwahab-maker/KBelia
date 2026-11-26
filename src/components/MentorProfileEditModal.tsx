@@ -14,13 +14,22 @@ import {
   Sparkles,
   Save,
   GraduationCap,
-  ShieldCheck
+  ShieldCheck,
+  Eye,
+  EyeOff,
+  AlertCircle
 } from 'lucide-react';
 import { MentorProfile } from '../types';
 import { ImageDropzone } from './ImageDropzone';
 import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { useRoleTheme } from '../hooks/useRoleTheme';
 import { getRoleTheme } from '../utils/roleTheme';
+import { generateRandomMentorPassword, hashPortalPassword } from '../utils/securityUtils';
+import {
+  saveLocalAccountCredentialHash,
+  saveMentorCredentialHash,
+  savePortalUserRecord
+} from '../services/dataService';
 
 interface MentorProfileEditModalProps {
   isOpen: boolean;
@@ -48,6 +57,9 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
   const [bio, setBio] = useState(mentor?.bio || '');
   const [expertise, setExpertise] = useState<string[]>(mentor?.expertise || []);
   const [newExpertiseInput, setNewExpertiseInput] = useState('');
+  const [assignedPassword, setAssignedPassword] = useState('');
+  const [showAssignedPassword, setShowAssignedPassword] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const { confirmDelete } = useConfirmDelete();
@@ -66,6 +78,9 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
       setAvailableDays(mentor?.availableDays || '');
       setBio(mentor?.bio || '');
       setExpertise(mentor?.expertise || []);
+      setAssignedPassword('');
+      setShowAssignedPassword(false);
+      setFormError(null);
       setSuccessToast(null);
     }
   }, [isOpen, mentor]);
@@ -85,34 +100,85 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
     setExpertise(expertise.filter(tag => tag !== tagToRemove));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError(null);
+    const trimmedPass = assignedPassword.trim();
+    if (isAdminEditing && isCreating && trimmedPass.length < 6) {
+      setFormError('Sila tetapkan kata laluan mentor sekurang-kurangnya 6 aksara.');
+      return;
+    }
+    if (isAdminEditing && !isCreating && trimmedPass.length > 0 && trimmedPass.length < 6) {
+      setFormError('Kata laluan baharu mestilah sekurang-kurangnya 6 aksara.');
+      return;
+    }
+
     setIsSaving(true);
+    const mentorId = mentor?.id || `mentor-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`;
+    const cleanEmail = email.trim().toLowerCase();
+    const nowIso = new Date().toISOString();
 
     const updatedProfile: MentorProfile = {
       ...(mentor || {}),
-      id: mentor?.id || `mentor-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      id: mentorId,
       name: name.trim(),
       title: title.trim(),
       agency: agency.trim(),
       phone: phone.trim(),
-      email: email.trim(),
+      email: cleanEmail,
       avatarUrl: avatarUrl.trim() || mentor?.avatarUrl || '/assets/generated/avatar_mentor_umk_1793924250411.jpg',
       availableDays: availableDays.trim(),
       bio: bio.trim(),
       expertise: expertise.length > 0 ? expertise : ['Bimbingan Keusahawanan', 'Pemasaran'],
       activeMenteesCount: mentor?.activeMenteesCount ?? 0,
-      updatedAt: new Date().toISOString()
+      updatedAt: nowIso
     };
 
-    setTimeout(() => {
+    try {
+      let passwordHash: string | undefined;
+      if (isAdminEditing && trimmedPass.length >= 6) {
+        passwordHash = await hashPortalPassword(trimmedPass);
+        saveMentorCredentialHash(mentorId, cleanEmail, passwordHash);
+        saveLocalAccountCredentialHash({
+          userId: `user-${mentorId}`,
+          fullName: updatedProfile.name,
+          email: cleanEmail,
+          phone: updatedProfile.phone,
+          district: 'Kota Bharu',
+          role: 'mentor',
+          mentorId,
+          passwordHash,
+          avatarUrl: updatedProfile.avatarUrl,
+          createdAt: nowIso
+        });
+      }
+
+      if (isAdminEditing) {
+        await savePortalUserRecord({
+          userId: `user-${mentorId}`,
+          fullName: updatedProfile.name,
+          email: cleanEmail,
+          phone: updatedProfile.phone,
+          district: 'Kota Bharu',
+          role: 'mentor',
+          mentorId,
+          institution: updatedProfile.agency,
+          designation: updatedProfile.title,
+          avatarUrl: updatedProfile.avatarUrl,
+          ...(passwordHash ? { passwordHash, passwordUpdatedAt: nowIso } : {})
+        }).catch(() => {});
+      }
+
       onSave(updatedProfile);
       setIsSaving(false);
       setSuccessToast(isCreating ? 'Mentor baharu berjaya didaftarkan!' : 'Profil mentor berjaya dikemas kini!');
       setTimeout(() => {
         onClose();
-      }, 600);
-    }, 250);
+      }, 500);
+    } catch {
+      setIsSaving(false);
+      setFormError('Gagal menyimpan maklumat mentor. Sila cuba lagi.');
+    }
   };
 
   return (
@@ -147,6 +213,13 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 sm:p-7 overflow-y-auto space-y-5">
           
+          {formError && (
+            <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 rounded-xl text-black dark:text-white text-sm flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
+              <span>{formError}</span>
+            </div>
+          )}
+
           {successToast && (
             <div className={`p-3.5 border rounded-xl text-black dark:text-white text-sm sm:text-[0.9375rem] flex items-center gap-2 ${modalTheme.surfaceMutedClass} ${modalTheme.dividerClass}`}>
               <Check className={`w-4 h-4 shrink-0 ${modalTheme.accentTextClass}`} />
@@ -226,19 +299,75 @@ export const MentorProfileEditModal: React.FC<MentorProfileEditModalProps> = ({
             </div>
           </div>
 
-          {/* Row 3: Emel Rasmi */}
-          <div>
-            <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
-              Alamat Emel <span className={modalTheme.accentTextClass}>*</span>
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Masukkan alamat emel"
-              className={fieldClass}
-            />
+          {/* Row 3: Kredensial Log Masuk Mentor (Emel + Kata Laluan) */}
+          <div className={`p-4 rounded-xl border space-y-3.5 ${modalTheme.surfaceMutedClass} ${modalTheme.dividerClass}`}>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <KeyRound className={`w-4 h-4 shrink-0 ${modalTheme.accentTextClass}`} />
+                <span className="text-sm font-semibold text-black dark:text-white">
+                  Kredensial Log Masuk Mentor
+                </span>
+              </div>
+              {isAdminEditing && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAssignedPassword(generateRandomMentorPassword());
+                    setShowAssignedPassword(true);
+                  }}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold cursor-pointer ${modalTheme.secondaryButtonClass}`}
+                >
+                  Jana Kata Laluan
+                </button>
+              )}
+            </div>
+
+            <div className={`grid grid-cols-1 ${isAdminEditing ? 'sm:grid-cols-2' : ''} gap-3.5`}>
+              <div>
+                <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
+                  Alamat Emel Rasmi <span className={modalTheme.accentTextClass}>*</span>
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="mentor@kbelia.my"
+                  className={fieldClass}
+                />
+              </div>
+
+              {isAdminEditing && (
+                <div>
+                  <label className="block text-sm font-medium text-black dark:text-white mb-1.5">
+                    Kata Laluan Mentor {isCreating ? <span className={modalTheme.accentTextClass}>*</span> : <span className="text-xs text-black/60 dark:text-white/60">(Pilihan)</span>}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showAssignedPassword ? 'text' : 'password'}
+                      required={isCreating}
+                      value={assignedPassword}
+                      onChange={(e) => setAssignedPassword(e.target.value)}
+                      placeholder={isCreating ? 'Minimum 6 aksara' : 'Biarkan kosong jika kekal'}
+                      className={`${fieldClass} pr-10 font-mono`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowAssignedPassword((prev) => !prev)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-black/65 dark:text-white/70 hover:text-black dark:hover:text-white cursor-pointer"
+                      aria-label={showAssignedPassword ? 'Sembunyi kata laluan' : 'Papar kata laluan'}
+                    >
+                      {showAssignedPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            {isAdminEditing && (
+              <p className="text-xs text-black/65 dark:text-white/65 leading-relaxed">
+                Mentor akan log masuk ke Portal Mentor menggunakan emel rasmi dan kata laluan yang ditetapkan di sini.
+              </p>
+            )}
           </div>
 
           {/* Section: Bidang Pengkhususan */}
