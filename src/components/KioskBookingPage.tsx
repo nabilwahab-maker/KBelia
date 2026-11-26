@@ -242,19 +242,17 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
   const [recordStatusFilter, setRecordStatusFilter] = useState<'all' | 'active' | 'processing' | 'closed'>('all');
   const [recordSortBy, setRecordSortBy] = useState<'date_desc' | 'date_asc' | 'status'>('date_desc');
   const [isFilterPopoverOpen, setIsFilterPopoverOpen] = useState(false);
-  const [isSortPopoverOpen, setIsSortPopoverOpen] = useState(false);
   const [expandedRecordIds, setExpandedRecordIds] = useState<string[]>([]);
 
   const headerMenuRef = useRef<HTMLDivElement>(null);
   const filterPopoverRef = useRef<HTMLDivElement>(null);
-  const sortPopoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setCarouselIdx(0);
   }, [activeBooking?.id]);
 
   useEffect(() => {
-    if (!isHeaderMenuOpen && !isFilterPopoverOpen && !isSortPopoverOpen) return;
+    if (!isHeaderMenuOpen && !isFilterPopoverOpen) return;
     const handlePointerDown = (e: MouseEvent) => {
       const target = e.target as Node;
       if (isHeaderMenuOpen && headerMenuRef.current && !headerMenuRef.current.contains(target)) {
@@ -263,15 +261,11 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
       if (isFilterPopoverOpen && filterPopoverRef.current && !filterPopoverRef.current.contains(target)) {
         setIsFilterPopoverOpen(false);
       }
-      if (isSortPopoverOpen && sortPopoverRef.current && !sortPopoverRef.current.contains(target)) {
-        setIsSortPopoverOpen(false);
-      }
     };
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsHeaderMenuOpen(false);
         setIsFilterPopoverOpen(false);
-        setIsSortPopoverOpen(false);
       }
     };
     document.addEventListener('mousedown', handlePointerDown);
@@ -280,7 +274,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isHeaderMenuOpen, isFilterPopoverOpen, isSortPopoverOpen]);
+  }, [isHeaderMenuOpen, isFilterPopoverOpen]);
 
   const userTickets = useMemo(() => {
     if (!user) return [];
@@ -471,7 +465,9 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
   ]);
 
   const activeFilterCount =
-    (recordTypeFilter !== 'all' ? 1 : 0) + (recordStatusFilter !== 'all' ? 1 : 0);
+    (recordTypeFilter !== 'all' ? 1 : 0) +
+    (recordStatusFilter !== 'all' ? 1 : 0) +
+    (recordSortBy !== 'date_desc' ? 1 : 0);
 
   const toggleExpandedRecord = (id: string) => {
     setExpandedRecordIds((prev) =>
@@ -1806,8 +1802,8 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     <div className="px-5 pb-4 pt-2 border-t border-slate-200 dark:border-zinc-700 text-sm text-black/80 dark:text-white/80 space-y-2.5">
                       <p className="leading-relaxed">
                         {activeBooking
-                          ? `Unit ${activeBooking.slotCode} (${activeBookingSlot?.size || '8ft x 8ft'}) di ${activeBooking.hubLocation} tersedia dengan kelengkapan asas perniagaan.`
-                          : 'Kiosk modular belia dilengkapi sambungan elektrik, Wi-Fi hab, serta kadar sewa bersubsidi.'}
+                          ? `Unit ${activeBooking.slotCode} (${activeBookingSlot?.size || '8ft x 8ft'}) di ${activeBooking.hubLocation} tersedia dengan kemudahan asas.`
+                          : 'Unit kiosk moden dengan kemudahan asas dan kadar sewa berpatutan.'}
                       </p>
                       <div className="flex flex-wrap gap-1.5">
                         {unitAmenities.map((item) => (
@@ -2051,170 +2047,142 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
             </div>
 
             {/* BARIS 4: JADUAL ADUAN & PERMOHONAN */}
-            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-hidden shadow-2xs">
-              <div className="px-5 py-4 border-b border-slate-200 dark:border-zinc-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 overflow-visible shadow-2xs">
+              <div className="px-5 py-4 border-b border-slate-200 dark:border-zinc-700">
                 <h2 className="text-base font-extrabold text-black dark:text-white tracking-tight">
                   Aduan &amp; Permohonan
                 </h2>
+              </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                  {/* Cari... */}
-                  <div
-                    style={{ ['--search-fit-w' as string]: '180px' }}
-                    className="relative w-full sm:w-[var(--search-fit-w)] sm:max-w-full min-w-0"
+              <div className="px-5 py-3 border-b border-slate-200 dark:border-zinc-700 flex items-center justify-between gap-2.5 flex-wrap">
+                {/* Cari di kiri */}
+                <div className="relative flex-1 min-w-[200px] sm:max-w-xs">
+                  <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={recordSearch}
+                    onChange={(e) => setRecordSearch(e.target.value)}
+                    placeholder="Cari rekod..."
+                    className="w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
+                  />
+                  {recordSearch && (
+                    <button
+                      type="button"
+                      aria-label="Kosongkan carian"
+                      onClick={() => setRecordSearch('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Satu butang penapis di kanan */}
+                <div className="relative ml-auto shrink-0" ref={filterPopoverRef}>
+                  <button
+                    type="button"
+                    aria-expanded={isFilterPopoverOpen}
+                    aria-label={activeFilterCount > 0 ? `Penapis (${activeFilterCount} aktif)` : 'Penapis'}
+                    title={activeFilterCount > 0 ? `Penapis (${activeFilterCount} aktif)` : 'Penapis'}
+                    onClick={() => setIsFilterPopoverOpen((prev) => !prev)}
+                    className={`min-h-[38px] px-3 rounded-xl border inline-flex items-center justify-center gap-1.5 text-sm font-semibold transition-colors cursor-pointer ${
+                      activeFilterCount > 0
+                        ? roleTheme.activeMiniBtnClass
+                        : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
+                    }`}
                   >
-                    <Search className="w-4 h-4 text-black/45 dark:text-white/50 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                    <input
-                      type="text"
-                      value={recordSearch}
-                      onChange={(e) => setRecordSearch(e.target.value)}
-                      placeholder="Cari rekod..."
-                      className="w-full pl-9 pr-8 py-2 rounded-xl text-sm bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 text-black dark:text-white placeholder:text-black/45 dark:placeholder:text-white/45 focus:bg-white dark:focus:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-600 transition-all"
-                    />
-                    {recordSearch && (
-                      <button
-                        type="button"
-                        aria-label="Kosongkan carian"
-                        onClick={() => setRecordSearch('')}
-                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-black/50 dark:text-white/50 hover:text-black dark:hover:text-white cursor-pointer"
-                      >
-                        <X className="w-3.5 h-3.5" />
-                      </button>
+                    <SlidersHorizontal className="w-4 h-4 shrink-0" />
+                    {activeFilterCount > 0 && (
+                      <span className="text-xs font-bold tabular-nums">{activeFilterCount}</span>
                     )}
-                  </div>
+                  </button>
 
-                  {/* Tapis */}
-                  <div className="relative" ref={filterPopoverRef}>
-                    <button
-                      type="button"
-                      aria-expanded={isFilterPopoverOpen}
-                      onClick={() => {
-                        setIsSortPopoverOpen(false);
-                        setIsFilterPopoverOpen((prev) => !prev);
-                      }}
-                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
-                        activeFilterCount > 0
-                          ? roleTheme.activeMiniBtnClass
-                          : 'bg-white dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
-                      }`}
-                    >
-                      <SlidersHorizontal className="w-4 h-4" />
-                      <span>Tapis</span>
-                    </button>
-
-                    {isFilterPopoverOpen && (
-                      <div className="animate-popover-enter absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl p-4 z-40 space-y-3.5 text-left">
-                        <div>
-                          <span className="block text-xs font-bold text-black/65 dark:text-white/70 mb-1.5">
-                            Jenis Rekod
-                          </span>
-                          <div className="grid grid-cols-3 gap-1.5">
-                            {[
-                              { key: 'all', label: 'Semua' },
-                              { key: 'aduan', label: 'Aduan' },
-                              { key: 'permohonan', label: 'Mohon' }
-                            ].map((opt) => (
-                              <button
-                                key={opt.key}
-                                type="button"
-                                onClick={() => setRecordTypeFilter(opt.key as 'all' | 'aduan' | 'permohonan')}
-                                className={`px-2 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
-                                  recordTypeFilter === opt.key
-                                    ? roleTheme.segmentedActiveClass + ' border-transparent'
-                                    : 'bg-slate-50 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white'
-                                }`}
-                              >
-                                {opt.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div>
-                          <span className="block text-xs font-bold text-black/65 dark:text-white/70 mb-1.5">
-                            Status
-                          </span>
-                          <select
-                            value={recordStatusFilter}
-                            onChange={(e) =>
-                              setRecordStatusFilter(
-                                e.target.value as 'all' | 'active' | 'processing' | 'closed'
-                              )
-                            }
-                            className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${roleTheme.inputClass}`}
-                          >
-                            <option value="all">Semua Status</option>
-                            <option value="active">Aktif</option>
-                            <option value="processing">Diproses / Diterima</option>
-                            <option value="closed">Selesai / Batal</option>
-                          </select>
-                        </div>
-
-                        <div className="pt-2 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setRecordTypeFilter('all');
-                              setRecordStatusFilter('all');
-                            }}
-                            className="text-xs font-semibold text-black/70 dark:text-white/75 hover:underline cursor-pointer"
-                          >
-                            Set Semula
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setIsFilterPopoverOpen(false)}
-                            className={roleTheme.compactPrimaryButtonClass}
-                          >
-                            Tutup
-                          </button>
+                  {isFilterPopoverOpen && (
+                    <div className="animate-popover-enter absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-2xl p-4 z-40 space-y-3.5 text-left">
+                      <div>
+                        <span className="block text-xs font-bold text-black/65 dark:text-white/70 mb-1.5">
+                          Jenis Rekod
+                        </span>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {[
+                            { key: 'all', label: 'Semua' },
+                            { key: 'aduan', label: 'Aduan' },
+                            { key: 'permohonan', label: 'Mohon' }
+                          ].map((opt) => (
+                            <button
+                              key={opt.key}
+                              type="button"
+                              onClick={() => setRecordTypeFilter(opt.key as 'all' | 'aduan' | 'permohonan')}
+                              className={`px-2 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
+                                recordTypeFilter === opt.key
+                                  ? roleTheme.segmentedActiveClass + ' border-transparent'
+                                  : 'bg-slate-50 dark:bg-zinc-950 border-slate-200 dark:border-zinc-700 text-black dark:text-white'
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
                         </div>
                       </div>
-                    )}
-                  </div>
 
-                  {/* Susun */}
-                  <div className="relative" ref={sortPopoverRef}>
-                    <button
-                      type="button"
-                      aria-expanded={isSortPopoverOpen}
-                      onClick={() => {
-                        setIsFilterPopoverOpen(false);
-                        setIsSortPopoverOpen((prev) => !prev);
-                      }}
-                      className={roleTheme.compactSecondaryButtonClass}
-                    >
-                      <ArrowUpDown className="w-4 h-4" />
-                      <span>Susun</span>
-                    </button>
-
-                    {isSortPopoverOpen && (
-                      <div className="animate-popover-enter absolute right-0 mt-2 w-48 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-40 text-left">
-                        {[
-                          { key: 'date_desc', label: 'Tarikh Terbaru' },
-                          { key: 'date_asc', label: 'Tarikh Terlama' },
-                          { key: 'status', label: 'Mengikut Status' }
-                        ].map((opt) => (
-                          <button
-                            key={opt.key}
-                            type="button"
-                            onClick={() => {
-                              setRecordSortBy(opt.key as 'date_desc' | 'date_asc' | 'status');
-                              setIsSortPopoverOpen(false);
-                            }}
-                            className={`w-full px-3.5 py-2 text-sm text-left flex items-center justify-between cursor-pointer ${
-                              recordSortBy === opt.key
-                                ? `font-bold ${roleTheme.accentTextClass} ${roleTheme.surfaceMutedClass}`
-                                : 'font-medium text-black dark:text-white hover:bg-slate-50 dark:hover:bg-zinc-800'
-                            }`}
-                          >
-                            <span>{opt.label}</span>
-                            {recordSortBy === opt.key && <Check className="w-4 h-4" />}
-                          </button>
-                        ))}
+                      <div>
+                        <span className="block text-xs font-bold text-black/65 dark:text-white/70 mb-1.5">
+                          Status
+                        </span>
+                        <select
+                          value={recordStatusFilter}
+                          onChange={(e) =>
+                            setRecordStatusFilter(
+                              e.target.value as 'all' | 'active' | 'processing' | 'closed'
+                            )
+                          }
+                          className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${roleTheme.inputClass}`}
+                        >
+                          <option value="all">Semua Status</option>
+                          <option value="active">Aktif</option>
+                          <option value="processing">Diproses / Diterima</option>
+                          <option value="closed">Selesai / Batal</option>
+                        </select>
                       </div>
-                    )}
-                  </div>
+
+                      <div className="pt-3 border-t pb-3 border-b border-slate-200 dark:border-zinc-700">
+                        <label className="block text-xs font-bold text-black/65 dark:text-white/70 mb-1.5 flex items-center gap-1.5">
+                          <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${roleTheme.accentTextClass}`} />
+                          <span>Susun Mengikut</span>
+                        </label>
+                        <select
+                          value={recordSortBy}
+                          onChange={(e) => setRecordSortBy(e.target.value as 'date_desc' | 'date_asc' | 'status')}
+                          className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${roleTheme.inputClass}`}
+                        >
+                          <option value="date_desc">Tarikh Terbaru</option>
+                          <option value="date_asc">Tarikh Terlama</option>
+                          <option value="status">Mengikut Status</option>
+                        </select>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-0.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setRecordTypeFilter('all');
+                            setRecordStatusFilter('all');
+                            setRecordSortBy('date_desc');
+                          }}
+                          className="text-xs font-semibold text-black/70 dark:text-white/75 hover:underline cursor-pointer"
+                        >
+                          Set Semula
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsFilterPopoverOpen(false)}
+                          className={roleTheme.compactPrimaryButtonClass}
+                        >
+                          Tutup
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

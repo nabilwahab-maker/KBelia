@@ -173,7 +173,7 @@ export const NewsPage: React.FC<NewsPageProps> = ({
       <div className="bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 rounded-2xl border border-slate-200 dark:border-zinc-700">
         <div className="space-y-1">
           <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight text-balance kbelia-trim">
-            Berita Terkini Ekosistem KBelia Kelantan
+            Berita &amp; Pengumuman KBelia Kelantan
           </h1>
         </div>
       </div>

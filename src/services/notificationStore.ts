@@ -68,7 +68,7 @@ export const INITIAL_NOTIFICATIONS: YouthNotification[] = [
     title: 'Pelantikan Mentor Industri Kelantan',
     message: 'Selamat bertugas kepada barisan mentor industri bagi sesi bimbingan inkubasi 2026.',
     category: 'status',
-    sender: 'Penyelaras Hab Usahawan KBelia',
+    sender: 'Pentadbir Portal KBelia',
     senderRole: 'admin',
     targetRole: 'mentor',
     targetUserId: '',

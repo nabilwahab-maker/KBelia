@@ -462,7 +462,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                     </div>
                     <div>
                       <h4 className="font-bold text-sm text-black dark:text-white">Tiada Temujanji Klinik Mentor</h4>
-                      <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Tempah sesi bimbingan perniagaan 1-ke-1 bersama mentor dalaman &amp; pakar industri.</p>
+                      <p className="text-[0.9375rem] text-black/70 dark:text-white/75">Tempah sesi bimbingan perniagaan bersama mentor KBelia.</p>
                     </div>
                   </div>
                   <button
@@ -643,7 +643,7 @@ export const ApplicationStatusDocumentsModal: React.FC<ApplicationStatusDocument
                 <div className="pt-4 border-t border-slate-300 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                   <div>
                     <div className="text-sm font-bold text-black">Pentadbiran Hab Kapsul Niaga Belia (KBelia)</div>
-                    <div className="text-[0.8125rem] text-black">Penyelaras Keusahawanan &amp; Urusetia KBelia Kelantan</div>
+                    <div className="text-[0.8125rem] text-black">Pentadbiran &amp; Urusetia Portal KBelia Kelantan</div>
                     <div className="text-[0.8125rem] text-black/70 mt-1">Dokumen ditandatangani secara digital mengikut Akta Tandatangan Digital 1997.</div>
                   </div>
 

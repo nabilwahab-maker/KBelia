@@ -334,7 +334,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                     }`}
                   >
                     <Store className="w-3.5 h-3.5 shrink-0" />
-                    <span>Usahawan</span>
+                    <span>{isEn ? 'Merchant' : 'Usahawan'}</span>
                   </button>
 
                   <button
@@ -366,7 +366,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setActiveTab }) => {
                     }`}
                   >
                     <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                    <span>Pentadbir</span>
+                    <span>{isEn ? 'Admin' : 'Pentadbir'}</span>
                   </button>
                 </div>
 

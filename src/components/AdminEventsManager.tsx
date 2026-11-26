@@ -205,26 +205,6 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
     filteredSortedBookings.length
   ]);
 
-  const categoryCounts = useMemo(
-    () => ({
-      all: events.length,
-      karnival: events.filter((e) => e.category === 'karnival').length,
-      bengkel: events.filter((e) => e.category === 'bengkel').length,
-      pitching: events.filter((e) => e.category === 'pitching').length,
-      expo: events.filter((e) => e.category === 'expo').length
-    }),
-    [events]
-  );
-
-  const bookingCounts = useMemo(
-    () => ({
-      all: eventBookings.length,
-      booked: eventBookings.filter((b) => b.status === 'booked').length,
-      cancelled: eventBookings.filter((b) => b.status === 'cancelled').length
-    }),
-    [eventBookings]
-  );
-
   const selectedEvent = useMemo(
     () =>
       filteredSortedEvents.find((e) => e.id === selectedEventId) ||
@@ -359,6 +339,15 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
     bookingSearch.trim() || bookingStatusFilter !== 'all' || bookingSortPreset !== DEFAULT_SORT_VALUE
   );
 
+  const catalogFilterCount =
+    (catalogCategoryFilter !== 'all' ? 1 : 0) +
+    (catalogDistrictFilter !== 'all' ? 1 : 0) +
+    (catalogSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0);
+
+  const bookingFilterCount =
+    (bookingStatusFilter !== 'all' ? 1 : 0) +
+    (bookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0);
+
   return (
     <div className="space-y-4 animate-dashboard-tab">
       {subView === 'catalog' ? (
@@ -401,44 +390,55 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
               </button>
             </div>
           }
-          tabs={[
-            { id: 'all', label: 'Semua', count: categoryCounts.all },
-            { id: 'karnival', label: 'Karnival', count: categoryCounts.karnival },
-            { id: 'bengkel', label: 'Bengkel', count: categoryCounts.bengkel },
-            { id: 'pitching', label: 'Pitching', count: categoryCounts.pitching },
-            { id: 'expo', label: 'Ekspo', count: categoryCounts.expo }
-          ]}
-          activeTab={catalogCategoryFilter}
-          onTabChange={(id) => {
-            setCatalogCategoryFilter(id as 'all' | YouthEvent['category']);
-            setMobileCatalogOpen(false);
-          }}
           searchValue={catalogSearch}
           onSearchChange={setCatalogSearch}
           searchPlaceholder="Cari tajuk acara atau daerah..."
-          extraControls={
+          filterCount={catalogFilterCount}
+          onResetFilters={() => {
+            setCatalogCategoryFilter('all');
+            setCatalogDistrictFilter('all');
+            setCatalogSortPreset(DEFAULT_SORT_VALUE);
+          }}
+          sortOptions={catalogSortOptions}
+          sortValue={catalogSortPreset}
+          onSortChange={setCatalogSortPreset}
+          filterContent={
             <>
-              <select
-                value={catalogDistrictFilter}
-                onChange={(e) => setCatalogDistrictFilter(e.target.value as 'all' | KelantanDistrict)}
-                aria-label="Tapis daerah acara"
-                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-              >
-                <option value="all">Semua Daerah</option>
-                {DISTRICTS.map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
-              <select
-                value={catalogSortPreset}
-                onChange={(e) => setCatalogSortPreset(e.target.value)}
-                aria-label="Susun acara belia"
-                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-              >
-                {catalogSortOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                  Kategori Acara
+                </label>
+                <select
+                  value={catalogCategoryFilter}
+                  onChange={(e) => {
+                    setCatalogCategoryFilter(e.target.value as 'all' | YouthEvent['category']);
+                    setMobileCatalogOpen(false);
+                  }}
+                  className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                >
+                  <option value="all">Semua Kategori</option>
+                  <option value="karnival">Karnival</option>
+                  <option value="bengkel">Bengkel</option>
+                  <option value="pitching">Pitching</option>
+                  <option value="expo">Ekspo</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                  Daerah
+                </label>
+                <select
+                  value={catalogDistrictFilter}
+                  onChange={(e) => setCatalogDistrictFilter(e.target.value as 'all' | KelantanDistrict)}
+                  className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                >
+                  <option value="all">Semua Daerah</option>
+                  {DISTRICTS.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
             </>
           }
         />
@@ -482,30 +482,48 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
               </button>
             </div>
           }
-          tabs={[
-            { id: 'all', label: 'Semua', count: bookingCounts.all },
-            { id: 'booked', label: 'Ditempah', count: bookingCounts.booked },
-            { id: 'cancelled', label: 'Dibatalkan', count: bookingCounts.cancelled }
-          ]}
-          activeTab={bookingStatusFilter}
-          onTabChange={(id) => {
-            setBookingStatusFilter(id as 'all' | 'booked' | 'cancelled');
-            setMobileBookingOpen(false);
-          }}
           searchValue={bookingSearch}
           onSearchChange={setBookingSearch}
           searchPlaceholder="Cari peserta, acara atau ID..."
-          extraControls={
-            <select
-              value={bookingSortPreset}
-              onChange={(e) => setBookingSortPreset(e.target.value)}
-              aria-label="Susun tempahan peserta"
-              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-            >
-              {bookingSortOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+          filterCount={bookingFilterCount}
+          onResetFilters={() => {
+            setBookingStatusFilter('all');
+            setBookingSortPreset(DEFAULT_SORT_VALUE);
+          }}
+          sortOptions={bookingSortOptions}
+          sortValue={bookingSortPreset}
+          onSortChange={setBookingSortPreset}
+          filterContent={
+            <div>
+              <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                Status Tempahan
+              </span>
+              <div className="grid grid-cols-3 gap-1.5">
+                {(
+                  [
+                    { id: 'all', label: 'Semua' },
+                    { id: 'booked', label: 'Ditempah' },
+                    { id: 'cancelled', label: 'Batal' }
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => {
+                      setBookingStatusFilter(opt.id);
+                      setMobileBookingOpen(false);
+                    }}
+                    className={`px-2 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors whitespace-nowrap ${
+                      bookingStatusFilter === opt.id
+                        ? adminTheme.activeMiniBtnClass
+                        : adminTheme.secondaryButtonClass
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           }
         />
       )}
@@ -710,8 +728,8 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
               ) : (
                 <SidePreviewEmptyState
                   icon={<Calendar className="w-10 h-10" />}
-                  title="Pilih acara belia"
-                  description="Klik mana-mana acara di senarai kiri untuk melihat poster, kuota tapak, dan pilihan suntingan."
+                  title="Tiada Acara Dipilih"
+                  description="Maklumat acara, kuota tapak dan pilihan suntingan akan dipaparkan di sini."
                 />
               )
             }
@@ -916,8 +934,8 @@ export const AdminEventsManager: React.FC<AdminEventsManagerProps> = ({ onRefres
             ) : (
               <SidePreviewEmptyState
                 icon={<Users className="w-10 h-10" />}
-                title="Pilih tempahan peserta"
-                description="Klik mana-mana rekod tempahan di senarai kiri untuk mengurus pengaktifan atau pembatalan."
+                title="Tiada Tempahan Dipilih"
+                description="Butiran tempahan peserta akan dipaparkan di sini."
               />
             )
           }

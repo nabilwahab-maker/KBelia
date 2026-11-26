@@ -831,7 +831,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Megaphone className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>{language === 'en' ? 'Trade Space' : 'Ruang Niaga'}</span>
+                          <span>{language === 'en' ? 'B2B & Suppliers' : 'Pembekal & B2B'}</span>
                         </button>
                         <button
                           type="button"
@@ -1017,7 +1017,7 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-semibold text-left text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                         >
                           <Network className="w-4 h-4 text-black dark:text-white/75" />
-                          <span>{language === 'en' ? 'Trade Space' : 'Ruang Niaga'}</span>
+                          <span>{language === 'en' ? 'B2B & Suppliers' : 'Pembekal & B2B'}</span>
                         </button>
                         <button
                           type="button"

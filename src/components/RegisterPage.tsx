@@ -584,7 +584,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setActiveTab }) => {
                   <strong>1. Kelayakan Pemohon:</strong> Terbuka kepada warganegara Malaysia berumur 18 hingga 40 tahun yang menetap atau beroperasi di Negeri Kelantan.
                 </p>
                 <p>
-                  <strong>2. Penggunaan Kiosk & Geran:</strong> Pemohon berdaftar layak memohon Kiosk Belia bersubsidi serta Geran Permulaan tertakluk kepada semakan pentadbir.
+                  <strong>2. Penggunaan Kiosk & Geran:</strong> Pemohon berdaftar layak memohon kiosk belia dan bantuan geran tertakluk kepada semakan pentadbir.
                 </p>
                 <p>
                   <strong>3. Dasar Privasi (PDPA 2010):</strong> Maklumat yang dikemukakan adalah sulit dan hanya digunakan bagi pengurusan program belia negeri.

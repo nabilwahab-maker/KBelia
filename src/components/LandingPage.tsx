@@ -117,17 +117,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     navigateToPage('login');
   };
 
-  // Hero visual showcase slides (warm human storytelling, free of internal jargon)
+  // Hero visual showcase slides (general, concise, natural formal copy)
   const heroSlides = isBM
     ? [
         {
           id: 'slide-1',
-          location: 'Kota Bharu · Seni & Kraf Tempatan',
-          title: 'Ruang Karya & Niaga Anak Muda',
+          location: 'Kota Bharu · Kiosk Kraf & Runcit',
+          title: 'Kiosk Moden Untuk Usahawan Muda',
           description:
-            'Tapak jualan moden yang menghimpunkan penggiat kraf, makanan warisan, dan jenama gaya hidup belia di bawah satu bumbung.',
+            'Tapak jualan sedia guna untuk produk tempatan dan jenama belia di seluruh Kelantan.',
           imageUrl: heroArtisanImg,
-          ctaText: 'Terokai Ruang',
+          ctaText: 'Lihat Lokasi Kiosk',
           onAction: () => {
             const el = document.getElementById('kiosk');
             el?.scrollIntoView({ behavior: 'smooth' });
@@ -135,12 +135,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         },
         {
           id: 'slide-2',
-          location: 'Kota Bharu · Fesyen & Tekstil',
-          title: 'Warisan Batik Kontemporari',
+          location: 'Kota Bharu · Batik & Fesyen Tempatan',
+          title: 'Produk & Kraf Anak Muda',
           description:
-            'Sentuhan moden daripada pereka muda tempatan yang membawa identiti seni Pantai Timur ke pasaran yang lebih luas.',
+            'Sertai usahawan muda Kelantan memasarkan produk tempatan terus kepada pelanggan.',
           imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
-          ctaText: 'Lihat Karya Belia',
+          ctaText: 'Lihat Kedai Belia',
           onAction: () => {
             const el = document.getElementById('direktori');
             el?.scrollIntoView({ behavior: 'smooth' });
@@ -148,24 +148,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         },
         {
           id: 'slide-3',
-          location: 'Bachok · Kopi & Hidangan Artisan',
-          title: 'Cita Rasa Generasi Baharu',
+          location: 'Bachok · Kopi & Makanan Belia',
+          title: 'Kafe Kopi & Makanan Belia',
           description:
-            'Suasana komuniti yang mesra pengunjung untuk anak muda menguji konsep kedai pertama mereka dengan sokongan rakan niaga.',
+            'Mulakan kedai pertama anda dengan kemudahan asas lengkap serta bimbingan mentor.',
           imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
-          ctaText: 'Sertai Komuniti',
+          ctaText: 'Daftar Akaun Belia',
           onAction: () => navigateToPage('register'),
         },
       ]
     : [
         {
           id: 'slide-1',
-          location: 'Kota Bharu · Local Craft & Trade',
-          title: 'Real Spaces for Young Makers',
+          location: 'Kota Bharu · Craft & Retail Kiosks',
+          title: 'Modern Kiosks for Young Founders',
           description:
-            'Warm, accessible storefronts bringing together young artisans, heritage food creators, and contemporary lifestyle brands.',
+            'Move-in retail kiosks for local products and youth brands across Kelantan.',
           imageUrl: heroArtisanImg,
-          ctaText: 'Explore Spaces',
+          ctaText: 'See Kiosk Locations',
           onAction: () => {
             const el = document.getElementById('kiosk');
             el?.scrollIntoView({ behavior: 'smooth' });
@@ -173,12 +173,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         },
         {
           id: 'slide-2',
-          location: 'Kota Bharu · Contemporary Fashion',
-          title: 'Modern Kelantan Batik Expressions',
+          location: 'Kota Bharu · Local Batik & Fashion',
+          title: 'Youth-Made Crafts & Products',
           description:
-            'Fresh collections crafted by young local designers sharing East Coast heritage with a wider community.',
+            'Join young Kelantan entrepreneurs selling original local products directly to customers.',
           imageUrl: '/assets/generated/batik_canting_kelantan.jpg',
-          ctaText: 'Browse Creators',
+          ctaText: 'Browse Youth Shops',
           onAction: () => {
             const el = document.getElementById('direktori');
             el?.scrollIntoView({ behavior: 'smooth' });
@@ -186,12 +186,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         },
         {
           id: 'slide-3',
-          location: 'Bachok · Artisan Coffee & Kitchen',
-          title: 'Neighborhood Flavors Reimagined',
+          location: 'Bachok · Coffee & Food Startups',
+          title: 'Youth Coffee & Food Startups',
           description:
-            'A supportive setting where emerging founders test their first physical concept alongside fellow youth entrepreneurs.',
+            'Start your first shop with essential facilities and practical mentor support.',
           imageUrl: '/assets/generated/kopi_nissem_melaka.jpg',
-          ctaText: 'Join Community',
+          ctaText: 'Create Youth Account',
           onAction: () => navigateToPage('register'),
         },
       ];
@@ -211,91 +211,91 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     {
       id: 'rib-1',
       img: heroArtisanImg,
-      title: isBM ? 'Kraf Anyaman & Kayu' : 'Handwoven Craft Studio',
+      title: isBM ? 'Kedai Kraf & Anyaman' : 'Craft & Weaving Kiosk',
       meta: 'Kota Bharu · Kraf',
       target: 'academic' as UMKTab,
     },
     {
       id: 'rib-2',
       img: '/assets/generated/batik_canting_kelantan.jpg',
-      title: isBM ? 'Batik Kontemporari Belia' : 'Contemporary Youth Batik',
+      title: isBM ? 'Batik Moden Belia' : 'Modern Youth Batik',
       meta: 'Kota Bharu · Fesyen',
       target: 'hepa' as UMKTab,
     },
     {
       id: 'rib-3',
       img: '/assets/generated/kopi_nissem_melaka.jpg',
-      title: isBM ? 'Kopi Artisan & Kuih Warisan' : 'Artisan Coffee & Delicacies',
-      meta: 'Bachok · Kulinari',
+      title: isBM ? 'Kafe Kopi & Kuih Tempatan' : 'Local Coffee & Pastry Shop',
+      meta: 'Bachok · Makanan',
       target: 'hepa' as UMKTab,
     },
     {
       id: 'rib-4',
       img: communityHubImg,
-      title: isBM ? 'Laman Komuniti Usahawan' : 'Entrepreneur Courtyard Hub',
-      meta: 'Kelantan · Ruang Niaga',
+      title: isBM ? 'Hab Kiosk Usahawan Belia' : 'Youth Entrepreneur Kiosk Hub',
+      meta: 'Kelantan · Hab Kiosk',
       target: 'academic' as UMKTab,
     },
     {
       id: 'rib-5',
       img: '/assets/generated/akok_kelantan_tradisi.jpg',
-      title: isBM ? 'Kuih Tradisi Sentuhan Muda' : 'Heritage Delicacy Reimagined',
+      title: isBM ? 'Jualan Kuih Tradisi' : 'Traditional Kuih Business',
       meta: 'Pasir Mas · Makanan',
       target: 'hepa' as UMKTab,
     },
     {
       id: 'rib-6',
       img: '/assets/generated/kiosk_modular_kbelia.jpg',
-      title: isBM ? 'Tapak Jualan Sedia Masuk' : 'Ready-to-Open Kiosk Bays',
+      title: isBM ? 'Unit Kiosk Sedia Masuk' : 'Move-In Ready Kiosk Units',
       meta: 'Bachok · Hab Belia',
       target: 'academic' as UMKTab,
     },
   ];
 
-  // Ecosystem story chapters (natural human phrasing without internal module details)
+  // Core benefits (general, concise, natural formal language)
   const storyChapters = isBM
     ? [
         {
           num: '01',
-          title: 'Ruang Niaga Sedia Masuk',
-          body: 'Tapak jualan fizikal yang tersusun dan moden di lokasi tumpuan sekitar negeri, membantu anak muda melangkah terus tanpa bebanan kos premis awal yang tinggi.',
+          title: 'Sewa Kiosk Mampu Milik',
+          body: 'Dapatkan tapak niaga moden di lokasi tumpuan seluruh negeri Kelantan dengan kadar sewa berpatutan.',
         },
         {
           num: '02',
-          title: 'Bimbingan & Perkongsian Amali',
-          body: 'Sesi perkongsian santai serta bimbingan praktikal bersama pengamal berpengalaman untuk membantu anda mengurus operasi harian, membina jenama, dan memahami pelanggan dengan lebih yakin.',
+          title: 'Khidmat Nasihat Mentor',
+          body: 'Tempah sesi bimbingan percuma bersama mentor untuk membantu perancangan, harga dan pemasaran kedai anda.',
         },
         {
           num: '03',
-          title: 'Sokongan Urusan Perniagaan',
-          body: 'Himpunan panduan ringkas yang teratur supaya perniagaan baharu dapat bermula secara sah, kemas, dan diyakini oleh pelanggan setempat mahupun luar.',
+          title: 'Daftar Perniagaan & Profil Digital',
+          body: 'Ikut langkah mudah untuk mendaftar perniagaan dan berkongsi profil kedai anda bersama pelanggan.',
         },
         {
           num: '04',
-          title: 'Laluan Sokongan & Perkembangan',
-          body: 'Maklumat peluang pembiayaan dan sokongan komuniti dihimpunkan di satu tempat bersama gambaran kemajuan yang mudah difahami pada setiap peringkat pertumbuhan.',
+          title: 'Bantuan Modal & Rekod Jualan',
+          body: 'Semak kelayakan bantuan modal belia, hantar permohonan dan pantau jualan harian di satu tempat.',
         },
       ]
     : [
         {
           num: '01',
-          title: 'Welcoming Retail Spaces',
-          body: 'Thoughtfully prepared physical booths across key community hubs, helping young entrepreneurs open their doors without heavy upfront property commitments.',
+          title: 'Affordable Youth Kiosks',
+          body: 'Access modern retail spaces at busy locations across Kelantan with affordable rent.',
         },
         {
           num: '02',
-          title: 'Practical Guidance & Shared Craft',
-          body: 'Approachable workshops and one-on-one sharing sessions that build everyday confidence in storytelling, customer connection, and sustainable operations.',
+          title: 'Free Mentor Guidance',
+          body: 'Book free coaching sessions with mentors to plan your pricing, operations, and marketing.',
         },
         {
           num: '03',
-          title: 'Clear Foundations for New Ventures',
-          body: 'Step-by-step guidance organized in plain language so emerging businesses can establish clean, trustworthy operations right from day one.',
+          title: 'Business Setup & Digital Profile',
+          body: 'Follow simple steps to register your business and share your digital shop card with customers.',
         },
         {
           num: '04',
-          title: 'Support Pathways & Steady Growth',
-          body: 'Financial support opportunities and simple progress reflections gathered in one calm space, helping founders make steady decisions as they grow.',
+          title: 'Startup Grants & Sales Tracking',
+          body: 'Check grant eligibility, submit funding applications, and keep track of daily sales in one place.',
         },
       ];
 
@@ -339,25 +339,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             : 'bg-[#F7F5F0]/90 border-[#0B6E52]/15'
         }`}
       >
-        <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12 h-full flex items-center justify-between gap-8">
+        <div className="max-w-[1380px] w-full mx-auto px-4 sm:px-8 lg:px-12 h-full grid grid-cols-[1fr_auto] md:grid-cols-[1fr_auto_1fr] items-center gap-4 lg:gap-8">
           {/* Zone 1: Single Official Brand Lockup */}
           <a
             href="#hero"
-            className="whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg"
+            className="justify-self-start whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg"
             aria-label="KBelia Kelantan"
           >
             <KBeliaLogo size="md" tone={isEditorialDark ? 'onDark' : 'onLight'} />
           </a>
 
-          {/* Zone 2: Concise Single-Line Text Links (Zero-Jitter Reserved Bold Width) */}
+          {/* Zone 2: Centered Horizontal Navigation Links */}
           <nav
             aria-label={isBM ? 'Navigasi utama' : 'Primary navigation'}
-            className={`hidden md:flex items-center gap-7 text-sm font-medium ${surfaceTextMuted}`}
+            className={`hidden md:flex items-center justify-center justify-self-center gap-7 text-sm font-medium ${surfaceTextMuted}`}
           >
             <a
               href="#hero"
-              data-reserved-text={isBM ? 'Utama' : 'Home'}
-              className={`kbelia-reserved-bold kbelia-trim kbelia-link whitespace-nowrap shrink-0 hover:font-bold transition-colors ${
+              className={`inline-flex items-center leading-none py-1.5 kbelia-link whitespace-nowrap shrink-0 transition-colors ${
                 isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
               }`}
             >
@@ -365,35 +364,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </a>
             <a
               href="#inisiatif"
-              data-reserved-text={isBM ? 'Pendekatan' : 'Approach'}
-              className={`kbelia-reserved-bold kbelia-trim kbelia-link whitespace-nowrap shrink-0 hover:font-bold transition-colors ${
+              className={`inline-flex items-center leading-none py-1.5 kbelia-link whitespace-nowrap shrink-0 transition-colors ${
                 isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
               }`}
             >
-              {isBM ? 'Pendekatan' : 'Approach'}
+              {isBM ? 'Kelebihan' : 'Benefits'}
             </a>
             <a
               href="#kiosk"
-              data-reserved-text={isBM ? 'Ruang Niaga' : 'Spaces'}
-              className={`kbelia-reserved-bold kbelia-trim kbelia-link whitespace-nowrap shrink-0 hover:font-bold transition-colors ${
+              className={`inline-flex items-center leading-none py-1.5 kbelia-link whitespace-nowrap shrink-0 transition-colors ${
                 isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
               }`}
             >
-              {isBM ? 'Ruang Niaga' : 'Spaces'}
+              {isBM ? 'Lokasi Kiosk' : 'Kiosks'}
             </a>
             <a
               href="#direktori"
-              data-reserved-text={isBM ? 'Karya Belia' : 'Creators'}
-              className={`kbelia-reserved-bold kbelia-trim kbelia-link whitespace-nowrap shrink-0 hover:font-bold transition-colors ${
+              className={`inline-flex items-center leading-none py-1.5 kbelia-link whitespace-nowrap shrink-0 transition-colors ${
                 isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
               }`}
             >
-              {isBM ? 'Karya Belia' : 'Creators'}
+              {isBM ? 'Kedai Belia' : 'Youth Shops'}
             </a>
           </nav>
 
           {/* Zone 3: Theme Switcher, Language Switch & Primary Action */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          <div className="flex items-center justify-self-end gap-2.5 shrink-0">
             <button
               id="landing-darkmode-toggle"
               type="button"
@@ -475,24 +471,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="lg:col-span-5 space-y-6">
               <p className={`text-xs sm:text-sm font-semibold tracking-wide ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
                 {isBM
-                  ? 'Kelantan Darul Naim · Komuniti & Keusahawanan Belia'
-                  : 'Kelantan · Youth Craft, Trade & Community'}
+                  ? 'Kelantan · Portal Usahawan Belia'
+                  : 'Kelantan · Youth Business Portal'}
               </p>
 
               <h1
                 className={`font-display text-fluid-hero font-bold tracking-tight text-balance kbelia-trim ${surfaceTextPrimary}`}
               >
                 {isBM
-                  ? 'Ruang Nyata Untuk Generasi Niaga Belia Kelantan'
-                  : 'A Living Ground for Young Kelantan Entrepreneurs'}
+                  ? 'Sewa Kiosk, Mohon Geran & Bina Bisnes Belia Kelantan'
+                  : 'Rent Kiosks, Apply for Grants & Grow Your Youth Business'}
               </h1>
 
               <p className={`text-fluid-lead max-w-xl kbelia-prose ${surfaceTextMuted}`}>
                 <AcronymText
                   text={
                     isBM
-                      ? 'Dari tapak jualan fizikal hingga ke jaringan bimbingan komuniti, kami menghimpunkan keperluan asas agar anak muda lebih berani melangkah dalam dunia perniagaan.'
-                      : 'From welcoming physical storefronts to shared community guidance, we bring together everyday essentials so young founders can take their first step with confidence.'
+                      ? 'Mohon tapak kiosk belia, dapatkan bantuan modal dan terima bimbingan terus daripada mentor.'
+                      : 'Apply for youth kiosks, get startup grants, and receive practical advice from mentors.'
                   }
                 />
               </p>
@@ -516,18 +512,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   href="#kiosk"
                   className={`inline-flex items-center gap-1.5 px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap shrink-0 kbelia-link ${surfaceTextPrimary}`}
                 >
-                  <span>{isBM ? 'Terokai Ruang Niaga' : 'Browse Spaces'}</span>
+                  <span>{isBM ? 'Lihat Lokasi Kiosk' : 'See Kiosk Locations'}</span>
                   <ChevronRight className="w-4 h-4" />
                 </a>
               </div>
 
               {/* Clean Typographic Context Strip (Unboxed) */}
               <div className={`pt-6 border-t ${hairlineBorder} flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm ${surfaceTextMuted}`}>
-                <span>{isBM ? 'Rangkaian Seluruh Negeri Kelantan' : 'Statewide Network Across Kelantan'}</span>
+                <span>{isBM ? 'Seluruh Negeri Kelantan' : 'Across Kelantan'}</span>
                 <span aria-hidden="true">·</span>
-                <span>{isBM ? 'Tapak Fizikal & Komuniti' : 'Physical & Community Spaces'}</span>
+                <span>{isBM ? 'Sewa Kiosk Berpatutan' : 'Affordable Kiosks'}</span>
                 <span aria-hidden="true">·</span>
-                <span>{isBM ? 'Sokongan Berterusan' : 'Ongoing Guidance'}</span>
+                <span>{isBM ? 'Bantuan Modal & Mentor' : 'Grants & Mentoring'}</span>
               </div>
             </div>
 
@@ -648,12 +644,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <div className="flex items-center gap-2 text-xs sm:text-sm font-semibold">
             <Camera className={`w-4 h-4 ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#0B6E52]'}`} />
             <span className={surfaceTextPrimary}>
-              {isBM ? 'Wajah & Suasana Komuniti Niaga Tempatan' : 'Moments From Our Local Makers'}
+              {isBM ? 'Aktiviti & Kedai Usahawan Belia' : 'Youth Shops & Community Highlights'}
             </span>
           </div>
-          <span className={`text-xs hidden sm:inline ${surfaceTextMuted}`}>
-            {isBM ? 'Klik mana-mana sorotan untuk masuk ke portal' : 'Select any highlight to enter the portal'}
-          </span>
         </div>
 
         <div className="relative w-full overflow-hidden mask-[linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
@@ -712,21 +705,21 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             {/* Left Lead Story Column (5 columns) */}
             <RevealBlock className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
               <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
-                {isBM ? 'Pendekatan KBelia' : 'The KBelia Approach'}
+                {isBM ? 'Apa Yang Anda Dapat' : 'What You Get'}
               </p>
 
               <h2 className={`font-display text-fluid-title font-bold text-balance kbelia-trim ${surfaceTextPrimary}`}>
                 {isBM
-                  ? 'Mengapa Anak Muda Perlukan Lebih Daripada Sekadar Tapak'
-                  : 'Why Young Founders Need More Than Just a Stall'}
+                  ? 'Semua Keperluan Asas Untuk Mula Berniaga'
+                  : 'Everything You Need to Start Business'}
               </h2>
 
               <p className={`text-fluid-lead kbelia-prose ${surfaceTextMuted}`}>
                 <AcronymText
                   text={
                     isBM
-                      ? 'Memulakan perniagaan buat kali pertama sering mencabar. KBelia dibina untuk merapatkan jurang antara idea di atas kertas dengan realiti jualan harian melalui ruang fizikal, panduan tersusun, dan sokongan komuniti setempat.'
-                      : 'Starting a venture for the first time can feel daunting. KBelia bridges the space between an early sketch and an open shopfront through accessible booths, practical guidance, and a welcoming network.'
+                      ? 'Mulakan perniagaan tanpa modal besar. KBelia menyediakan tapak kiosk, bantuan dana dan bimbingan mentor di satu portal.'
+                      : 'Start your business without heavy upfront costs. KBelia brings together kiosks, funding, and mentoring in one portal.'
                   }
                 />
               </p>
@@ -735,7 +728,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 {!failedImages['story-hub'] ? (
                   <img
                     src={communityHubImg}
-                    alt={isBM ? 'Suasana hab komuniti usahawan belia Kelantan' : 'Kelantan youth entrepreneur courtyard hub'}
+                    alt={isBM ? 'Suasana hab kiosk usahawan belia Kelantan' : 'Kelantan youth entrepreneur kiosk hub'}
                     referrerPolicy="no-referrer"
                     onError={() => markImageFailed('story-hub')}
                     className="w-full h-full object-cover"
@@ -746,8 +739,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B100E]/75 via-transparent to-transparent" />
                 <p className="absolute bottom-3.5 left-4 right-4 text-xs sm:text-sm text-[#F4F1EA]/90 font-medium">
                   {isBM
-                    ? 'Interaksi harian antara pengasas muda, mentor komuniti, dan pengunjung tempatan.'
-                    : 'Daily conversations uniting young makers, mentors, and neighborhood visitors.'}
+                    ? 'Hab kiosk belia lengkap dengan kawasan jualan, pengunjung dan sesi bimbingan.'
+                    : 'Youth kiosk hubs connecting founders, mentors, and local shoppers.'}
                 </p>
               </div>
             </RevealBlock>
@@ -793,10 +786,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <RevealBlock className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2 max-w-2xl">
               <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
-                {isBM ? 'Lokasi Tumpuan Negeri' : 'Featured Community Hubs'}
+                {isBM ? 'Pilihan Tapak Niaga' : 'Available Hubs'}
               </p>
               <h2 className={`font-display text-fluid-title font-bold text-balance kbelia-trim ${surfaceTextPrimary}`}>
-                {isBM ? 'Ruang Niaga Sedia Diterokai' : 'Spaces Ready for Your Next Chapter'}
+                {isBM ? 'Pilih Lokasi Kiosk Anda' : 'Pick Your Kiosk Location'}
               </h2>
             </div>
 
@@ -807,7 +800,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'
               }`}
             >
-              <span>{isBM ? 'Log masuk untuk memohon ruang' : 'Sign in to explore full availability'}</span>
+              <span>{isBM ? 'Log masuk untuk mohon kiosk' : 'Sign in to book a kiosk'}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </RevealBlock>
@@ -820,8 +813,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   if (!user) {
                     requireBeliaLogin(
                       isBM
-                        ? 'Sila log masuk akaun Belia untuk melihat butiran penuh ruang niaga dan membuat tempahan.'
-                        : 'Please sign in with a Belia account to view space details and book.'
+                        ? 'Sila log masuk akaun Belia untuk lihat maklumat kiosk dan buat tempahan.'
+                        : 'Please sign in with a Belia account to view kiosk details and book.'
                     );
                     return;
                   }
@@ -859,7 +852,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   <div className={`pt-4 border-t ${hairlineBorder} flex items-center justify-between gap-4`}>
                     <div>
                       <span className={`text-xs block ${surfaceTextMuted}`}>
-                        {isBM ? 'Kadar penyertaan bermula' : 'Accessible participation from'}
+                        {isBM ? 'Kadar sewa bermula' : 'Rent starts at'}
                       </span>
                       <span className={`font-display text-lg font-bold tabular-nums ${surfaceTextPrimary}`}>
                         RM{leadSlot.dailyRate}{' '}
@@ -874,7 +867,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         isEditorialDark ? 'text-[#E5B85C]' : 'text-[#0B6E52]'
                       }`}
                     >
-                      <span>{isBM ? 'Lihat Ruang' : 'Explore Space'}</span>
+                      <span>{isBM ? 'Lihat Kiosk' : 'View Kiosk'}</span>
                       <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </span>
                   </div>
@@ -957,15 +950,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <RevealBlock className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2 max-w-2xl">
               <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
-                {isBM ? 'Jenama & Karya Tempatan' : 'Youth-Founded Brands'}
+                {isBM ? 'Kedai & Produk Tempatan' : 'Local Youth Brands'}
               </p>
               <h2 className={`font-display text-fluid-title font-bold text-balance kbelia-trim ${surfaceTextPrimary}`}>
-                {isBM ? 'Kenali Pengasas Muda Kelantan' : 'Meet Local Youth Creators'}
+                {isBM ? 'Sokong Bisnes Anak Muda Kelantan' : 'Explore Kelantan Youth Businesses'}
               </h2>
               <p className={`text-fluid-lead kbelia-prose ${surfaceTextMuted}`}>
                 {isBM
-                  ? 'Himpunan jenama ciptaan generasi belia untuk diterokai, dihubungi, dan disokong bersama.'
-                  : 'Original local businesses built by young Kelantan founders, ready for you to discover and support.'}
+                  ? 'Kenali usahawan muda tempatan, lihat produk mereka dan hubungi terus melalui WhatsApp.'
+                  : 'Discover local youth-run businesses, browse their products, and message them on WhatsApp.'}
               </p>
             </div>
           </RevealBlock>
@@ -989,7 +982,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                       requireBeliaLogin(
                         isBM
                           ? 'Sila log masuk akaun Belia untuk melihat profil penuh usahawan dan produk mereka.'
-                          : 'Please sign in with a Belia account to explore creator profiles and catalogs.'
+                          : 'Please sign in with a Belia account to explore shop profiles and catalogs.'
                       );
                       return;
                     }
@@ -998,12 +991,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                   className={`rounded-2xl p-6 flex flex-col justify-between gap-5 transition-all duration-300 cursor-pointer group ${cardSurface}`}
                 >
                   <div className="space-y-4">
-                    <div className="flex items-center gap-3.5">
+                    <div className="flex items-center gap-4">
                       <img
                         src={displayImg}
                         alt={biz.businessName}
                         referrerPolicy="no-referrer"
-                        className={`w-14 h-14 rounded-xl object-cover shrink-0 border ${hairlineBorder}`}
+                        className={`w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover shrink-0 border ${hairlineBorder}`}
                       />
                       <div className="min-w-0">
                         <div className={`text-xs truncate ${surfaceTextMuted}`}>
@@ -1030,7 +1023,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                         isEditorialDark ? 'text-[#E5B85C]' : 'text-[#0B6E52]'
                       }`}
                     >
-                      <span>{isBM ? 'Terokai' : 'View'}</span>
+                      <span>{isBM ? 'Lihat Kedai' : 'View Shop'}</span>
                       <ChevronRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                     </span>
                   </div>
@@ -1050,19 +1043,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
               <div className="lg:col-span-7 space-y-3">
                 <p className={`text-xs sm:text-sm font-semibold ${isEditorialDark ? 'text-[#E5B85C]' : 'text-[#9A6B19]'}`}>
-                  {isBM ? 'Permulaan Yang Ringkas' : 'Simple Way to Begin'}
+                  {isBM ? 'Mula Hari Ini' : 'Start Today'}
                 </p>
                 <h2 className={`font-display text-fluid-title font-bold text-balance kbelia-trim ${surfaceTextPrimary}`}>
                   {isBM
-                    ? 'Langkah Pertama Anda Bermula Di Sini'
-                    : 'Your Next Chapter Starts With One Step'}
+                    ? 'Daftar Akaun & Mula Berniaga Sekarang'
+                    : 'Sign Up & Start Selling Today'}
                 </h2>
                 <p className={`text-fluid-lead max-w-xl kbelia-prose ${surfaceTextMuted}`}>
                   <AcronymText
                     text={
                       isBM
-                        ? 'Sertai komuniti usahawan muda Kelantan untuk mengakses ruang niaga, jaringan bimbingan, dan peluang sokongan negeri.'
-                        : 'Join Kelantan youth entrepreneurs building authentic businesses with shared physical spaces and community support.'
+                        ? 'Buka akaun percuma untuk mohon sewa kiosk, semak kelayakan geran dan senaraikan produk anda di direktori.'
+                        : 'Create a free account to apply for a kiosk, check grant eligibility, and list your products in the directory.'
                     }
                   />
                 </p>
@@ -1101,32 +1094,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <div className={`pt-8 border-t ${hairlineBorder} grid grid-cols-1 md:grid-cols-3 gap-6`}>
               <div className="space-y-1.5">
                 <div className={`text-xs font-semibold ${isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'}`}>
-                  01 · {isBM ? 'Daftar Profil' : 'Set Up Profile'}
+                  01 · {isBM ? 'Daftar Akaun Percuma' : 'Create Free Account'}
                 </div>
                 <p className={`text-sm leading-relaxed ${surfaceTextMuted}`}>
                   {isBM
-                    ? 'Cipta akaun usahawan muda dalam beberapa minit untuk membuka akses penuh komuniti.'
-                    : 'Create your youth entrepreneur account in minutes to unlock full community access.'}
+                    ? 'Isi maklumat asas anda dalam 1 minit untuk membuka akaun portal.'
+                    : 'Enter your basic details in one minute to open your portal account.'}
                 </p>
               </div>
               <div className="space-y-1.5">
                 <div className={`text-xs font-semibold ${isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'}`}>
-                  02 · {isBM ? 'Pilih Ruang & Kongsi Karya' : 'Choose Space & Share'}
+                  02 · {isBM ? 'Mohon Kiosk & Isi Profil Kedai' : 'Apply for Kiosk & Set Up Shop'}
                 </div>
                 <p className={`text-sm leading-relaxed ${surfaceTextMuted}`}>
                   {isBM
-                    ? 'Terokai tapak jualan mengikut daerah pilihan serta tonjolkan produk anda di direktori.'
-                    : 'Explore booths in your preferred district and introduce your brand in the directory.'}
+                    ? 'Pilih lokasi kiosk yang sesuai dan senaraikan produk anda.'
+                    : 'Choose a suitable kiosk location and list your business products.'}
                 </p>
               </div>
               <div className="space-y-1.5">
                 <div className={`text-xs font-semibold ${isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'}`}>
-                  03 · {isBM ? 'Berkembang Bersama' : 'Grow Together'}
+                  03 · {isBM ? 'Rekod Jualan & Jumpa Mentor' : 'Track Sales & Meet Your Mentor'}
                 </div>
                 <p className={`text-sm leading-relaxed ${surfaceTextMuted}`}>
                   {isBM
-                    ? 'Manfaatkan sesi perkongsian dan peluang sokongan untuk mengukuhkan langkah perniagaan.'
-                    : 'Tap into mentoring conversations and support pathways to grow steadily.'}
+                    ? 'Pantau jualan harian, mohon bantuan modal dan tempah sesi mentor.'
+                    : 'Track daily sales, apply for grants, and book mentor sessions.'}
                 </p>
               </div>
             </div>
@@ -1143,8 +1136,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <KBeliaLogo size="md" tone={isEditorialDark ? 'onDark' : 'onLight'} />
             <p className={`text-sm leading-relaxed ${surfaceTextMuted}`}>
               {isBM
-                ? 'Inisiatif pembangunan keusahawanan, ruang niaga, dan komuniti belia Negeri Kelantan.'
-                : 'Kelantan youth entrepreneurship, retail space, and community development initiative.'}
+                ? 'Portal tapak kiosk, bantuan modal dan sokongan usahawan belia di seluruh negeri Kelantan.'
+                : 'Portal for youth kiosks, startup grants, and business support across Kelantan.'}
             </p>
             <p className={`text-xs ${surfaceTextMuted}`}>
               Kompleks Kota Darulnaim, 15503 Kota Bharu, Kelantan Darul Naim.
@@ -1163,17 +1156,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </li>
               <li>
                 <a href="#inisiatif" className="kbelia-link">
-                  {isBM ? 'Pendekatan KBelia' : 'Our Approach'}
+                  {isBM ? 'Kelebihan KBelia' : 'Benefits'}
                 </a>
               </li>
               <li>
                 <a href="#kiosk" className="kbelia-link">
-                  {isBM ? 'Ruang Niaga' : 'Retail Spaces'}
+                  {isBM ? 'Lokasi Kiosk' : 'Kiosks'}
                 </a>
               </li>
               <li>
                 <a href="#direktori" className="kbelia-link">
-                  {isBM ? 'Karya Belia' : 'Youth Creators'}
+                  {isBM ? 'Kedai Belia' : 'Youth Shops'}
                 </a>
               </li>
               <li>

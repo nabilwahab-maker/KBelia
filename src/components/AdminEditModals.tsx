@@ -1623,7 +1623,7 @@ export const ManageBusinessProductsModal: React.FC<ManageBusinessProductsModalPr
                     <img
                       src={prod.imageUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                       alt={prod.name}
-                      className={`w-14 h-14 rounded-xl object-cover border shrink-0 ${adminTheme.dividerClass}`}
+                      className={`w-20 h-20 rounded-xl object-cover border shrink-0 ${adminTheme.dividerClass}`}
                     />
                     <div className="min-w-0">
                       <div className="font-bold text-sm text-stone-900 dark:text-[#F5F2EC] truncate">{prod.name}</div>

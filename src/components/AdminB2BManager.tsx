@@ -193,15 +193,6 @@ export const AdminB2BManager: React.FC = () => {
     filteredListings.length
   ]);
 
-  const typeCounts = useMemo(
-    () => ({
-      all: listings.length,
-      supply: listings.filter((l) => l.type === 'supply').length,
-      demand: listings.filter((l) => l.type === 'demand').length
-    }),
-    [listings]
-  );
-
   const selectedListing = useMemo(
     () =>
       filteredListings.find((item) => item.id === selectedB2BId) ||
@@ -354,42 +345,66 @@ export const AdminB2BManager: React.FC = () => {
             <span>{showForm ? 'Tutup' : 'Tambah'}</span>
           </button>
         }
-        tabs={[
-          { id: 'all', label: 'Semua', count: typeCounts.all },
-          { id: 'supply', label: 'Membekal', count: typeCounts.supply },
-          { id: 'demand', label: 'Mencari', count: typeCounts.demand }
-        ]}
-        activeTab={filterType}
-        onTabChange={(id) => {
-          setFilterType(id as 'all' | 'supply' | 'demand');
-          setMobilePreviewOpen(false);
-        }}
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="Cari iklan, syarikat atau daerah..."
-        extraControls={
+        filterCount={activeFilterCount}
+        onResetFilters={() => {
+          setFilterType('all');
+          setDistrictFilter('Semua');
+          setSortBy(DEFAULT_SORT_VALUE);
+        }}
+        sortOptions={b2bSortOptions}
+        sortValue={sortBy}
+        onSortChange={setSortBy}
+        filterContent={
           <>
-            <select
-              value={districtFilter}
-              onChange={(e) => setDistrictFilter(e.target.value)}
-              aria-label="Tapis daerah iklan"
-              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-            >
-              <option value="Semua">Semua Daerah</option>
-              {DISTRICTS.map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              aria-label="Susun iklan ruang niaga"
-              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-            >
-              {b2bSortOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            <div>
+              <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                Jenis Iklan
+              </span>
+              <div className="grid grid-cols-3 gap-1.5">
+                {(
+                  [
+                    { id: 'all', label: 'Semua' },
+                    { id: 'supply', label: 'Membekal' },
+                    { id: 'demand', label: 'Mencari' }
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => {
+                      setFilterType(opt.id);
+                      setMobilePreviewOpen(false);
+                    }}
+                    className={`px-2 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors whitespace-nowrap ${
+                      filterType === opt.id
+                        ? adminTheme.activeMiniBtnClass
+                        : adminTheme.secondaryButtonClass
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                Daerah
+              </label>
+              <select
+                value={districtFilter}
+                onChange={(e) => setDistrictFilter(e.target.value)}
+                className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+              >
+                <option value="Semua">Semua Daerah</option>
+                {DISTRICTS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
           </>
         }
       />
@@ -807,8 +822,8 @@ export const AdminB2BManager: React.FC = () => {
             ) : (
               <SidePreviewEmptyState
                 icon={<Megaphone className="w-10 h-10" />}
-                title="Pilih iklan Ruang Niaga"
-                description="Klik mana-mana iklan di sebelah kiri untuk melihat butiran penuh serta tindakan suntingan."
+                title="Tiada Iklan Dipilih"
+                description="Butiran iklan pembekal dan pilihan suntingan akan dipaparkan di sini."
               />
             )
           }

@@ -224,7 +224,7 @@ export const DirectorySection: React.FC<DirectorySectionProps> = ({
                       <img
                         src={biz.logoUrl || biz.bannerUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                         alt={biz.businessName}
-                        className="w-16 h-16 rounded-lg object-cover shrink-0 border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800"
+                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover shrink-0 border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800"
                       />
 
                       <div className="min-w-0 flex-1 space-y-1">

@@ -156,10 +156,10 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold text-black dark:text-white">
-                {language === 'en' ? 'Youth Ruang Niaga Supplier & Matchmaking Board' : 'Papan Rangkaian Pembekal & Padanan Ruang Niaga Belia'}
+                {language === 'en' ? 'Youth B2B & Supplier Network' : 'Senarai Pembekal & Padanan B2B Belia'}
               </h3>
               <span className="text-[0.8125rem] font-semibold text-black dark:text-white/75">
-                {language === 'en' ? 'Circular Economy Among Kelantan Entrepreneurs' : 'Ekonomi Pusingan Sesama Usahawan Kelantan'}
+                {language === 'en' ? 'Direct Supply & Stock Network for Kelantan Youth' : 'Rangkaian Bekalan & Stok Sesama Usahawan Kelantan'}
               </span>
             </div>
           </div>
@@ -341,8 +341,8 @@ export const YouthB2BNetworkModal: React.FC<YouthB2BNetworkModalProps> = ({
                 <a
                   href={item.whatsapp ? `https://wa.me/${item.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
                     language === 'en'
-                      ? `Hi ${item.authorName}, I saw your Ruang Niaga matchmaking post "${item.title}" on the Kelantan Youth Business Portal.`
-                      : `Salam ${item.authorName}, saya melihat siaran padanan Ruang Niaga anda "${item.title}" di Portal Niaga Belia Kelantan.`
+                      ? `Hi ${item.authorName}, I saw your B2B supplier listing "${item.title}" on the KBelia Portal.`
+                      : `Salam ${item.authorName}, saya melihat iklan pembekal B2B anda "${item.title}" di Portal KBelia.`
                   )}` : '#'}
                   target={item.whatsapp ? '_blank' : undefined}
                   rel={item.whatsapp ? 'noopener noreferrer' : undefined}

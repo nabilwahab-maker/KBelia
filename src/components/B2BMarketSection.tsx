@@ -214,14 +214,14 @@ export const B2BMarketSection: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight kbelia-trim">
-          {isEn ? 'Supply Network & Commercial Ads' : 'Rangkaian Bekalan & Ruang Niaga'}
+          {isEn ? 'B2B & Supplier Network' : 'Rangkaian Pembekal & B2B'}
         </h1>
         <p className="text-sm text-black/65 dark:text-white/70 mt-1 max-w-2xl kbelia-prose">
           <AcronymText
             text={
               isEn
-                ? 'Connect directly with Kelantan youth wholesale suppliers, local product makers, and commercial kiosk partners.'
-                : 'Terokai tawaran pembekal borong, bahan mentah kiosk, dan permintaan rakan niaga usahawan belia di seluruh Kelantan.'
+                ? 'Connect directly with Kelantan youth wholesale suppliers, local makers, and kiosk partners.'
+                : 'Cari pembekal borong, bahan mentah kiosk, dan rakan niaga belia di seluruh Kelantan.'
             }
           />
         </p>

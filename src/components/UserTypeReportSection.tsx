@@ -91,7 +91,7 @@ const USER_TYPE_COLORS: Record<Exclude<ReportUserTypeKey, 'all'>, { fill: string
   },
   admin: {
     fill: '#D98A4E',
-    label: 'Penyelaras Rangkaian',
+    label: 'Pentadbir KBelia',
     textTone: 'text-[#9A5628] dark:text-[#D98A4E]'
   }
 };
@@ -278,35 +278,35 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
       });
     });
 
-    // 4. Rekod Penyelaras Rangkaian (Pentadbir Utama & Urusetia)
-    const chiefAdminName = portalSettings?.adminOfficerName || 'Penyelaras Utama KBelia';
+    // 4. Rekod Pentadbir Portal (Pentadbir Utama & Urusetia)
+    const chiefAdminName = portalSettings?.adminOfficerName || 'Pentadbir Utama KBelia';
     records.push({
       id: 'usr-adm-chief',
       displayName: chiefAdminName,
-      secondaryEntity: 'Penyelaras Utama Rangkaian KBelia Kelantan',
+      secondaryEntity: 'Pentadbir Utama Portal KBelia Kelantan',
       userType: 'admin',
-      userTypeLabel: 'Penyelaras Rangkaian',
+      userTypeLabel: 'Pentadbir KBelia',
       locationOrAgency: 'Kompleks Kota Darulnaim, Kota Bharu',
-      activitySummary: 'Penyelarasan Ruang Niaga & Sokongan Usahawan',
+      activitySummary: 'Pengurusan Kiosk & Geran Belia',
       metricDisplay: `${bookings.length + grantApplications.length} Semakan`,
-      statusLabel: portalSettings?.systemStatus === 'maintenance' ? 'Penjagaan' : 'Aktif',
+      statusLabel: portalSettings?.systemStatus === 'maintenance' ? 'Penyelenggaraan' : 'Aktif',
       statusTone: portalSettings?.systemStatus === 'maintenance' ? 'amber' : 'bronze',
-      detailLine: `Menyelaras ${businesses.length} perniagaan belia berdaftar serta penjadualan ruang niaga.`,
+      detailLine: `Mengurus ${businesses.length} perniagaan belia berdaftar serta slot sewaan kiosk.`,
       modifiedMs: Date.now()
     });
 
     records.push({
       id: 'usr-adm-urusetia',
       displayName: 'Urusetia Pengurusan KBelia',
-      secondaryEntity: 'Unit Pemantauan Program, Aduan & Siaran Komuniti',
+      secondaryEntity: 'Unit Pemantauan Program, Aduan & Berita Portal',
       userType: 'admin',
-      userTypeLabel: 'Penyelaras Rangkaian',
+      userTypeLabel: 'Pentadbir KBelia',
       locationOrAgency: 'Unit Pembangunan Ekonomi Belia',
-      activitySummary: `Seliaan ${programs.length} Inisiatif & ${maintenanceTickets.length} Penjagaan`,
-      metricDisplay: `${programs.length} Inisiatif · ${newsItems.length} Siaran`,
+      activitySummary: `Seliaan ${programs.length} Program & ${maintenanceTickets.length} Aduan`,
+      metricDisplay: `${programs.length} Program · ${newsItems.length} Berita`,
       statusLabel: 'Aktif',
       statusTone: 'bronze',
-      detailLine: `Menyelaras ${newsItems.length} pengumuman rasmi dan ${maintenanceTickets.length} laporan penjagaan kemudahan.`,
+      detailLine: `Mengurus ${newsItems.length} pengumuman rasmi dan ${maintenanceTickets.length} laporan kerosakan kiosk.`,
       modifiedMs: Date.now() - 1000
     });
 
@@ -421,7 +421,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
         <div className="flex items-center gap-2.5">
           <FileText className={`w-5 h-5 ${adminTheme.accentTextClass}`} />
           <h3 className="text-lg sm:text-xl font-bold text-slate-900 dark:text-[#F5F2EC] tracking-tight">
-            Perkembangan Komuniti Mengikut Peranan
+            Ringkasan Pengguna Mengikut Peranan
           </h3>
         </div>
       </div>
@@ -663,7 +663,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
           }`}
         >
           <div className="flex items-center justify-between gap-2">
-            <span className="text-sm font-semibold text-slate-800 dark:text-[#F5F2EC]">Penyelaras Rangkaian</span>
+            <span className="text-sm font-semibold text-slate-800 dark:text-[#F5F2EC]">Pentadbir KBelia</span>
             <ShieldCheck className="w-4 h-4 text-[#9A5628] dark:text-[#D98A4E] shrink-0" />
           </div>
           <div className="flex items-baseline justify-between gap-2">
@@ -675,7 +675,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
             </span>
           </div>
           <p className="text-xs text-slate-500 dark:text-stone-400 leading-snug">
-            Urusetia &amp; seliaan · {programs.length} inisiatif · {newsItems.length} siaran
+            Urusetia &amp; admin · {programs.length} program · {newsItems.length} berita
           </p>
         </button>
       </div>
@@ -705,7 +705,7 @@ export const UserTypeReportSection: React.FC<UserTypeReportSectionProps> = ({
                     { id: 'all', label: `Semua (${consolidatedRecords.length})` },
                     { id: 'belia', label: `Usahawan Belia (${countsByType.belia})` },
                     { id: 'mentor', label: `Panel Mentor (${countsByType.mentor})` },
-                    { id: 'admin', label: `Penyelaras (${countsByType.admin})` }
+                    { id: 'admin', label: `Pentadbir (${countsByType.admin})` }
                   ] as const
                 ).map((tab) => (
                   <button

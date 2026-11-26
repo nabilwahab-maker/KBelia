@@ -123,7 +123,7 @@ export const MentorshipClinicModal: React.FC<MentorshipClinicModalProps> = ({
                 Hab Temujanji Klinik Usahawan & Mentor
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white">
-                Bimbingan 1-ke-1 Percuma Bersama Mentor Dalaman &amp; Pakar Industri (Tajaan Dana Belia)
+                Khidmat bimbingan perniagaan percuma bersama mentor KBelia.
               </p>
             </div>
           </div>

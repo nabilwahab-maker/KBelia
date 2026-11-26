@@ -228,7 +228,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
   const roleCategories: SidebarCategoryGroup[] = isAdmin
     ? [
         {
-          title: isMs ? 'Ruang Utama' : 'Main Workspace',
+          title: isMs ? 'Pengurusan Utama' : 'Main Management',
           items: [
             {
               key: 'admin:queue',
@@ -267,7 +267,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
           ]
         },
         {
-          title: isMs ? 'Dana & Bimbingan' : 'Grants & Mentoring',
+          title: isMs ? 'Geran & Acara' : 'Grants & Events',
           items: [
             {
               key: 'admin:ceed',
@@ -324,8 +324,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             },
             {
               key: 'admin:b2b',
-              label: isMs ? 'Ruang Niaga' : 'Trade Space',
-              keywords: 'ruang niaga iklan pembekal gambar b2b ads admin',
+              label: isMs ? 'Pembekal & B2B' : 'B2B & Suppliers',
+              keywords: 'pembekal b2b iklan gambar ruang niaga ads admin',
               icon: Megaphone,
               isActive: activeTab === 'admin' && adminSubTab === 'b2b',
               onClick: () => goAdmin('b2b', 'admin:b2b')
@@ -360,7 +360,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
     : isMentor
     ? [
         {
-          title: isMs ? 'Ruang Bimbingan' : 'Coaching Space',
+          title: isMs ? 'Bimbingan' : 'Coaching',
           items: [
             {
               key: 'mentor:overview',
@@ -407,7 +407,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
           ]
         },
         {
-          title: isMs ? 'Sokongan Usahawan' : 'Entrepreneur Support',
+          title: isMs ? 'Semakan Geran' : 'Grant Reviews',
           items: [
             {
               key: 'mentor:readiness',
@@ -451,7 +451,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
       ]
     : [
         {
-          title: isMs ? 'Ruang Usaha' : 'Business Space',
+          title: isMs ? 'Bisnes Saya' : 'My Business',
           items: [
             {
               key: 'youth:overview',
@@ -514,7 +514,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
           ]
         },
         {
-          title: isMs ? 'Dana & Peluang' : 'Grants & Growth',
+          title: isMs ? 'Geran & Latihan' : 'Grants & Growth',
           items: [
             {
               key: 'youth:ceed',
@@ -534,8 +534,8 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             },
             {
               key: 'youth:b2b',
-              label: isMs ? 'Ruang Niaga' : 'Trade Space',
-              keywords: 'ruang niaga iklan peluang pembekal market trade',
+              label: isMs ? 'Pembekal & B2B' : 'B2B & Suppliers',
+              keywords: 'pembekal b2b iklan peluang borong ruang niaga market trade',
               icon: Network,
               isActive: activeTab === 'b2b',
               onClick: () => goTab('b2b', 'youth:b2b')

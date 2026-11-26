@@ -294,7 +294,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
             </div>
             <div>
               <h3 className="font-extrabold text-base sm:text-lg text-black dark:text-white tracking-tight">
-                {language === 'en' ? 'Ruang Niaga Supplier Matching' : 'Padanan Pembekal Ruang Niaga'}
+                {language === 'en' ? 'B2B & Supplier Network' : 'Rangkaian Pembekal & B2B'}
               </h3>
             </div>
           </div>
@@ -558,7 +558,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                 {language === 'en' ? 'No active applications at the moment' : 'Tiada permohonan aktif buat masa ini'}
               </div>
               <p className="text-[0.9375rem] text-black dark:text-white mt-0.5">
-                {language === 'en' ? 'Rent modular business spaces from RM150/month or apply for RM3,000 Youth Seed Grant.' : 'Sewa ruang niaga modular serendah RM150/bulan atau mohon Geran Permulaan Belia RM3,000.'}
+                {language === 'en' ? 'Apply for a youth kiosk or startup grant to get started.' : 'Mohon tapak kiosk atau geran permulaan belia untuk mula berniaga.'}
               </p>
             </div>
           </div>
@@ -636,7 +636,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                   <tr key={slot.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                     <td className="py-3.5 px-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-16 h-14 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
+                        <div className="w-24 h-20 rounded-xl overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-900 shrink-0">
                           <PortalImage
                             src={resolveSlotImage(slot)}
                             alt={slot.name}
@@ -729,7 +729,7 @@ export const UMKHomeFeed: React.FC<UMKHomeFeedProps> = ({
                     src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                     alt={biz.businessName}
                     referrerPolicy="no-referrer"
-                    className="w-14 h-14 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0 group-hover:scale-105 transition-transform"
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-slate-300 dark:border-slate-600 shrink-0 group-hover:scale-105 transition-transform"
                   />
                   <div className="overflow-hidden flex-1">
                     <div className="flex items-center gap-1">

@@ -1045,6 +1045,22 @@ html.dark .kbelia-live-dot::after {
   will-change: transform;
 }
 
+@keyframes kbeliaSelectionReveal {
+  from {
+    opacity: 0;
+    transform: translate3d(-6px, 0, 0) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.animate-selection-checkbox {
+  animation: kbeliaSelectionReveal 0.16s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-login-float-a,
   .animate-login-float-b,
@@ -1069,7 +1085,8 @@ html.dark .kbelia-live-dot::after {
 
   .animate-dashboard-card,
   .animate-dashboard-tab,
-  .animate-popover-enter {
+  .animate-popover-enter,
+  .animate-selection-checkbox {
     animation: none;
     opacity: 1;
     transform: none;

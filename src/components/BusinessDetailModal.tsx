@@ -124,7 +124,7 @@ export const BusinessDetailModal: React.FC<BusinessDetailModalProps> = ({
                 <img
                   src={business.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                   alt={business.businessName}
-                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs object-cover bg-white dark:bg-slate-900 shrink-0"
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border border-slate-300 dark:border-slate-600 shadow-xs object-cover bg-white dark:bg-slate-900 shrink-0"
                 />
                 <div>
                   <h2 className="font-display text-fluid-title font-black text-black dark:text-white tracking-tight leading-tight kbelia-trim">

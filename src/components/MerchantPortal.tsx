@@ -35,8 +35,6 @@ import {
   ChevronRight,
   Loader2,
   Search,
-  SlidersHorizontal,
-  ArrowUpDown,
   Plus,
   Wallet,
   Printer,
@@ -102,6 +100,7 @@ import { useConfirmDelete } from '../context/ConfirmDeleteContext';
 import { exportProductsToExcel } from '../utils/excelExport';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 import { usePrefersReducedMotion } from '../hooks/useMotion';
+import { useLongPressSelection } from '../hooks/useLongPressSelection';
 import confetti from 'canvas-confetti';
 import { AcronymText, MiddleTruncate } from './TypographyPrimitives';
 import { QrCodeGraphic } from './QrCodeGraphic';
@@ -128,7 +127,7 @@ const ProductRowThumbnail: React.FC<{ src?: string; alt: string; compact?: boole
     setHasError(false);
   }, [src]);
 
-  const sizeClass = compact ? 'w-14 h-14 rounded-lg' : 'w-16 h-16 rounded-lg';
+  const sizeClass = compact ? 'w-20 h-20 rounded-xl' : 'w-24 h-24 rounded-xl';
 
   if (!src || hasError) {
     return (
@@ -294,39 +293,39 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   const [prodSearch, setProdSearch] = useState('');
   const [prodCategoryFilter, setProdCategoryFilter] = useState<string>('Semua');
   const [prodStockFilter, setProdStockFilter] = useState<'all' | 'in_stock' | 'out_of_stock'>('all');
-  const [isProdFilterOpen, setIsProdFilterOpen] = useState(false);
+  const [prodPriceFilter, setProdPriceFilter] = useState<'all' | 'under_10' | '10_30' | 'over_30'>('all');
   const [prodSortBy, setProdSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [prodSort, setProdSort] = useState<{
     key: 'name' | 'category' | 'price' | 'inStock' | 'createdAt';
     dir: 'asc' | 'desc';
   }>({ key: 'createdAt', dir: 'desc' });
-  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const validProductIds = React.useMemo(
+    () => (myProducts || []).map((p) => p.id),
+    [myProducts]
+  );
+  const {
+    isSelectionMode: isProductSelectionMode,
+    selectedIds: selectedProductIds,
+    exitSelectionMode: exitProductSelectionMode,
+    toggleRow: toggleSelectProductRow,
+    removeId: removeProductId,
+    togglePage: toggleSelectProductPage,
+    getRowHandlers: getProductRowHandlers
+  } = useLongPressSelection({
+    scopeId: 'merchant-products',
+    validIds: validProductIds
+  });
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [mobileProductPreviewOpen, setMobileProductPreviewOpen] = useState(false);
 
+  React.useEffect(() => {
+    if (activeTab !== 'products' && isProductSelectionMode) {
+      exitProductSelectionMode();
+    }
+  }, [activeTab, isProductSelectionMode, exitProductSelectionMode]);
+
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-  React.useEffect(() => {
-    const handleOutsideClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target) return;
-      if (!target.closest('[data-prod-filter]')) {
-        setIsProdFilterOpen(false);
-      }
-    };
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsProdFilterOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleOutsideClick);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', handleOutsideClick);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
 
   const productSortOptions = React.useMemo(
     () =>
@@ -369,7 +368,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         prodStockFilter === 'all' ||
         (prodStockFilter === 'in_stock' && isAvail) ||
         (prodStockFilter === 'out_of_stock' && !isAvail);
-      return matchSearch && matchCategory && matchStock;
+      const priceVal = Number(p.price) || 0;
+      const matchPrice =
+        prodPriceFilter === 'all' ||
+        (prodPriceFilter === 'under_10' && priceVal < 10) ||
+        (prodPriceFilter === '10_30' && priceVal >= 10 && priceVal <= 30) ||
+        (prodPriceFilter === 'over_30' && priceVal > 30);
+      return matchSearch && matchCategory && matchStock && matchPrice;
     });
 
     if (prodSortBy === 'table_column') {
@@ -409,12 +414,13 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         return null;
       }
     });
-  }, [safeProducts, prodSearch, prodCategoryFilter, prodStockFilter, prodSortBy, prodSort]);
+  }, [safeProducts, prodSearch, prodCategoryFilter, prodStockFilter, prodPriceFilter, prodSortBy, prodSort]);
 
   const productsPagination = usePagination(filteredSortedProducts, 7, [
     prodSearch,
     prodCategoryFilter,
     prodStockFilter,
+    prodPriceFilter,
     prodSortBy,
     prodSort.key,
     prodSort.dir,
@@ -535,7 +541,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
   const handleDeleteProd = async (id: string) => {
     try {
       await deleteProduct(id);
-      setSelectedProductIds((prev) => prev.filter((item) => item !== id));
+      removeProductId(id);
       setMessage({ type: 'success', text: 'Produk telah dipadam dari katalog.' });
       showToast('Produk telah dipadam dari katalog.', 'success');
       onRefresh();
@@ -642,28 +648,28 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
           const headerMap: Record<MerchantSubTab, { prefix: string; accent: string }> = {
             overview: {
-              prefix: isMs ? 'Gambaran Usaha Niaga ' : 'Your Business ',
-              accent: isMs ? 'Anda' : 'Overview'
+              prefix: isMs ? 'Ringkasan ' : 'Your Business ',
+              accent: isMs ? 'Bisnes Anda' : 'Summary'
             },
             profile: {
-              prefix: isMs ? 'Identiti ' : 'Manage ',
-              accent: isMs ? 'Perniagaan' : 'Business Identity'
+              prefix: isMs ? 'Profil ' : 'Shop ',
+              accent: isMs ? 'Kedai & Bisnes' : 'Profile & Info'
             },
             products: {
-              prefix: isMs ? 'Koleksi ' : 'Your ',
-              accent: isMs ? 'Produk & Tawaran' : 'Products & Offers'
+              prefix: isMs ? 'Senarai ' : 'Product ',
+              accent: isMs ? 'Produk Kedai' : 'Catalog'
             },
             cashflow: {
-              prefix: isMs ? 'Aliran Hasil & ' : 'Sales & ',
-              accent: isMs ? 'Perkembangan' : 'Cashflow'
+              prefix: isMs ? 'Jualan & ' : 'Sales & ',
+              accent: isMs ? 'Tunai Harian' : 'Cashflow'
             },
             vault: {
-              prefix: isMs ? 'Dokumen & ' : 'Records & ',
-              accent: isMs ? 'Rekod Simpanan' : 'Documents'
+              prefix: isMs ? 'Dokumen & ' : 'Letters & ',
+              accent: isMs ? 'Surat Rasmi' : 'Documents'
             },
             card: {
-              prefix: isMs ? 'Perkongsian ' : 'Share ',
-              accent: isMs ? 'Kad Digital' : 'Digital Card'
+              prefix: isMs ? 'Kad Digital & ' : 'Shop Card & ',
+              accent: isMs ? 'QR Kedai' : 'QR Code'
             }
           };
           const currentHeader = headerMap[activeTab] || headerMap.overview;
@@ -928,65 +934,65 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         const stepperItems = [
           {
             step: 1,
-            title: 'Kenalkan Perniagaan Anda',
-            date: myBusiness?.createdAt ? formatDisplayDate(myBusiness.createdAt.split('T')[0]) : 'Langkah Awal',
-            officer: 'Ruang Usaha',
+            title: 'Daftar Profil Kedai',
+            date: myBusiness?.createdAt ? formatDisplayDate(myBusiness.createdAt.split('T')[0]) : 'Langkah 1',
+            officer: 'Profil',
             status: hasBusiness ? 'completed' : 'current',
             desc: hasBusiness
-              ? `Perniagaan "${myBusiness?.businessName || userProfile?.businessName}" sudah tersenarai dalam rangkaian.`
-              : 'Kongsikan nama dan latar ringkas perniagaan anda.'
+              ? `Kedai "${myBusiness?.businessName || userProfile?.businessName}" sudah tersenarai di direktori.`
+              : 'Isi nama kedai dan maklumat asas perniagaan anda.'
           },
           {
             step: 2,
-            title: 'Lengkapkan Butiran Asas',
-            date: hasSsm ? 'Sudah Lengkap' : 'Dalam Proses',
-            officer: 'Maklumat Asas',
+            title: 'Isi Maklumat SSM',
+            date: hasSsm ? 'Sudah Lengkap' : 'Belum Lengkap',
+            officer: 'SSM',
             status: hasSsm ? 'completed' : hasBusiness ? 'current' : 'upcoming',
             desc: hasSsm
-              ? 'Maklumat pendaftaran perniagaan anda telah dikemas kini.'
-              : 'Tambahkan nombor pendaftaran perniagaan apabila sedia.'
+              ? 'Nombor pendaftaran SSM anda telah disimpan.'
+              : 'Masukkan nombor pendaftaran SSM anda apabila sudah ada.'
           },
           {
             step: 3,
-            title: 'Pilih Ruang Niaga',
-            date: primaryBooking ? formatDisplayDate(primaryBooking.createdAt?.split('T')[0]) : 'Pilihan Terbuka',
-            officer: 'Lokasi Pilihan',
+            title: 'Mohon Sewa Kiosk',
+            date: primaryBooking ? formatDisplayDate(primaryBooking.createdAt?.split('T')[0]) : 'Belum Mohon',
+            officer: 'Kiosk',
             status: isBookingApproved ? 'completed' : hasBooking ? 'current' : 'upcoming',
             desc: primaryBooking
-              ? `Penyertaan di ${primaryBooking.hubLocation} kini berstatus: ${primaryBooking.status === 'approved' ? 'Diluluskan' : primaryBooking.status === 'rejected' ? 'Perlu Semakan Semula' : 'Dalam Semakan'}.`
-              : 'Teroka ruang niaga yang sesuai dengan keperluan perniagaan anda.'
+              ? `Permohonan kiosk di ${primaryBooking.hubLocation} kini berstatus: ${primaryBooking.status === 'approved' ? 'Diluluskan' : primaryBooking.status === 'rejected' ? 'Ditolak' : 'Dalam Semakan'}.`
+              : 'Pilih lokasi kiosk yang masih kosong untuk mula berniaga.'
           },
           {
             step: 4,
-            title: 'Sahkan Penyertaan',
-            date: isBookingApproved ? (isTenancySigned ? 'Disahkan' : 'Menunggu Pengesahan') : 'Fasa Seterusnya',
-            officer: 'Pengesahan',
+            title: 'Sahkan Perjanjian Kiosk',
+            date: isBookingApproved ? (isTenancySigned ? 'Disahkan' : 'Perlu Disahkan') : 'Seterusnya',
+            officer: 'Perjanjian',
             status: isTenancySigned ? 'completed' : isBookingApproved ? 'current' : 'upcoming',
             desc: isTenancySigned
-              ? 'Pengesahan penyertaan ruang niaga anda telah lengkap.'
+              ? 'Perjanjian sewa kiosk anda telah lengkap disahkan.'
               : isBookingApproved
-              ? 'Dokumen penyertaan sedia untuk disemak dan disahkan.'
-              : 'Langkah pengesahan akan dibuka selepas lokasi dipilih.'
+              ? 'Surat perjanjian sedia untuk anda semak dan sahkan.'
+              : 'Langkah ini akan dibuka selepas permohonan kiosk diluluskan.'
           },
           {
             step: 5,
-            title: 'Mula Berniaga & Catat Hasil',
-            date: isTenancySigned ? 'Sedang Berjalan' : 'Sedia Bermula',
-            officer: 'Perkembangan',
+            title: 'Mula Berniaga & Rekod Jualan',
+            date: isTenancySigned ? 'Aktif' : 'Sedia Bermula',
+            officer: 'Jualan',
             status: isTenancySigned && safeCashflow.length > 0 ? 'completed' : isTenancySigned ? 'current' : 'upcoming',
             desc: safeCashflow.length > 0
-              ? `${safeCashflow.length} catatan hasil jualan telah direkodkan.`
-              : 'Mula catat hasil harian anda bagi memantau perkembangan semasa.'
+              ? `${safeCashflow.length} rekod jualan harian telah disimpan.`
+              : 'Catat jualan tunai dan QR setiap hari untuk pantau untung kedai.'
           }
         ];
 
-        // Dynamic updates in general friendly prose
+        // Dynamic updates in clear direct language
         const liveAlerts: { tag: string; time: string; title: string; body: string; action?: () => void }[] = [];
         if (upcomingMentor) {
           liveAlerts.push({
             tag: 'Bimbingan',
             time: upcomingMentor.preferredDate || 'Dijadualkan',
-            title: `Perbincangan: ${upcomingMentor.topic}`,
+            title: `Sesi Mentor: ${upcomingMentor.topic}`,
             body: `${upcomingMentor.mentorName} · ${upcomingMentor.preferredTime} (${normalizeMentorshipMode(upcomingMentor.mode)})`,
             action: onOpenMentorshipClinic
           });
@@ -994,7 +1000,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         if (safeTickets.length > 0) {
           const latestTicket = safeTickets[0];
           liveAlerts.push({
-            tag: 'Penjagaan Ruang',
+            tag: 'Aduan Kiosk',
             time: latestTicket.status === 'resolved' ? 'Selesai' : latestTicket.status === 'in_progress' ? 'Sedang Diurus' : 'Diterima',
             title: `${latestTicket.issueCategory}`,
             body: latestTicket.description,
@@ -1003,15 +1009,15 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         }
         if (latestGrant) {
           liveAlerts.push({
-            tag: 'Sokongan Modal',
-            time: latestGrant.status === 'approved' ? 'Diluluskan' : latestGrant.status === 'rejected' ? 'Tidak Berjaya' : 'Dalam Semakan',
+            tag: 'Geran Belia',
+            time: latestGrant.status === 'approved' ? 'Diluluskan' : latestGrant.status === 'rejected' ? 'Ditolak' : 'Dalam Semakan',
             title: latestGrant.programTitle,
-            body: `Anggaran sokongan: ${latestGrant.grantAmount} (${latestGrant.businessName})`,
+            body: `Jumlah dipohon: ${latestGrant.grantAmount} (${latestGrant.businessName})`,
             action: () => setActiveTab('vault')
           });
         }
 
-        // Aggregate open pending items calmly
+        // Aggregate open pending items clearly
         const pendingApprovalItems: {
           id: string;
           category: string;
@@ -1027,7 +1033,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             .filter((b) => b.status === 'pending')
             .map((b) => ({
               id: `booking-${b.id}`,
-              category: 'Ruang Niaga',
+              category: 'Sewa Kiosk',
               title: `${b.hubLocation}`,
               subtitle: `${b.businessName} · Tempoh ${b.durationMonths} bulan`,
               statusLabel: 'Menunggu Semakan',
@@ -1040,7 +1046,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             .filter((g) => g.status === 'pending')
             .map((g) => ({
               id: `grant-${g.id}`,
-              category: 'Sokongan Modal',
+              category: 'Geran Belia',
               title: g.programTitle,
               subtitle: `${g.businessName} · ${g.grantAmount || g.amount || 'Dalam Semakan'}`,
               statusLabel: 'Dalam Semakan',
@@ -1053,7 +1059,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             .filter((m) => m.status === 'pending')
             .map((m) => ({
               id: `mentor-${m.id}`,
-              category: 'Sesi Bimbingan',
+              category: 'Sesi Mentor',
               title: m.topic,
               subtitle: `${m.mentorName} · ${m.preferredDate} (${m.preferredTime})`,
               statusLabel: 'Menunggu Pengesahan',
@@ -1066,7 +1072,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             .filter((t) => t.status === 'received' || t.status === 'in_progress')
             .map((t) => ({
               id: `ticket-${t.id}`,
-              category: 'Penjagaan Ruang',
+              category: 'Aduan Kiosk',
               title: `${t.issueCategory}`,
               subtitle: `${t.kioskName} · ${t.description}`,
               statusLabel: t.status === 'in_progress' ? 'Sedang Diurus' : 'Diterima',
@@ -1092,48 +1098,48 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             items={[
               {
                 id: 'sales',
-                label: 'Perkembangan Jualan',
+                label: 'Jumlah Jualan',
                 value: `RM ${totalSalesAll.toLocaleString('ms-MY', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`,
                 summary:
                   safeCashflow.length > 0
-                    ? `Ringkasan hasil terkini (Purata RM ${avgDailySales.toLocaleString()})`
+                    ? `Purata harian RM ${avgDailySales.toLocaleString()}`
                     : 'Mula catat jualan harian anda',
                 highlightTone: 'primary',
                 onClick: () => setActiveTab('cashflow')
               },
               {
                 id: 'space',
-                label: 'Ruang Niaga',
-                value: primaryBooking ? primaryBooking.slotCode : 'Terbuka',
+                label: 'Kiosk Saya',
+                value: primaryBooking ? primaryBooking.slotCode : 'Belum Mohon',
                 summary: primaryBooking
                   ? `${primaryBooking.hubLocation} · ${primaryBooking.durationMonths} bulan`
-                  : 'Teroka pilihan tapak niaga',
+                  : 'Pilih & mohon sewa kiosk',
                 highlightTone: 'secondary',
                 onClick: () =>
                   onOpenBookingTab?.(primaryBooking || safeTickets.length > 0 ? 'manage' : 'browse')
               },
               {
                 id: 'support',
-                label: 'Sokongan Modal',
+                label: 'Geran Belia',
                 value: `RM ${totalGrantValue.toLocaleString('ms-MY')}`,
-                summary: latestGrant ? latestGrant.programTitle : 'Lihat peluang sokongan modal',
+                summary: latestGrant ? latestGrant.programTitle : 'Semak senarai geran belia',
                 highlightTone: 'neutral',
                 onClick: () => setActiveTab('vault')
               },
               {
                 id: 'mentoring',
-                label: 'Sesi Bimbingan',
-                value: upcomingMentor ? upcomingMentor.preferredDate : 'Sedia Diatur',
+                label: 'Sesi Mentor',
+                value: upcomingMentor ? upcomingMentor.preferredDate : 'Belum Tempah',
                 summary: upcomingMentor
                   ? `${upcomingMentor.mentorName} · ${upcomingMentor.preferredTime}`
-                  : 'Atur sesi bersama mentor',
+                  : 'Tempah sesi bersama mentor',
                 highlightTone: 'neutral',
                 onClick: onOpenMentorshipClinic
               }
             ]}
           />
 
-          {/* [2] Seksyen Analitik 2:1 — Aliran Perkembangan Jualan + Ringkasan Hasil */}
+          {/* [2] Seksyen Analitik 2:1 — Graf Jualan Harian + Ringkasan Tunai */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
             <div
               style={{ '--stagger': 4 } as React.CSSProperties}
@@ -1145,7 +1151,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <BarChart3 className={`w-5 h-5 shrink-0 ${beliaTheme.accentTextClass}`} />
                   <div>
                     <h4 className="font-display text-base sm:text-[1.0625rem] font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
-                      Aliran Perkembangan Jualan
+                      Graf Jualan Harian
                     </h4>
                     {chartRangeLabel && (
                       <p className="text-xs text-slate-500 dark:text-stone-400">
@@ -1385,7 +1391,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             <RoleDonutCard
               role="belia"
               className="lg:col-span-1 h-full"
-              title="Ringkasan Hasil & Perbelanjaan"
+              title="Ringkasan Tunai & Belanja"
               icon={Wallet}
               headerRight={
                 <span className="text-[0.8125rem] font-medium text-slate-500 dark:text-stone-400">
@@ -1394,11 +1400,11 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               }
               segments={paymentMixSegments}
               centerValue={`${periodProfitMargin}%`}
-              centerLabel="Baki Positif"
+              centerLabel="Margin Untung"
               valueUnit="RM"
               summaryPairs={[
                 {
-                  label: 'Aliran Masuk',
+                  label: 'Untung Bersih',
                   value: `${periodNetProfit < 0 ? '-' : ''}RM ${Math.abs(periodNetProfit).toLocaleString('ms-MY')}`,
                   dotColor: periodNetProfit >= 0 ? beliaTheme.chartPrimary : '#F43F5E'
                 },
@@ -1409,8 +1415,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                 }
               ]}
               emptyState={{
-                title: 'Belum Ada Catatan Tempoh Ini',
-                description: 'Catat jualan harian dan perbelanjaan anda bagi melihat ringkasan perkembangan semasa.',
+                title: 'Belum Ada Rekod Jualan',
+                description: 'Catat jualan harian dan belanja kedai anda untuk lihat jumlah untung bersih.',
                 actionLabel: 'Catat Jualan',
                 onAction: () => setActiveTab('cashflow')
               }}
@@ -1418,9 +1424,9 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             />
           </div>
 
-          {/* [3] Dua Lajur Ringkasan Editorial Terbuka (Tanpa Kotak Bertindih) */}
+          {/* [3] Dua Lajur Ringkasan */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-            {/* Lajur Kiri: Perkara Terkini Untuk Anda */}
+            {/* Lajur Kiri: Permohonan & Status Semasa */}
             <div
               style={{ '--stagger': 5 } as React.CSSProperties}
               className={`animate-dashboard-card min-w-0 rounded-2xl border backdrop-blur-xs overflow-hidden transition-all duration-200 flex flex-col ${beliaTheme.surfaceClass}`}
@@ -1428,7 +1434,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <div className={`border-b py-3.5 px-5 flex items-center gap-2.5 ${beliaTheme.dividerClass}`}>
                 <Clock className={`w-4.5 h-4.5 shrink-0 ${beliaTheme.accentStrongTextClass}`} />
                 <h4 className="font-display text-base sm:text-[1.0625rem] font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
-                  Perkara Terkini Untuk Anda
+                  Permohonan &amp; Status Semasa
                 </h4>
               </div>
 
@@ -1438,10 +1444,10 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     <CheckCircle2 className={`w-7 h-7 ${beliaTheme.accentTextClass}`} />
                     <div>
                       <p className="text-sm sm:text-base font-semibold text-slate-900 dark:text-[#F4F1EA]">
-                        Semua Urusan Berjalan Lancar
+                        Tiada Permohonan Tertangguh
                       </p>
                       <p className="text-sm text-slate-600 dark:text-stone-400 mt-1 max-w-md leading-relaxed">
-                        Semua urusan semasa anda berada dalam keadaan teratur. Teroka peluang baharu apabila anda bersedia.
+                        Semua permohonan anda telah selesai disemak. Anda boleh mohon sewa kiosk atau semak dokumen rasmi anda di sini.
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
@@ -1450,14 +1456,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                         onClick={() => (onOpenBookingTab ? onOpenBookingTab('browse') : onOpenBookingModal?.())}
                         className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${beliaTheme.primaryButtonClass}`}
                       >
-                        Teroka Ruang Niaga
+                        Mohon Sewa Kiosk
                       </button>
                       <button
                         type="button"
                         onClick={() => setActiveTab('vault')}
                         className={`px-3.5 py-2 rounded-xl text-sm font-semibold transition-colors cursor-pointer ${beliaTheme.secondaryButtonClass}`}
                       >
-                        Lihat Sokongan
+                        Lihat Dokumen
                       </button>
                     </div>
                   </div>
@@ -1508,7 +1514,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               </div>
             </div>
 
-            {/* Lajur Kanan: Perjalanan Usaha Niaga */}
+            {/* Lajur Kanan: Langkah Mula Berniaga */}
             <div
               style={{ '--stagger': 6 } as React.CSSProperties}
               className={`animate-dashboard-card min-w-0 rounded-2xl border backdrop-blur-xs overflow-hidden transition-all duration-200 flex flex-col ${beliaTheme.surfaceClass}`}
@@ -1516,7 +1522,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
               <div className={`border-b py-3.5 px-5 flex items-center gap-2.5 ${beliaTheme.dividerClass}`}>
                 <FileCheck className={`w-4.5 h-4.5 shrink-0 ${beliaTheme.accentTextClass}`} />
                 <h4 className="font-display text-base sm:text-[1.0625rem] font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
-                  Perjalanan Usaha Niaga
+                  Langkah Mula Berniaga
                 </h4>
               </div>
 
@@ -1595,7 +1601,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             </div>
           </div>
 
-          {/* [4] Catatan & Kemas Kini Semasa (Aliran Terbuka) */}
+          {/* [4] Aktiviti & Notis Terkini */}
           <div
             style={{ '--stagger': 7 } as React.CSSProperties}
             className={`animate-dashboard-card w-full rounded-2xl border backdrop-blur-xs overflow-hidden transition-all duration-200 flex flex-col ${beliaTheme.surfaceClass}`}
@@ -1603,17 +1609,17 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
             <div className={`border-b py-3.5 px-5 flex items-center gap-2.5 ${beliaTheme.dividerClass}`}>
               <Bell className={`w-4.5 h-4.5 shrink-0 ${beliaTheme.accentTextClass}`} />
               <h4 className="font-display text-base sm:text-[1.0625rem] font-bold text-slate-900 dark:text-[#F4F1EA] tracking-tight">
-                Catatan &amp; Kemas Kini Semasa
+                Aktiviti &amp; Notis Terkini
               </h4>
             </div>
 
             {liveAlerts.length === 0 ? (
               <div className="p-6 text-center space-y-2.5">
                 <p className="text-[0.9375rem] font-semibold text-slate-900 dark:text-[#F4F1EA]">
-                  Kongsikan Perkembangan Usaha Anda
+                  Belum Ada Aktiviti Terkini
                 </p>
                 <p className="text-[0.875rem] text-slate-600 dark:text-stone-400 leading-relaxed max-w-xl mx-auto">
-                  Anda boleh mengatur sesi bimbingan bersama mentor atau mengemas kini keperluan ruang niaga anda pada bila-bila masa.
+                  Tempah sesi bersama mentor atau lapor kerosakan kiosk anda pada bila-bila masa.
                 </p>
                 <div className="flex flex-wrap justify-center gap-2.5 pt-1">
                   {onOpenMentorshipClinic && (
@@ -1622,7 +1628,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       onClick={onOpenMentorshipClinic}
                       className={`px-4 py-2 rounded-xl text-[0.8125rem] font-semibold ${beliaTheme.primaryButtonClass}`}
                     >
-                      Atur Sesi
+                      Tempah Sesi Mentor
                     </button>
                   )}
                   {onOpenMaintenanceModal && (
@@ -1631,7 +1637,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       onClick={onOpenMaintenanceModal}
                       className={`px-4 py-2 rounded-xl text-[0.8125rem] font-semibold ${beliaTheme.secondaryButtonClass}`}
                     >
-                      Lapor Ruang
+                      Lapor Kerosakan
                     </button>
                   )}
                 </div>
@@ -1860,23 +1866,14 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
         const activeFilterCount =
           (prodCategoryFilter !== 'Semua' ? 1 : 0) +
           (prodStockFilter !== 'all' ? 1 : 0) +
+          (prodPriceFilter !== 'all' ? 1 : 0) +
           (prodSortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
         const pageIds = productsPagination.paginatedItems.map((p) => p.id);
         const allPageSelected =
           pageIds.length > 0 && pageIds.every((id) => selectedProductIds.includes(id));
 
         const toggleSelectAllOnPage = () => {
-          if (allPageSelected) {
-            setSelectedProductIds((prev) => prev.filter((id) => !pageIds.includes(id)));
-          } else {
-            setSelectedProductIds((prev) => Array.from(new Set([...prev, ...pageIds])));
-          }
-        };
-
-        const toggleSelectRow = (id: string) => {
-          setSelectedProductIds((prev) =>
-            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-          );
+          toggleSelectProductPage(pageIds);
         };
 
         return (
@@ -2038,8 +2035,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
 
           {/* Google Workspace Header + Split-Pane Products List & Preview */}
           {(() => {
-            const inStockCount = safeProducts.filter((p) => p.inStock !== false).length;
-            const outOfStockCount = safeProducts.filter((p) => p.inStock === false).length;
             const activeProduct =
               filteredSortedProducts.find((p) => p.id === selectedProductId) ||
               productsPagination.paginatedItems[0] ||
@@ -2052,34 +2047,33 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   role="belia"
                   icon={<ShoppingBag className="w-5 h-5" />}
                   title="Katalog Produk & Perkhidmatan"
-                  subtitle="Pilih mana-mana produk di kiri untuk pratonton gambar, harga, penerangan, dan tindakan pantas."
-                  tabs={[
-                    { id: 'all', label: 'Semua', count: safeProducts.length },
-                    { id: 'in_stock', label: 'Tersedia', count: inStockCount },
-                    { id: 'out_of_stock', label: 'Habis Stok', count: outOfStockCount }
-                  ]}
-                  activeTab={prodStockFilter}
-                  onTabChange={(id) => setProdStockFilter(id as 'all' | 'in_stock' | 'out_of_stock')}
+                  subtitle="Urus senarai produk, harga dan stok kedai anda."
                   searchValue={prodSearch}
                   onSearchChange={setProdSearch}
                   searchPlaceholder="Cari produk atau kategori..."
                   rightActions={
                     <>
-                      {selectedProductIds.length > 0 && (
-                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[0.8125rem] font-semibold ${beliaTheme.activeMiniBtnClass}`}>
+                      {isProductSelectionMode && (
+                        <div
+                          data-selection-scope="merchant-products"
+                          className={`animate-selection-checkbox inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1 rounded-xl border text-[0.8125rem] font-semibold ${beliaTheme.activeMiniBtnClass}`}
+                        >
                           <span className="tabular-nums">{selectedProductIds.length} dipilih</span>
                           <button
                             type="button"
-                            onClick={() => setSelectedProductIds([])}
-                            className="underline cursor-pointer font-semibold"
+                            onClick={exitProductSelectionMode}
+                            aria-label="Tutup mod pilihan"
+                            title="Tutup mod pilihan"
+                            className="p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer transition-colors"
                           >
-                            Kosongkan
+                            <X className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       )}
 
                       <button
                         type="button"
+                        data-selection-scope="merchant-products"
                         onClick={handleExportProducts}
                         className={`min-h-[38px] px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${beliaTheme.secondaryButtonClass}`}
                       >
@@ -2101,104 +2095,142 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                       </button>
                     </>
                   }
-                  extraControls={
-                    <div className="relative flex items-center gap-2" data-prod-filter>
-                      <select
-                        value={prodCategoryFilter}
-                        onChange={(e) => setProdCategoryFilter(e.target.value)}
-                        aria-label="Tapis kategori produk"
-                        className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
-                      >
-                        {productCategories.map((cat) => (
-                          <option key={cat} value={cat}>
-                            {cat === 'Semua' ? 'Semua Kategori' : cat}
-                          </option>
-                        ))}
-                      </select>
+                  filterCount={activeFilterCount}
+                  onResetFilters={() => {
+                    setProdCategoryFilter('Semua');
+                    setProdStockFilter('all');
+                    setProdPriceFilter('all');
+                    setProdSortBy(DEFAULT_SORT_VALUE);
+                  }}
+                  sortOptions={
+                    prodSortBy === 'table_column'
+                      ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...productSortOptions]
+                      : productSortOptions
+                  }
+                  sortValue={prodSortBy === 'table_column' ? '' : prodSortBy}
+                  onSortChange={(val) => {
+                    if (val) setProdSortBy(val);
+                  }}
+                  filterContent={
+                    <>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 dark:text-stone-300 mb-1.5">
+                          Kategori Produk
+                        </label>
+                        <select
+                          value={prodCategoryFilter}
+                          onChange={(e) => setProdCategoryFilter(e.target.value)}
+                          className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
+                        >
+                          {productCategories.map((cat) => (
+                            <option key={cat} value={cat}>
+                              {cat === 'Semua' ? 'Semua Kategori' : cat}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
 
-                      <button
-                        type="button"
-                        onClick={() => setIsProdFilterOpen((prev) => !prev)}
-                        aria-expanded={isProdFilterOpen}
-                        aria-label="Susun produk"
-                        title="Susun produk"
-                        className={`min-h-[34px] w-[34px] rounded-xl border inline-flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
-                          activeFilterCount > 0
-                            ? beliaTheme.activeMiniBtnClass
-                            : beliaTheme.secondaryButtonClass
-                        }`}
-                      >
-                        <SlidersHorizontal className="w-4 h-4 shrink-0" />
-                      </button>
-
-                      {isProdFilterOpen && (
-                        <div className="animate-popover-enter absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#141D1A] border border-slate-200 dark:border-[#24342D] shadow-xl p-4 z-30 space-y-3.5">
-                          <div className={`pb-3 border-b ${beliaTheme.dividerClass}`}>
-                            <label className="block text-[0.8125rem] font-semibold text-slate-700 dark:text-stone-300 mb-1.5 flex items-center gap-1.5">
-                              <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${beliaTheme.accentTextClass}`} />
-                              <span>Susun Mengikut</span>
-                            </label>
-                            <select
-                              value={prodSortBy === 'table_column' ? '' : prodSortBy}
-                              onChange={(e) => {
-                                if (e.target.value) setProdSortBy(e.target.value);
-                              }}
-                              className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
-                            >
-                              {productSortOptions.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                  {opt.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div className="flex items-center justify-between">
+                      <div>
+                        <span className="block text-xs font-semibold text-slate-700 dark:text-stone-300 mb-1.5">
+                          Status Stok
+                        </span>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {(
+                            [
+                              { id: 'all', label: 'Semua' },
+                              { id: 'in_stock', label: 'Tersedia' },
+                              { id: 'out_of_stock', label: 'Habis Stok' }
+                            ] as const
+                          ).map((opt) => (
                             <button
+                              key={opt.id}
                               type="button"
-                              onClick={() => {
-                                setProdCategoryFilter('Semua');
-                                setProdStockFilter('all');
-                                setProdSortBy(DEFAULT_SORT_VALUE);
-                              }}
-                              className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300 hover:underline cursor-pointer"
+                              onClick={() => setProdStockFilter(opt.id)}
+                              className={`px-2 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors whitespace-nowrap ${
+                                prodStockFilter === opt.id
+                                  ? beliaTheme.activeMiniBtnClass
+                                  : beliaTheme.secondaryButtonClass
+                              }`}
                             >
-                              Set Semula
+                              {opt.label}
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => setIsProdFilterOpen(false)}
-                              className={`px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${beliaTheme.primaryButtonClass}`}
-                            >
-                              Tutup
-                            </button>
-                          </div>
+                          ))}
                         </div>
-                      )}
-                    </div>
+                      </div>
+
+                      <div>
+                        <span className="block text-xs font-semibold text-slate-700 dark:text-stone-300 mb-1.5">
+                          Julat Harga
+                        </span>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {(
+                            [
+                              { id: 'all', label: 'Semua Harga' },
+                              { id: 'under_10', label: 'Bawah RM10' },
+                              { id: '10_30', label: 'RM10 - RM30' },
+                              { id: 'over_30', label: 'Atas RM30' }
+                            ] as const
+                          ).map((opt) => (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => setProdPriceFilter(opt.id)}
+                              className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors whitespace-nowrap ${
+                                prodPriceFilter === opt.id
+                                  ? beliaTheme.activeMiniBtnClass
+                                  : beliaTheme.secondaryButtonClass
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </>
                   }
                 />
 
                 <GoogleWorkspaceSplitPane
                   role="belia"
+                  leftSelectionScope="merchant-products"
                   mobileOpen={mobileProductPreviewOpen}
                   onMobileClose={() => setMobileProductPreviewOpen(false)}
                   mobileTitle={activeProduct?.name || 'Produk'}
                   leftHeader={
                     filteredSortedProducts.length > 0 ? (
-                      <div className={`px-4 py-2.5 border-b flex items-center justify-between gap-2 text-xs font-semibold text-slate-600 dark:text-stone-400 ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
-                        <label className="inline-flex items-center gap-2.5 cursor-pointer select-none">
-                          <input
-                            type="checkbox"
-                            checked={allPageSelected}
-                            onChange={toggleSelectAllOnPage}
-                            aria-label="Pilih semua produk pada halaman ini"
-                            className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
-                          />
-                          <span>Pilih Semua (Halaman Ini)</span>
-                        </label>
-                        <span className="tabular-nums">{filteredSortedProducts.length} produk</span>
-                      </div>
+                      isProductSelectionMode ? (
+                        <div className={`px-4 py-2 border-b flex items-center justify-between gap-2 text-xs font-semibold ${beliaTheme.activeMiniBtnClass} ${beliaTheme.dividerClass}`}>
+                          <label className="inline-flex items-center gap-2.5 cursor-pointer select-none animate-selection-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={allPageSelected}
+                              onChange={toggleSelectAllOnPage}
+                              aria-label="Pilih semua produk pada halaman ini"
+                              className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
+                            />
+                            <span>Pilih Semua (Halaman Ini)</span>
+                          </label>
+                          <div className="flex items-center gap-2 shrink-0">
+                            <span className="tabular-nums">{selectedProductIds.length} dipilih</span>
+                            <button
+                              type="button"
+                              onClick={exitProductSelectionMode}
+                              aria-label="Tutup mod pilihan"
+                              title="Tutup mod pilihan"
+                              className="p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className={`px-4 py-2.5 border-b flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-stone-400 ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
+                          <span className="font-medium">Tekan lama item untuk memilih</span>
+                          <span className="font-semibold tabular-nums text-slate-600 dark:text-stone-300">
+                            {filteredSortedProducts.length} produk
+                          </span>
+                        </div>
+                      )
                     ) : undefined
                   }
                   leftContent={
@@ -2224,6 +2256,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                             setProdSearch('');
                             setProdCategoryFilter('Semua');
                             setProdStockFilter('all');
+                            setProdPriceFilter('all');
                           }}
                           className={`text-xs font-semibold hover:underline cursor-pointer ${beliaTheme.accentTextClass}`}
                         >
@@ -2240,37 +2273,39 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                           (prod.updatedAt || prod.createdAt || '').slice(0, 10)
                         );
 
+                        const rowHandlers = getProductRowHandlers(prod.id, () => {
+                          setSelectedProductId(prod.id);
+                          setMobileProductPreviewOpen(true);
+                        });
+                        const highlightRow = isProductSelectionMode ? isChecked : isSelected;
+
                         return (
                           <div
                             key={prod.id}
-                            onClick={() => {
-                              setSelectedProductId(prod.id);
-                              setMobileProductPreviewOpen(true);
-                            }}
+                            {...rowHandlers}
                             role="button"
                             tabIndex={0}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                setSelectedProductId(prod.id);
-                                setMobileProductPreviewOpen(true);
-                              }
-                            }}
-                            className={`w-full text-left p-3.5 sm:px-4 flex items-start gap-3 transition-colors cursor-pointer ${
-                              isSelected
+                            aria-selected={isProductSelectionMode ? isChecked : isSelected}
+                            className={`w-full text-left p-3.5 sm:px-4 flex items-start gap-3 transition-colors cursor-pointer select-none ${
+                              highlightRow
                                 ? getWorkspaceActiveRowClass('belia')
                                 : beliaTheme.rowHoverClass
                             }`}
                           >
-                            <div className="pt-1 shrink-0" onClick={(e) => e.stopPropagation()}>
-                              <input
-                                type="checkbox"
-                                checked={isChecked}
-                                onChange={() => toggleSelectRow(prod.id)}
-                                aria-label={`Pilih ${prod.name}`}
-                                className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
-                              />
-                            </div>
+                            {isProductSelectionMode && (
+                              <div
+                                className="pt-1 shrink-0 animate-selection-checkbox"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={isChecked}
+                                  onChange={() => toggleSelectProductRow(prod.id)}
+                                  aria-label={`Pilih ${prod.name}`}
+                                  className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
+                                />
+                              </div>
+                            )}
                             <ProductRowThumbnail src={prod.imageUrl} alt={prod.name} compact />
                             <div className="min-w-0 flex-1 space-y-1">
                               <div className="flex items-center justify-between gap-2">
@@ -2315,7 +2350,7 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                     !activeProduct ? (
                       <SidePreviewEmptyState
                         icon={<ShoppingBag className="w-10 h-10 text-slate-400 dark:text-stone-500" />}
-                        title="Pilih produk daripada senarai di sebelah kiri"
+                        title="Tiada Produk Dipilih"
                         description="Gambar produk, harga jualan, status stok dan penerangan penuh akan dipaparkan di sini."
                       />
                     ) : (() => {
@@ -2490,8 +2525,8 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   <span>Kad Profil &amp; Kod QR Perniagaan</span>
                 </div>
 
-                <div className="space-y-3">
-                  <div className={`w-16 h-16 rounded-2xl mx-auto border overflow-hidden ${beliaTheme.dividerClass} ${beliaTheme.surfaceMutedClass}`}>
+                <div className="space-y-4 w-full">
+                  <div className={`w-32 h-32 sm:w-36 sm:h-36 rounded-2xl mx-auto border overflow-hidden shadow-xs ${beliaTheme.dividerClass} ${beliaTheme.surfaceMutedClass}`}>
                     <PortalImage
                       src={myBusiness?.logoUrl || user.photoURL || ''}
                       alt={myBusiness?.businessName || 'Logo Perniagaan'}

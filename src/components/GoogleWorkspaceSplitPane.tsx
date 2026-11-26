@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ArrowUpDown, Search, SlidersHorizontal, X } from 'lucide-react';
 import { DashboardRole, getRoleTheme } from '../utils/roleTheme';
+import { ToolbarSortOption } from '../utils/sortUtils';
 
 export interface WorkspaceSplitPaneProps {
   role: Extract<DashboardRole, 'admin' | 'belia'>;
@@ -12,6 +13,7 @@ export interface WorkspaceSplitPaneProps {
   onMobileClose: () => void;
   mobileBackLabel?: string;
   mobileTitle?: string;
+  leftSelectionScope?: string;
 }
 
 export function getWorkspaceActiveRowClass(role: Extract<DashboardRole, 'admin' | 'belia'>): string {
@@ -30,7 +32,8 @@ export const GoogleWorkspaceSplitPane: React.FC<WorkspaceSplitPaneProps> = ({
   mobileOpen,
   onMobileClose,
   mobileBackLabel = 'Kembali ke Senarai',
-  mobileTitle
+  mobileTitle,
+  leftSelectionScope
 }) => {
   const theme = getRoleTheme(role);
 
@@ -49,9 +52,12 @@ export const GoogleWorkspaceSplitPane: React.FC<WorkspaceSplitPaneProps> = ({
       : 'bg-[#FAF9F6] dark:bg-[#101614]';
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-4 items-stretch">
+    <div className="relative z-0 grid grid-cols-1 lg:grid-cols-[minmax(0,45fr)_minmax(0,55fr)] gap-4 items-stretch">
       {/* Left Pane: 45% List Queue */}
-      <div className={`rounded-2xl border backdrop-blur-xs overflow-hidden flex flex-col justify-between ${theme.surfaceClass}`}>
+      <div
+        data-selection-scope={leftSelectionScope}
+        className={`rounded-2xl border backdrop-blur-xs overflow-hidden flex flex-col justify-between ${theme.surfaceClass}`}
+      >
         <div className="flex-1 flex flex-col min-h-0">
           {leftHeader}
           <div className={`divide-y ${theme.dividerClass} flex-1`}>
@@ -210,7 +216,7 @@ export interface WorkspaceHeaderTab {
 }
 
 interface WorkspaceHeaderCardProps {
-  role: Extract<DashboardRole, 'admin' | 'belia'>;
+  role: DashboardRole;
   icon?: React.ReactNode;
   title: React.ReactNode;
   subtitle?: React.ReactNode;
@@ -222,6 +228,13 @@ interface WorkspaceHeaderCardProps {
   onSearchChange?: (val: string) => void;
   searchPlaceholder?: string;
   extraControls?: React.ReactNode;
+  filterCount?: number;
+  onResetFilters?: () => void;
+  filterContent?: React.ReactNode;
+  sortOptions?: ToolbarSortOption[];
+  sortValue?: string;
+  onSortChange?: (val: string) => void;
+  sortLabel?: string;
 }
 
 export const WorkspaceHeaderCard: React.FC<WorkspaceHeaderCardProps> = ({
@@ -236,13 +249,53 @@ export const WorkspaceHeaderCard: React.FC<WorkspaceHeaderCardProps> = ({
   searchValue,
   onSearchChange,
   searchPlaceholder = 'Cari...',
-  extraControls
+  extraControls,
+  filterCount = 0,
+  onResetFilters,
+  filterContent,
+  sortOptions,
+  sortValue,
+  onSortChange,
+  sortLabel = 'Susun Mengikut'
 }) => {
   const theme = getRoleTheme(role);
-  const hasBottomStrip = Boolean((tabs && tabs.length > 0) || onSearchChange || extraControls);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  const hasSortControl = Boolean(sortOptions && sortOptions.length > 0 && sortValue !== undefined && onSortChange);
+  const hasPopoverBody = Boolean(filterContent || hasSortControl);
+  const hasTabs = Boolean(tabs && tabs.length > 0);
+  const hasBottomStrip = Boolean(hasTabs || onSearchChange || extraControls || hasPopoverBody);
+
+  useEffect(() => {
+    if (!isFilterOpen) return;
+    const handlePointerDown = (e: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFilterOpen]);
+
+  const popoverSurfaceClass =
+    role === 'admin'
+      ? 'bg-white dark:bg-[#1A1816] border-[#E3DDD2] dark:border-[#37322D]'
+      : role === 'mentor'
+      ? 'bg-white dark:bg-[#141B24] border-[#DCE2EC] dark:border-[#243244]'
+      : 'bg-white dark:bg-[#141D1A] border-[#E2DCCB] dark:border-[#24342D]';
 
   return (
-    <div className={`rounded-2xl border backdrop-blur-xs overflow-visible transition-colors ${theme.surfaceClass}`}>
+    <div className={`relative z-20 rounded-2xl border backdrop-blur-xs overflow-visible transition-colors ${theme.surfaceClass}`}>
       <div className="p-4 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-start sm:items-center gap-2.5 min-w-0">
           {icon && <div className={`shrink-0 mt-0.5 sm:mt-0 ${theme.accentTextClass}`}>{icon}</div>}
@@ -266,8 +319,8 @@ export const WorkspaceHeaderCard: React.FC<WorkspaceHeaderCardProps> = ({
       </div>
 
       {hasBottomStrip && (
-        <div className={`px-4 sm:px-5 border-t flex items-center justify-between flex-wrap gap-3 ${theme.dividerClass}`}>
-          {tabs && tabs.length > 0 ? (
+        <div className={`px-4 sm:px-5 border-t flex items-center justify-between flex-wrap gap-2.5 ${theme.dividerClass}`}>
+          {hasTabs && tabs ? (
             <div className="flex items-center gap-5 overflow-x-auto">
               {tabs.map((tab) => {
                 const isTabActive = activeTab === tab.id;
@@ -296,28 +349,38 @@ export const WorkspaceHeaderCard: React.FC<WorkspaceHeaderCardProps> = ({
                 );
               })}
             </div>
+          ) : onSearchChange ? (
+            <div className="py-2.5 flex-1 min-w-[200px] sm:max-w-xs md:max-w-sm">
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 dark:text-stone-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={searchValue ?? ''}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  placeholder={searchPlaceholder}
+                  className={`pl-9 pr-7 py-2 rounded-xl text-xs sm:text-sm w-full focus:outline-none ${theme.inputClass}`}
+                />
+                {searchValue && (
+                  <button
+                    type="button"
+                    onClick={() => onSearchChange('')}
+                    aria-label="Kosongkan carian"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+            </div>
           ) : (
             <div />
           )}
 
-          {(onSearchChange || extraControls) && (
-            <div className="flex flex-wrap items-center gap-2 py-2 ml-auto">
-              {onSearchChange && (
+          {(extraControls || hasPopoverBody || (hasTabs && onSearchChange)) && (
+            <div className="flex flex-wrap items-center gap-2 py-2 ml-auto shrink-0">
+              {hasTabs && onSearchChange && (
                 <div className="relative">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="w-4 h-4 text-slate-400 dark:text-stone-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"
-                    aria-hidden="true"
-                  >
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="m21 21-4.3-4.3" />
-                  </svg>
+                  <Search className="w-4 h-4 text-slate-400 dark:text-stone-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                   <input
                     type="text"
                     value={searchValue ?? ''}
@@ -330,14 +393,86 @@ export const WorkspaceHeaderCard: React.FC<WorkspaceHeaderCardProps> = ({
                       type="button"
                       onClick={() => onSearchChange('')}
                       aria-label="Kosongkan carian"
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer text-xs font-bold"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                     >
-                      ×
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   )}
                 </div>
               )}
+
               {extraControls}
+
+              {hasPopoverBody && (
+                <div className="relative" ref={filterRef}>
+                  <button
+                    type="button"
+                    onClick={() => setIsFilterOpen((prev) => !prev)}
+                    aria-expanded={isFilterOpen}
+                    aria-label={filterCount > 0 ? `Penapis (${filterCount} aktif)` : 'Penapis'}
+                    title={filterCount > 0 ? `Penapis (${filterCount} aktif)` : 'Penapis'}
+                    className={`min-h-[38px] px-2.5 rounded-xl border inline-flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-colors ${
+                      filterCount > 0
+                        ? theme.activeMiniBtnClass
+                        : theme.secondaryButtonClass
+                    }`}
+                  >
+                    <SlidersHorizontal className="w-4 h-4 shrink-0" />
+                    {filterCount > 0 && (
+                      <span className="text-xs font-bold tabular-nums">{filterCount}</span>
+                    )}
+                  </button>
+
+                  {isFilterOpen && (
+                    <div
+                      className={`animate-popover-enter absolute right-0 top-full mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-2xl border shadow-2xl p-4 z-40 space-y-3.5 text-left ${popoverSurfaceClass}`}
+                    >
+                      {filterContent}
+
+                      {hasSortControl && sortOptions && onSortChange && (
+                        <div className={filterContent ? `pt-3 border-t pb-3 border-b ${theme.dividerClass}` : `pb-3 border-b ${theme.dividerClass}`}>
+                          <label className="block text-xs font-semibold text-slate-700 dark:text-stone-300 mb-1.5 flex items-center gap-1.5">
+                            <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${theme.accentTextClass}`} />
+                            <span>{sortLabel}</span>
+                          </label>
+                          <select
+                            value={sortValue}
+                            onChange={(e) => onSortChange(e.target.value)}
+                            className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${theme.inputClass}`}
+                          >
+                            {sortOptions.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between pt-0.5">
+                        {onResetFilters ? (
+                          <button
+                            type="button"
+                            onClick={onResetFilters}
+                            className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300 hover:underline cursor-pointer"
+                          >
+                            Set Semula
+                          </button>
+                        ) : (
+                          <span />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setIsFilterOpen(false)}
+                          className={`px-3.5 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${theme.primaryButtonClass}`}
+                        >
+                          Tutup
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

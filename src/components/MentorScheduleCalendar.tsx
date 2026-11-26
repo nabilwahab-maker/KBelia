@@ -1403,7 +1403,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                   <>
                     <div className={`px-6 py-4 border-b flex items-start justify-between gap-4 ${mentorTheme.surfaceMutedClass} ${mentorTheme.dividerClass}`}>
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className={`w-12 h-12 rounded-xl overflow-hidden border bg-slate-100 dark:bg-slate-800 shrink-0 ${mentorTheme.dividerClass}`}>
+                        <div className={`w-20 h-20 rounded-xl overflow-hidden border bg-slate-100 dark:bg-slate-800 shrink-0 ${mentorTheme.dividerClass}`}>
                           <PortalImage
                             src={visuals.businessUrl}
                             alt={reg.businessName}

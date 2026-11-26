@@ -24,33 +24,33 @@ export const DashboardBannerHeader: React.FC<DashboardBannerHeaderProps> = ({
   const getBreadcrumbLabel = (): string => {
     switch (activeTab) {
       case 'home':
-        if (role === 'admin') return isMs ? 'Pusat Penyelarasan' : 'Ecosystem Hub';
-        if (role === 'mentor') return isMs ? 'Ruang Bimbingan' : 'Mentorship Space';
-        return isMs ? 'Ruang Usaha Anda' : 'Your Business Space';
+        if (role === 'admin') return isMs ? 'Panel Admin' : 'Admin Panel';
+        if (role === 'mentor') return isMs ? 'Portal Mentor' : 'Mentor Portal';
+        return isMs ? 'Dashboard Usahawan' : 'Merchant Dashboard';
       case 'merchant':
-        return isMs ? 'Ruang Usaha Anda' : 'Your Business Space';
+        return isMs ? 'Bisnes Saya' : 'My Business';
       case 'mentor':
-        return isMs ? 'Ruang Bimbingan' : 'Mentorship Space';
+        return isMs ? 'Portal Mentor' : 'Mentor Portal';
       case 'mentorship':
-        return isMs ? 'Sesi & Senarai Mentor' : 'Mentor Advisory & Sessions';
+        return isMs ? 'Tempah Sesi Mentor' : 'Book Mentor Session';
       case 'admin':
-        return isMs ? 'Pusat Penyelarasan' : 'Ecosystem Hub';
+        return isMs ? 'Panel Admin' : 'Admin Panel';
       case 'academic':
-        return isMs ? 'Teroka Ruang Niaga' : 'Explore Business Spaces';
+        return isMs ? 'Lokasi & Sewa Kiosk' : 'Kiosk Locations';
       case 'hepa':
-        return isMs ? 'Komuniti Usahawan Kelantan' : 'Kelantan Entrepreneurs';
+        return isMs ? 'Direktori Kedai Belia' : 'Youth Business Directory';
       case 'ceed':
-        return isMs ? 'Sokongan Modal & Inisiatif' : 'Capital Support & Initiatives';
+        return isMs ? 'Geran & Bantuan Modal' : 'Grants & Funding';
       case 'events':
-        return isMs ? 'Acara & Ekspo Komuniti' : 'Community Events & Expo';
+        return isMs ? 'Acara & Karnival' : 'Events & Expos';
       case 'b2b':
-        return isMs ? 'Jaringan Pembekal & Niaga' : 'Trade & Supplier Network';
+        return isMs ? 'Pembekal & B2B' : 'B2B & Suppliers';
       case 'calculator':
-        return isMs ? 'Anggaran Kelayakan Sokongan' : 'Support Eligibility Estimator';
+        return isMs ? 'Kalkulator Untung & Geran' : 'Profit & Grant Calculator';
       case 'news':
-        return isMs ? 'Berita & Perkongsian' : 'News & Updates';
+        return isMs ? 'Berita & Info Terkini' : 'News & Updates';
       case 'community':
-        return isMs ? 'Forum & Perbincangan' : 'Community Forum';
+        return isMs ? 'Forum Usahawan' : 'Entrepreneur Forum';
       case 'settings':
         return isMs ? 'Tetapan Akaun' : 'Account Settings';
       default:

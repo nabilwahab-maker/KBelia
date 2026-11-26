@@ -5,8 +5,6 @@ import {
   Download,
   Plus,
   Search,
-  SlidersHorizontal,
-  ArrowUpDown,
   Calendar,
   Pencil,
   Trash2,
@@ -29,6 +27,7 @@ import { exportSalesToExcel } from '../utils/excelExport';
 import { DEFAULT_SORT_VALUE, buildStandardSortOptions, sortRecords } from '../utils/sortUtils';
 import { ModernDatePicker, addDaysIso, toLocalIsoDate } from './ModernDateTimePicker';
 import { useAnimatedMetric } from '../hooks/useMotion';
+import { useLongPressSelection } from '../hooks/useLongPressSelection';
 import { getRoleTheme } from '../utils/roleTheme';
 import {
   GoogleWorkspaceSplitPane,
@@ -45,7 +44,8 @@ interface KioskCashflowTrackerProps {
 }
 
 type SaleSortKey = 'date' | 'cashSales' | 'qrSales' | 'expenses' | 'net';
-type SaleCategoryFilter = 'all' | 'cash' | 'qr' | 'profit';
+type SaleCategoryFilter = 'all' | 'cash' | 'qr';
+type SaleAmountFilter = 'all' | 'under_100' | '100_300' | 'over_300';
 
 const formatSaleDate = (dateStr?: string): string => {
   if (!dateStr) return '-';
@@ -92,13 +92,25 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   const [salesSearch, setSalesSearch] = useState('');
   const [monthFilter, setMonthFilter] = useState<string>('Semua');
   const [categoryFilter, setCategoryFilter] = useState<SaleCategoryFilter>('all');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [amountFilter, setAmountFilter] = useState<SaleAmountFilter>('all');
   const [sortBy, setSortBy] = useState<string>(DEFAULT_SORT_VALUE);
   const [sortConfig] = useState<{ key: SaleSortKey; dir: 'asc' | 'desc' }>({
     key: 'date',
     dir: 'desc'
   });
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const validSaleIds = useMemo(() => salesRecords.map((r) => r.id), [salesRecords]);
+  const {
+    isSelectionMode,
+    selectedIds,
+    exitSelectionMode,
+    toggleRow: toggleSelectRow,
+    removeId: removeSaleId,
+    togglePage: toggleSelectPage,
+    getRowHandlers: getSaleRowHandlers
+  } = useLongPressSelection({
+    scopeId: 'cashflow-sales',
+    validIds: validSaleIds
+  });
   const [selectedRecordId, setSelectedRecordId] = useState<string | null>(null);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
 
@@ -141,32 +153,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
     };
   }, [ownerId, isDemoSession, externalRecords, storageKey]);
 
-  // Dismiss filter popover on outside click / Escape
-  useEffect(() => {
-    const handlePointerDown = (e: MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (isFilterOpen && !target?.closest('[data-cf-filter]')) {
-        setIsFilterOpen(false);
-      }
-    };
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsFilterOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isFilterOpen]);
-
-  // Keep selectedIds synced with existing records
-  useEffect(() => {
-    const validIds = new Set(salesRecords.map((r) => r.id));
-    setSelectedIds((prev) => prev.filter((id) => validIds.has(id)));
-  }, [salesRecords]);
+  // Selection synchronization is handled automatically by useLongPressSelection
 
   const availableMonths = useMemo(() => {
     const months = new Set<string>();
@@ -199,7 +186,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   const filteredSortedSales = useMemo(() => {
     const q = salesSearch.trim().toLowerCase();
     const filtered = salesRecords.filter((r) => {
-      const net = (r.cashSales + r.qrSales) - r.expenses;
+      const dailyTotal = r.cashSales + r.qrSales;
       const matchesSearch =
         !q ||
         (r.date || '').toLowerCase().includes(q) ||
@@ -209,10 +196,14 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
         monthFilter === 'Semua' || (r.date || '').startsWith(monthFilter);
       const matchesCategory =
         categoryFilter === 'all' ||
-        (categoryFilter === 'cash' && r.cashSales > 0) ||
-        (categoryFilter === 'qr' && r.qrSales > 0) ||
-        (categoryFilter === 'profit' && net > 0);
-      return matchesSearch && matchesMonth && matchesCategory;
+        (categoryFilter === 'cash' && r.cashSales > 0 && r.qrSales === 0) ||
+        (categoryFilter === 'qr' && r.qrSales > 0 && r.cashSales === 0);
+      const matchesAmount =
+        amountFilter === 'all' ||
+        (amountFilter === 'under_100' && dailyTotal < 100) ||
+        (amountFilter === '100_300' && dailyTotal >= 100 && dailyTotal <= 300) ||
+        (amountFilter === 'over_300' && dailyTotal > 300);
+      return matchesSearch && matchesMonth && matchesCategory && matchesAmount;
     });
 
     if (sortBy === 'table_column') {
@@ -254,13 +245,14 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
         return null;
       }
     });
-  }, [salesRecords, salesSearch, monthFilter, categoryFilter, sortBy, sortConfig]);
+  }, [salesRecords, salesSearch, monthFilter, categoryFilter, amountFilter, sortBy, sortConfig]);
 
   const salesPagination = usePagination(filteredSortedSales, 7, [
     salesRecords.length,
     salesSearch,
     monthFilter,
     categoryFilter,
+    amountFilter,
     sortBy,
     sortConfig.key,
     sortConfig.dir
@@ -269,6 +261,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
   const activeFilterCount =
     (monthFilter !== 'Semua' ? 1 : 0) +
     (categoryFilter !== 'all' ? 1 : 0) +
+    (amountFilter !== 'all' ? 1 : 0) +
     (sortBy !== DEFAULT_SORT_VALUE ? 1 : 0);
 
   const pageIds = salesPagination.paginatedItems.map((r) => r.id);
@@ -276,28 +269,8 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
     pageIds.length > 0 && pageIds.every((id) => selectedIds.includes(id));
 
   const toggleSelectAllOnPage = () => {
-    if (allPageSelected) {
-      setSelectedIds((prev) => prev.filter((id) => !pageIds.includes(id)));
-    } else {
-      setSelectedIds((prev) => Array.from(new Set([...prev, ...pageIds])));
-    }
+    toggleSelectPage(pageIds);
   };
-
-  const toggleSelectRow = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
-  };
-
-  const categoryCounts = useMemo(
-    () => ({
-      all: salesRecords.length,
-      cash: salesRecords.filter((r) => r.cashSales > 0).length,
-      qr: salesRecords.filter((r) => r.qrSales > 0).length,
-      profit: salesRecords.filter((r) => (r.cashSales + r.qrSales) - r.expenses > 0).length
-    }),
-    [salesRecords]
-  );
 
   const activeSale =
     filteredSortedSales.find((r) => r.id === selectedRecordId) ||
@@ -382,7 +355,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
     try {
       await deleteCashflowRecord(id, ownerId);
       setSalesRecords(prev => prev.filter(r => r.id !== id));
-      setSelectedIds(prev => prev.filter(item => item !== id));
+      removeSaleId(id);
       showToast({
         type: 'info',
         title: 'Rekod Dipadam',
@@ -576,35 +549,33 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
         role="belia"
         icon={<Coins className="w-5 h-5" />}
         title="Rekod Aliran Tunai Harian"
-        subtitle="Pilih mana-mana catatan harian di kiri untuk pratonton pecahan tunai, DuitNow QR, dan tindakan kemas kini."
-        tabs={[
-          { id: 'all', label: 'Semua', count: categoryCounts.all },
-          { id: 'cash', label: 'Ada Tunai', count: categoryCounts.cash },
-          { id: 'qr', label: 'Ada QR', count: categoryCounts.qr },
-          { id: 'profit', label: 'Baki Positif', count: categoryCounts.profit }
-        ]}
-        activeTab={categoryFilter}
-        onTabChange={(id) => setCategoryFilter(id as SaleCategoryFilter)}
+        subtitle="Rekod dan pantau aliran tunai harian perniagaan anda."
         searchValue={salesSearch}
         onSearchChange={setSalesSearch}
         searchPlaceholder="Cari tarikh atau catatan..."
         rightActions={
           <>
-            {selectedIds.length > 0 && (
-              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[0.8125rem] font-semibold ${beliaTheme.activeMiniBtnClass}`}>
+            {isSelectionMode && (
+              <div
+                data-selection-scope="cashflow-sales"
+                className={`animate-selection-checkbox inline-flex items-center gap-1.5 pl-3 pr-1.5 py-1 rounded-xl border text-[0.8125rem] font-semibold ${beliaTheme.activeMiniBtnClass}`}
+              >
                 <span className="tabular-nums">{selectedIds.length} dipilih</span>
                 <button
                   type="button"
-                  onClick={() => setSelectedIds([])}
-                  className="underline cursor-pointer font-semibold"
+                  onClick={exitSelectionMode}
+                  aria-label="Tutup mod pilihan"
+                  title="Tutup mod pilihan"
+                  className="p-1 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer transition-colors"
                 >
-                  Kosongkan
+                  <X className="w-3.5 h-3.5" />
                 </button>
               </div>
             )}
 
             <button
               type="button"
+              data-selection-scope="cashflow-sales"
               onClick={handleExportSales}
               className={`min-h-[38px] px-3.5 py-2 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer transition-colors ${beliaTheme.secondaryButtonClass}`}
             >
@@ -624,104 +595,142 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
             </button>
           </>
         }
-        extraControls={
-          <div className="relative flex items-center gap-2" data-cf-filter>
-            <select
-              value={monthFilter}
-              onChange={(e) => setMonthFilter(e.target.value)}
-              aria-label="Tapis mengikut bulan"
-              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
-            >
-              {availableMonths.map((ym) => (
-                <option key={ym} value={ym}>
-                  {formatMonthLabel(ym)}
-                </option>
-              ))}
-            </select>
+        filterCount={activeFilterCount}
+        onResetFilters={() => {
+          setMonthFilter('Semua');
+          setCategoryFilter('all');
+          setAmountFilter('all');
+          setSortBy(DEFAULT_SORT_VALUE);
+        }}
+        sortOptions={
+          sortBy === 'table_column'
+            ? [{ value: '', label: 'Ikut Lajur Jadual' }, ...cashflowSortOptions]
+            : cashflowSortOptions
+        }
+        sortValue={sortBy === 'table_column' ? '' : sortBy}
+        onSortChange={(val) => {
+          if (val) setSortBy(val);
+        }}
+        filterContent={
+          <>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-stone-300 mb-1.5">
+                Bulan Rekod
+              </label>
+              <select
+                value={monthFilter}
+                onChange={(e) => setMonthFilter(e.target.value)}
+                className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
+              >
+                {availableMonths.map((ym) => (
+                  <option key={ym} value={ym}>
+                    {formatMonthLabel(ym)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <button
-              type="button"
-              onClick={() => setIsFilterOpen((prev) => !prev)}
-              aria-expanded={isFilterOpen}
-              aria-label={activeFilterCount > 0 ? `Penapis & Susunan (${activeFilterCount} aktif)` : 'Susun & Penapis'}
-              title={activeFilterCount > 0 ? `Penapis (${activeFilterCount} aktif)` : 'Susun & Penapis'}
-              className={`min-h-[34px] w-[34px] rounded-xl border inline-flex items-center justify-center shrink-0 cursor-pointer transition-colors ${
-                activeFilterCount > 0
-                  ? beliaTheme.activeMiniBtnClass
-                  : beliaTheme.secondaryButtonClass
-              }`}
-            >
-              <SlidersHorizontal className="w-4 h-4 shrink-0" />
-            </button>
-
-            {isFilterOpen && (
-              <div className="animate-popover-enter absolute right-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] rounded-2xl bg-white dark:bg-[#141D1A] border border-slate-200 dark:border-[#24342D] shadow-xl p-4 z-30 space-y-3.5">
-                <div className={`pb-3 border-b ${beliaTheme.dividerClass}`}>
-                  <label className="block text-[0.8125rem] font-semibold text-slate-700 dark:text-stone-300 mb-1.5 flex items-center gap-1.5">
-                    <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${beliaTheme.accentTextClass}`} />
-                    <span>Susun Mengikut</span>
-                  </label>
-                  <select
-                    value={sortBy === 'table_column' ? '' : sortBy}
-                    onChange={(e) => {
-                      if (e.target.value) setSortBy(e.target.value);
-                    }}
-                    className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${beliaTheme.inputClass}`}
-                  >
-                    {cashflowSortOptions.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex items-center justify-between">
+            <div>
+              <span className="block text-xs font-semibold text-slate-700 dark:text-stone-300 mb-1.5">
+                Kaedah Bayaran
+              </span>
+              <div className="grid grid-cols-3 gap-1.5">
+                {(
+                  [
+                    { id: 'all', label: 'Semua' },
+                    { id: 'cash', label: 'Tunai' },
+                    { id: 'qr', label: 'QR' }
+                  ] as const
+                ).map((opt) => (
                   <button
+                    key={opt.id}
                     type="button"
-                    onClick={() => {
-                      setMonthFilter('Semua');
-                      setCategoryFilter('all');
-                      setSortBy(DEFAULT_SORT_VALUE);
-                    }}
-                    className="text-[0.8125rem] font-semibold text-slate-600 dark:text-stone-300 hover:underline cursor-pointer"
+                    onClick={() => setCategoryFilter(opt.id)}
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors whitespace-nowrap ${
+                      categoryFilter === opt.id
+                        ? beliaTheme.activeMiniBtnClass
+                        : beliaTheme.secondaryButtonClass
+                    }`}
                   >
-                    Set Semula
+                    {opt.label}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsFilterOpen(false)}
-                    className={`px-3 py-1.5 rounded-xl text-[0.8125rem] font-semibold cursor-pointer ${beliaTheme.primaryButtonClass}`}
-                  >
-                    Tutup
-                  </button>
-                </div>
+                ))}
               </div>
-            )}
-          </div>
+            </div>
+
+            <div>
+              <span className="block text-xs font-semibold text-slate-700 dark:text-stone-300 mb-1.5">
+                Julat Jumlah Jualan
+              </span>
+              <div className="grid grid-cols-2 gap-1.5">
+                {(
+                  [
+                    { id: 'all', label: 'Semua' },
+                    { id: 'under_100', label: 'Bawah RM100' },
+                    { id: '100_300', label: 'RM100 - RM300' },
+                    { id: 'over_300', label: 'Atas RM300' }
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setAmountFilter(opt.id)}
+                    className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors whitespace-nowrap ${
+                      amountFilter === opt.id
+                        ? beliaTheme.activeMiniBtnClass
+                        : beliaTheme.secondaryButtonClass
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
         }
       />
 
       <GoogleWorkspaceSplitPane
         role="belia"
+        leftSelectionScope="cashflow-sales"
         mobileOpen={mobilePreviewOpen}
         onMobileClose={() => setMobilePreviewOpen(false)}
         mobileTitle={activeSale ? formatSaleDate(activeSale.date) : 'Aliran Tunai'}
         leftHeader={
           filteredSortedSales.length > 0 ? (
-            <div className={`px-4 py-2.5 border-b flex items-center justify-between gap-2 text-xs font-semibold text-slate-600 dark:text-stone-400 ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
-              <label className="inline-flex items-center gap-2.5 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={allPageSelected}
-                  onChange={toggleSelectAllOnPage}
-                  aria-label="Pilih semua rekod jualan pada halaman ini"
-                  className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
-                />
-                <span>Pilih Semua (Halaman Ini)</span>
-              </label>
-              <span className="tabular-nums">{filteredSortedSales.length} rekod</span>
-            </div>
+            isSelectionMode ? (
+              <div className={`px-4 py-2 border-b flex items-center justify-between gap-2 text-xs font-semibold ${beliaTheme.activeMiniBtnClass} ${beliaTheme.dividerClass}`}>
+                <label className="inline-flex items-center gap-2.5 cursor-pointer select-none animate-selection-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={allPageSelected}
+                    onChange={toggleSelectAllOnPage}
+                    aria-label="Pilih semua rekod jualan pada halaman ini"
+                    className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
+                  />
+                  <span>Pilih Semua (Halaman Ini)</span>
+                </label>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="tabular-nums">{selectedIds.length} dipilih</span>
+                  <button
+                    type="button"
+                    onClick={exitSelectionMode}
+                    aria-label="Tutup mod pilihan"
+                    title="Tutup mod pilihan"
+                    className="p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 cursor-pointer transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className={`px-4 py-2.5 border-b flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-stone-400 ${beliaTheme.surfaceMutedClass} ${beliaTheme.dividerClass}`}>
+                <span className="font-medium">Tekan lama item untuk memilih</span>
+                <span className="font-semibold tabular-nums text-slate-600 dark:text-stone-300">
+                  {filteredSortedSales.length} rekod
+                </span>
+              </div>
+            )
           ) : undefined
         }
         leftContent={
@@ -747,6 +756,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
                   setSalesSearch('');
                   setMonthFilter('Semua');
                   setCategoryFilter('all');
+                  setAmountFilter('all');
                 }}
                 className={`text-xs font-semibold hover:underline cursor-pointer ${beliaTheme.accentTextClass}`}
               >
@@ -760,37 +770,39 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
               const isChecked = selectedIds.includes(r.id);
               const isSelected = activeSale?.id === r.id;
 
+              const rowHandlers = getSaleRowHandlers(r.id, () => {
+                setSelectedRecordId(r.id);
+                setMobilePreviewOpen(true);
+              });
+              const highlightRow = isSelectionMode ? isChecked : isSelected;
+
               return (
                 <div
                   key={r.id}
-                  onClick={() => {
-                    setSelectedRecordId(r.id);
-                    setMobilePreviewOpen(true);
-                  }}
+                  {...rowHandlers}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      setSelectedRecordId(r.id);
-                      setMobilePreviewOpen(true);
-                    }
-                  }}
-                  className={`w-full text-left p-3.5 sm:px-4 flex items-start gap-3 transition-colors cursor-pointer ${
-                    isSelected
+                  aria-selected={isSelectionMode ? isChecked : isSelected}
+                  className={`w-full text-left p-3.5 sm:px-4 flex items-start gap-3 transition-colors cursor-pointer select-none ${
+                    highlightRow
                       ? getWorkspaceActiveRowClass('belia')
                       : beliaTheme.rowHoverClass
                   }`}
                 >
-                  <div className="pt-1 shrink-0" onClick={(e) => e.stopPropagation()}>
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => toggleSelectRow(r.id)}
-                      aria-label={`Pilih rekod bertarikh ${r.date}`}
-                      className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
-                    />
-                  </div>
+                  {isSelectionMode && (
+                    <div
+                      className="pt-1 shrink-0 animate-selection-checkbox"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => toggleSelectRow(r.id)}
+                        aria-label={`Pilih rekod bertarikh ${r.date}`}
+                        className="w-4 h-4 rounded border-slate-300 dark:border-stone-600 cursor-pointer accent-[#0B6E52] dark:accent-[#10B981]"
+                      />
+                    </div>
+                  )}
                   <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${beliaTheme.activeMiniBtnClass}`}>
                     <Calendar className="w-4 h-4" />
                   </div>
@@ -837,7 +849,7 @@ export const KioskCashflowTracker: React.FC<KioskCashflowTrackerProps> = ({
           !activeSale ? (
             <SidePreviewEmptyState
               icon={<Coins className="w-10 h-10 text-slate-400 dark:text-stone-500" />}
-              title="Pilih rekod daripada senarai di sebelah kiri"
+              title="Tiada Rekod Dipilih"
               description="Pecahan jualan tunai, bayaran QR, perbelanjaan dan nota harian akan dipaparkan di sini."
             />
           ) : (() => {

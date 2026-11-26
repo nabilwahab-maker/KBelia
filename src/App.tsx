@@ -1962,9 +1962,9 @@ function MainApp() {
                   <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Ruang Ini Khusus untuk Usahawan</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Halaman Ini Khusus untuk Usahawan</h3>
                   <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
-                    Akaun Mentor tertumpu kepada sesi bimbingan, jadual pertemuan, dan sokongan usahawan di Ruang Bimbingan.
+                    Akaun Mentor tertumpu kepada sesi bimbingan, jadual pertemuan, dan surat sokongan usahawan di Portal Mentor.
                   </p>
                 </div>
                 <button
@@ -1973,7 +1973,7 @@ function MainApp() {
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Kembali ke Ruang Bimbingan</span>
+                  <span>Kembali ke Portal Mentor</span>
                 </button>
               </div>
             ) : isAdmin ? (
@@ -2034,9 +2034,9 @@ function MainApp() {
                   <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Senarai Usahawan Anda di Ruang Bimbingan</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Senarai Usahawan Anda di Portal Mentor</h3>
                   <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
-                    Untuk menjaga privasi komuniti, Mentor melihat senarai usahawan di bawah bimbingan sendiri terus dari Ruang Bimbingan.
+                    Untuk menjaga privasi, Mentor hanya melihat senarai usahawan di bawah bimbingan sendiri terus dari Portal Mentor.
                   </p>
                 </div>
                 <button
@@ -2045,7 +2045,7 @@ function MainApp() {
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Kembali ke Ruang Bimbingan</span>
+                  <span>Kembali ke Portal Mentor</span>
                 </button>
               </div>
             ) : (
@@ -2059,7 +2059,7 @@ function MainApp() {
             );
           })()}
 
-          {/* SOKONGAN MODAL & INISIATIF */}
+          {/* GERAN BELIA & PROGRAM */}
           {activeTab === 'ceed' && (() => {
             const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
             return isMentor ? (
@@ -2068,9 +2068,9 @@ function MainApp() {
                   <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Urusan Sokongan Melalui Ruang Bimbingan</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Urusan Sokongan Geran di Portal Mentor</h3>
                   <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
-                    Mentor mengurus pengesahan sokongan usahawan melalui tab Sokongan Usahawan di Ruang Bimbingan.
+                    Mentor mengurus surat sokongan geran usahawan melalui tab Surat Sokongan Geran di Portal Mentor.
                   </p>
                 </div>
                 <button
@@ -2079,7 +2079,7 @@ function MainApp() {
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Kembali ke Ruang Bimbingan</span>
+                  <span>Kembali ke Portal Mentor</span>
                 </button>
               </div>
             ) : (
@@ -2116,7 +2116,7 @@ function MainApp() {
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
-                  <span>{isAdmin ? 'Ke Pusat Penyelarasan' : 'Ke Ruang Bimbingan'}</span>
+                  <span>{isAdmin ? 'Ke Panel Admin' : 'Ke Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
@@ -2126,7 +2126,7 @@ function MainApp() {
             );
           })()}
 
-          {/* JARINGAN PEMBEKAL & NIAGA */}
+          {/* PEMBEKAL & B2B */}
           {activeTab === 'b2b' && (() => {
             const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
             return !isYouth ? (
@@ -2135,9 +2135,9 @@ function MainApp() {
                   <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Jaringan Niaga Khusus untuk Usahawan</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Rangkaian Pembekal B2B Khusus untuk Usahawan</h3>
                   <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
-                    Jaringan pembekal dan kerjasama niaga ini dikhaskan untuk komuniti usahawan belia Kelantan.
+                    Senarai pembekal dan kerjasama B2B ini dikhaskan untuk usahawan belia Kelantan.
                   </p>
                 </div>
                 <button
@@ -2145,7 +2145,7 @@ function MainApp() {
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
-                  <span>{isAdmin ? 'Ke Pusat Penyelarasan' : 'Ke Ruang Bimbingan'}</span>
+                  <span>{isAdmin ? 'Ke Panel Admin' : 'Ke Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
@@ -2155,7 +2155,7 @@ function MainApp() {
             );
           })()}
 
-          {/* ANGGARAN KELAYAKAN SOKONGAN */}
+          {/* KALKULATOR KELAYAKAN GERAN */}
           {activeTab === 'calculator' && (() => {
             const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
             return !isYouth ? (
@@ -2164,9 +2164,9 @@ function MainApp() {
                   <Lock className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Anggaran Sokongan Khusus untuk Usahawan</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">Kalkulator Geran Khusus untuk Usahawan</h3>
                   <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
-                    Alat semakan anggaran kelayakan ini dikhaskan untuk pemohon Usahawan Belia.
+                    Alat semakan kelayakan geran ini dikhaskan untuk pemohon Usahawan Belia.
                   </p>
                 </div>
                 <button
@@ -2174,7 +2174,7 @@ function MainApp() {
                   onClick={() => navigateWithSkeleton(isAdmin ? 'admin' : 'mentor')}
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
-                  <span>{isAdmin ? 'Ke Pusat Penyelarasan' : 'Ke Ruang Bimbingan'}</span>
+                  <span>{isAdmin ? 'Ke Panel Admin' : 'Ke Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
@@ -2187,7 +2187,7 @@ function MainApp() {
             );
           })()}
 
-          {/* PUSAT PENYELARASAN (ADMIN ONLY) */}
+          {/* PANEL ADMIN (ADMIN ONLY) */}
           {activeTab === 'admin' && (() => {
             const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
             return !isAdmin ? (
@@ -2197,12 +2197,12 @@ function MainApp() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">
-                    {language === 'en' ? 'Coordinator Access Only' : 'Khusus untuk Penyelaras Ekosistem'}
+                    {language === 'en' ? 'Admin Access Only' : 'Khusus untuk Pentadbir KBelia'}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
                     {isMentor 
-                      ? 'Akaun anda ialah akaun Mentor. Ruangan penyelarasan ekosistem ini dikhaskan untuk pihak pentadbir.'
-                      : 'Ruangan ini dikhaskan kepada Penyelaras Ekosistem Portal KBelia.'}
+                      ? 'Akaun anda ialah akaun Mentor. Panel pentadbiran ini dikhaskan untuk pihak admin.'
+                      : 'Halaman ini dikhaskan kepada Pentadbir Portal KBelia.'}
                   </p>
                 </div>
                 <button
@@ -2211,7 +2211,7 @@ function MainApp() {
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  <span>{isMentor ? 'Kembali ke Ruang Bimbingan' : 'Laman Utama'}</span>
+                  <span>{isMentor ? 'Kembali ke Portal Mentor' : 'Laman Utama'}</span>
                 </button>
               </div>
             ) : (
@@ -2241,7 +2241,7 @@ function MainApp() {
             );
           })()}
 
-          {/* RUANG BIMBINGAN (MENTOR ONLY) */}
+          {/* PORTAL MENTOR (MENTOR ONLY) */}
           {activeTab === 'mentor' && (() => {
             const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
             return !isMentor ? (
@@ -2255,8 +2255,8 @@ function MainApp() {
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
                     {isAdmin
-                      ? 'Penyelaras boleh mengurus senarai mentor melalui tab Mentor di Pusat Penyelarasan, manakala ruang bimbingan ini dikhaskan untuk Mentor.'
-                      : 'Ruang Bimbingan ini dikhaskan untuk panel mentor dan pembimbing keusahawanan KBelia.'}
+                      ? 'Pentadbir mengurus senarai mentor melalui tab Mentor di Panel Admin, manakala Portal Mentor ini dikhaskan untuk Mentor.'
+                      : 'Portal Mentor ini dikhaskan untuk panel mentor dan pembimbing keusahawanan KBelia.'}
                   </p>
                 </div>
                 <button
@@ -2265,7 +2265,7 @@ function MainApp() {
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>{isAdmin ? 'Ke Pusat Penyelarasan' : 'Laman Utama'}</span>
+                  <span>{isAdmin ? 'Ke Panel Admin' : 'Laman Utama'}</span>
                 </button>
               </div>
             ) : (
@@ -2286,7 +2286,7 @@ function MainApp() {
             );
           })()}
 
-          {/* RUANG USAHA ANDA (KHUSUS BELIA) */}
+          {/* DASHBOARD USAHAWAN (KHUSUS BELIA) */}
           {activeTab === 'merchant' && (() => {
             const roleTheme = getRoleTheme(isAdmin ? 'admin' : isMentor ? 'mentor' : 'belia');
             return isAdmin ? (
@@ -2296,12 +2296,12 @@ function MainApp() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">
-                    {language === 'en' ? 'Youth Entrepreneur Space Only' : 'Khusus untuk Usahawan Belia'}
+                    {language === 'en' ? 'Youth Entrepreneur Access Only' : 'Khusus untuk Usahawan Belia'}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
                     {language === 'en'
-                      ? 'You are logged in as Coordinator. Business and product workspaces are reserved for youth entrepreneurs.'
-                      : 'Akaun anda ialah Penyelaras Ekosistem. Ruang pengurusan perniagaan ini dikhaskan untuk usahawan belia Kelantan.'}
+                      ? 'You are logged in as Admin. Business and product workspaces are reserved for youth entrepreneurs.'
+                      : 'Akaun anda ialah Pentadbir KBelia. Halaman pengurusan bisnes ini dikhaskan untuk usahawan belia Kelantan.'}
                   </p>
                 </div>
                 <button
@@ -2310,7 +2310,7 @@ function MainApp() {
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  <span>{language === 'en' ? 'Ecosystem Hub' : 'Ke Pusat Penyelarasan'}</span>
+                  <span>{language === 'en' ? 'Admin Panel' : 'Ke Panel Admin'}</span>
                 </button>
               </div>
             ) : isMentor ? (
@@ -2320,12 +2320,12 @@ function MainApp() {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-[#F5F3EE]">
-                    {language === 'en' ? 'Youth Entrepreneur Space Only' : 'Khusus untuk Usahawan Belia'}
+                    {language === 'en' ? 'Youth Entrepreneur Access Only' : 'Khusus untuk Usahawan Belia'}
                   </h3>
                   <p className="text-sm text-slate-600 dark:text-stone-400 max-w-md mx-auto mt-1.5 leading-relaxed">
                     {language === 'en'
-                      ? 'You are logged in with a Mentor account. Please use your Mentorship Space to review sessions and support requests.'
-                      : 'Akaun anda ialah Mentor KBelia. Sila gunakan Ruang Bimbingan untuk menyemak sesi dan memberi panduan kepada usahawan.'}
+                      ? 'You are logged in with a Mentor account. Please use your Mentor Portal to review sessions and support requests.'
+                      : 'Akaun anda ialah Mentor KBelia. Sila gunakan Portal Mentor untuk menyemak sesi dan memberi panduan kepada usahawan.'}
                   </p>
                 </div>
                 <button
@@ -2334,7 +2334,7 @@ function MainApp() {
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>{language === 'en' ? 'Mentorship Space' : 'Ke Ruang Bimbingan'}</span>
+                  <span>{language === 'en' ? 'Mentor Portal' : 'Ke Portal Mentor'}</span>
                 </button>
               </div>
             ) : (
@@ -2401,7 +2401,7 @@ function MainApp() {
                   className={`px-5 py-2.5 font-semibold rounded-xl text-sm transition-colors cursor-pointer inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>{isAdmin ? 'Ke Pusat Penyelarasan' : 'Ke Ruang Bimbingan'}</span>
+                  <span>{isAdmin ? 'Ke Panel Admin' : 'Ke Portal Mentor'}</span>
                 </button>
               </div>
             ) : (

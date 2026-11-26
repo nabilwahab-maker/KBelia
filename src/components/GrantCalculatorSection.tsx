@@ -87,7 +87,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
       <div className="rounded-2xl bg-slate-50/80 dark:bg-zinc-950/80 p-4 sm:p-5 border border-slate-200 dark:border-zinc-700">
         <div className="max-w-2xl">
           <h1 className="font-display text-fluid-portal font-extrabold tracking-tight text-black dark:text-white kbelia-trim">
-            {isEn ? 'Grant & Micro-Finance Eligibility Calculator' : 'Semak Kelayakan Geran & Bantuan Modal'}
+            {isEn ? 'Grant Eligibility Calculator' : 'Kalkulator Kelayakan Geran'}
           </h1>
         </div>
       </div>
@@ -368,7 +368,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
           {/* Score Badge Card */}
           <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-slate-300 dark:border-slate-600 shadow-xs text-center space-y-3">
             <span className="text-[0.8125rem] font-extrabold uppercase tracking-wider text-black/70 dark:text-white/75">
-              {isEn ? 'Overall Match Rating' : 'Skor Kebarangkalian Lulus'}
+              {isEn ? 'Estimated Grant Eligibility' : 'Anggaran Kelayakan Geran'}
             </span>
 
             <div className="relative inline-flex items-center justify-center">
@@ -385,7 +385,7 @@ export const GrantCalculatorSection: React.FC<GrantCalculatorProps> = ({
             <div>
               <h3 className="text-lg font-extrabold text-black dark:text-white tracking-tight">
                 {score >= 80 
-                  ? (isEn ? 'High Probability (Top Tier)' : 'Potensi Sangat Tinggi (Tier Utama)')
+                  ? (isEn ? 'Eligible to Apply (High Chance)' : 'Layak Memohon (Peluang Tinggi)')
                   : (isEn ? 'Moderate Eligibility' : 'Kelayakan Sederhana')}
               </h3>
               <p className="text-[0.9375rem] text-black dark:text-white/75 mt-1">

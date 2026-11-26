@@ -971,73 +971,73 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="pointer-events-none absolute -bottom-16 right-8 w-48 h-48 rounded-full bg-[#78907C]/10 blur-3xl animate-ambient-orb-b" aria-hidden="true" />
 
         {(() => {
-          const adminDisplayName = userProfile?.fullName || user?.displayName || (isMs ? 'Penyelaras Ekosistem' : 'Ecosystem Coordinator');
+          const adminDisplayName = userProfile?.fullName || user?.displayName || (isMs ? 'Pentadbir KBelia' : 'KBelia Admin');
           const pendingBookingsCount = safeBookings.filter(b => b && b.status === 'pending').length;
           const pendingGrantsCount = (grantApplications || []).filter(g => g.status === 'pending').length;
           const openTicketsCount = (maintenanceTickets || []).filter(t => t.status !== 'resolved').length;
 
           const adminHeaderMap: Record<AdminSubTab, { prefix: string; accent: string }> = {
             queue: {
-              prefix: isMs ? 'Gambaran Keseluruhan ' : 'Ecosystem ',
-              accent: isMs ? 'Ekosistem' : 'Overview'
+              prefix: isMs ? 'Ringkasan ' : 'Operations ',
+              accent: isMs ? 'Operasi' : 'Summary'
             },
             bookings: {
-              prefix: isMs ? 'Penyelarasan ' : 'Coordinate ',
-              accent: isMs ? 'Ruang Niaga' : 'Business Spaces'
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Permohonan Kiosk' : 'Kiosk Bookings'
             },
             businesses: {
               prefix: isMs ? 'Direktori & Profil ' : 'Entrepreneur ',
               accent: isMs ? 'Usahawan' : 'Directory'
             },
             slots: {
-              prefix: isMs ? 'Penjadualan ' : 'Manage ',
-              accent: isMs ? 'Lokasi Niaga' : 'Business Slots'
+              prefix: isMs ? 'Urus ' : 'Manage ',
+              accent: isMs ? 'Slot Kiosk' : 'Kiosk Slots'
             },
             programs: {
-              prefix: isMs ? 'Inisiatif & ' : 'Support ',
-              accent: isMs ? 'Sokongan Modal' : 'Initiatives'
+              prefix: isMs ? 'Program & ' : 'Grants & ',
+              accent: isMs ? 'Geran Belia' : 'Programs'
             },
             mentors: {
-              prefix: isMs ? 'Rangkaian ' : 'Mentorship ',
-              accent: isMs ? 'Panel Mentor' : 'Network'
+              prefix: isMs ? 'Senarai ' : 'Mentor ',
+              accent: isMs ? 'Panel Mentor' : 'Directory'
             },
             news: {
-              prefix: isMs ? 'Perkongsian & ' : 'Community ',
-              accent: isMs ? 'Siaran Komuniti' : 'Announcements'
+              prefix: isMs ? 'Pengurusan ' : 'Manage ',
+              accent: isMs ? 'Berita Portal' : 'News & Updates'
             },
             b2b: {
-              prefix: isMs ? 'Peluang ' : 'Business ',
-              accent: isMs ? 'Ruang Niaga' : 'Listings'
+              prefix: isMs ? 'Iklan ' : 'B2B ',
+              accent: isMs ? 'Pembekal B2B' : 'Supplier Ads'
             },
             events: {
-              prefix: isMs ? 'Aktiviti & ' : 'Community ',
-              accent: isMs ? 'Acara Komuniti' : 'Events'
+              prefix: isMs ? 'Acara & ' : 'Youth ',
+              accent: isMs ? 'Karnival Belia' : 'Events'
             },
             users: {
-              prefix: isMs ? 'Direktori ' : 'Community ',
-              accent: isMs ? 'Ahli Komuniti' : 'Members'
+              prefix: isMs ? 'Pengurusan ' : 'User ',
+              accent: isMs ? 'Akaun Pengguna' : 'Accounts'
             },
             sync: {
-              prefix: isMs ? 'Penyelarasan ' : 'Record ',
-              accent: isMs ? 'Rekod Semasa' : 'Synchronization'
+              prefix: isMs ? 'Semak & ' : 'Data ',
+              accent: isMs ? 'Sync Data' : 'Sync'
             },
             settings: {
-              prefix: isMs ? 'Konfigurasi ' : 'General ',
-              accent: isMs ? 'Umum Portal' : 'Preferences'
+              prefix: isMs ? 'Tetapan ' : 'Portal ',
+              accent: isMs ? 'Portal' : 'Settings'
             }
           };
           const currentAdminHeader = adminHeaderMap[adminTab] || adminHeaderMap.queue;
           const targetTab: AdminSubTab = adminTab === 'queue' ? 'bookings' : 'queue';
           const actionLabel =
             adminTab === 'queue'
-              ? (isMs ? 'Semak Rekod' : 'Review Records')
+              ? (isMs ? 'Semak Permohonan' : 'Review Applications')
               : 'Dashboard';
 
           return (
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="min-w-0">
                 <p className={`text-xs sm:text-[13px] font-semibold mb-1 ${adminTheme.accentTextClass}`}>
-                  {isMs ? 'Rangkaian Seluruh Negeri Kelantan' : 'Statewide Network Across Kelantan'}
+                  {isMs ? 'Seluruh Negeri Kelantan' : 'Across Kelantan'}
                 </p>
                 <h1 className="font-display text-fluid-portal font-bold text-slate-900 dark:text-[#F5F2EC] tracking-tight kbelia-trim">
                   {currentAdminHeader.prefix}
@@ -1175,11 +1175,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   style={{ '--stagger': 4 } as React.CSSProperties}
                   className={`animate-dashboard-card lg:col-span-2 h-full relative rounded-2xl border backdrop-blur-xs overflow-hidden transition-all duration-200 flex flex-col justify-between min-w-0 ${adminTheme.surfaceClass}`}
                 >
-                  <div className={`px-4 py-3.5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${adminTheme.dividerClass}`}>
+                <div className={`px-4 py-3.5 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${adminTheme.dividerClass}`}>
                     <div className="flex items-center gap-2.5">
                       <BarChart3 className={`w-5 h-5 shrink-0 ${adminTheme.accentTextClass}`} />
                       <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-[#F5F2EC] tracking-tight">
-                        Taburan Rangkaian &amp; Aktiviti Semasa
+                        Statistik Kiosk &amp; Permohonan Semasa
                       </h3>
                     </div>
 
@@ -1193,7 +1193,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             : 'text-slate-600 dark:text-stone-300 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
-                        Rangkaian Seluruh Negeri Kelantan
+                        Mengikut Daerah
                       </button>
                       <button
                         type="button"
@@ -1204,7 +1204,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             : 'text-slate-600 dark:text-stone-300 hover:text-slate-900 dark:hover:text-white'
                         }`}
                       >
-                        Perkembangan Permohonan
+                        Status Permohonan
                       </button>
                     </div>
                   </div>
@@ -1383,20 +1383,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <RoleDonutCard
                   className="lg:col-span-1 h-full"
                   role="admin"
-                  title="Gambaran Ruang Niaga"
+                  title="Status Unit Kiosk"
                   icon={Building2}
                   segments={capsuleStatusSegments}
                   centerValue={safeSlots.length}
-                  centerLabel="Jumlah Ruang"
-                  valueUnit="ruang"
+                  centerLabel="Jumlah Kiosk"
+                  valueUnit="unit"
                   summaryPairs={[
-                    { label: 'Sedia Digunakan', value: `${availableSlotsCount} ruang`, dotColor: adminTheme.chartSecondary },
-                    { label: 'Dalam Penjagaan', value: `${capsuleMaintenanceCount} ruang`, dotColor: adminTheme.chartPrimary }
+                    { label: 'Sedia Disewa', value: `${availableSlotsCount} unit`, dotColor: adminTheme.chartSecondary },
+                    { label: 'Dalam Penjagaan', value: `${capsuleMaintenanceCount} unit`, dotColor: adminTheme.chartPrimary }
                   ]}
                   emptyState={{
-                    title: 'Tiada Ruang Niaga',
-                    description: 'Tambah ruang niaga baharu untuk memantau pecahan penyertaan dan penjagaan.',
-                    actionLabel: 'Urus Ruang',
+                    title: 'Tiada Unit Kiosk',
+                    description: 'Tambah unit kiosk baharu untuk memantau status sewaan dan pembaikan.',
+                    actionLabel: 'Urus Kiosk',
                     onAction: () => setAdminTab('slots')
                   }}
                   staggerIndex={5}
@@ -1405,7 +1405,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                 {/* 2. Dua Lajur Seimbang Tanpa Kotak Bertindih */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 items-stretch">
-                  {/* Lajur Kiri: Ringkasan Rangkaian Negeri (Pembahagi Garis Halus) */}
+                  {/* Lajur Kiri: Ringkasan Operasi Kelantan (Pembahagi Garis Halus) */}
                   <div
                     style={{ '--stagger': 5 } as React.CSSProperties}
                     className={`animate-dashboard-card relative min-w-0 h-full rounded-2xl border backdrop-blur-xs overflow-hidden transition-all duration-200 flex flex-col justify-start ${adminTheme.surfaceClass}`}
@@ -1414,7 +1414,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <div className="flex items-center gap-2.5">
                         <Building2 className={`w-4.5 h-4.5 shrink-0 ${adminTheme.accentTextClass}`} />
                         <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-[#F5F2EC] tracking-tight">
-                          Ringkasan Rangkaian Negeri
+                          Ringkasan Operasi Kelantan
                         </h3>
                       </div>
                     </div>
@@ -1423,42 +1423,42 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <div className={`grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x ${adminTheme.dividerClass} border-b`}>
                       <div className="px-4 py-3.5">
                         <div className="text-xs font-medium text-slate-500 dark:text-stone-400">
-                          Tahap Penyertaan Ruang
+                          Kadar Kelulusan Kiosk
                         </div>
                         <div className="mt-1.5 flex items-baseline justify-between gap-2">
                           <span className="text-lg font-bold font-mono text-slate-900 dark:text-[#F5F2EC] tabular-nums">
                             {bookingApprovalRate}%
                           </span>
                           <span className="text-xs font-mono text-slate-500 dark:text-stone-400 tabular-nums">
-                            {approvedBookingsCount} disahkan
+                            {approvedBookingsCount} diluluskan
                           </span>
                         </div>
                       </div>
 
                       <div className="px-4 py-3.5">
                         <div className="text-xs font-medium text-slate-500 dark:text-stone-400">
-                          Tahap Sokongan Inisiatif
+                          Kadar Kelulusan Geran
                         </div>
                         <div className="mt-1.5 flex items-baseline justify-between gap-2">
                           <span className="text-lg font-bold font-mono text-slate-900 dark:text-[#F5F2EC] tabular-nums">
                             {grantApprovalRate}%
                           </span>
                           <span className="text-xs font-mono text-slate-500 dark:text-stone-400 tabular-nums">
-                            {approvedGrantsCount} disahkan
+                            {approvedGrantsCount} diluluskan
                           </span>
                         </div>
                       </div>
 
                       <div className="px-4 py-3.5">
                         <div className="text-xs font-medium text-slate-500 dark:text-stone-400">
-                          Liputan Lokasi Aktif
+                          Daerah Aktif
                         </div>
                         <div className="mt-1.5 flex items-baseline justify-between gap-2">
                           <span className="text-lg font-bold font-mono text-slate-900 dark:text-[#F5F2EC] tabular-nums">
                             {activeDistrictsCount} Daerah
                           </span>
                           <span className="text-xs font-mono text-slate-500 dark:text-stone-400 tabular-nums">
-                            {occupiedSlotsCount} aktif
+                            {occupiedSlotsCount} disewa
                           </span>
                         </div>
                       </div>
@@ -1469,14 +1469,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <div className="p-4 flex flex-col justify-start gap-2.5">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <span className="text-sm font-semibold text-slate-900 dark:text-[#F5F2EC]">
-                            Lokasi Mempunyai Ruang
+                            Daerah Ada Kiosk Kosong
                           </span>
                           <button
                             type="button"
                             onClick={() => setAdminTab('slots')}
                             className={`text-[0.8125rem] font-semibold hover:underline inline-flex items-center gap-0.5 cursor-pointer shrink-0 ${adminTheme.accentTextClass}`}
                           >
-                            <span>Urus Ruang</span>
+                            <span>Urus Kiosk</span>
                             <ChevronRight className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -1499,7 +1499,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </div>
                         ) : (
                           <p className="text-[0.8125rem] text-slate-600 dark:text-stone-400">
-                            Semua ruang di rangkaian seluruh negeri Kelantan telah diisi buat masa ini.
+                            Semua unit kiosk di seluruh Kelantan telah penuh disewa buat masa ini.
                           </p>
                         )}
                       </div>
@@ -1507,7 +1507,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <div className="p-4 flex flex-col justify-start gap-2.5">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <span className="text-sm font-semibold text-slate-900 dark:text-[#F5F2EC]">
-                            Keseimbangan Semakan Semasa
+                            Baki Permohonan Semasa
                           </span>
                           <button
                             type="button"
@@ -1521,7 +1521,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                         <div className="space-y-2">
                           <div className="flex items-center justify-between text-[0.8125rem] text-slate-600 dark:text-stone-300">
-                            <span>Kadar Penyertaan Keseluruhan</span>
+                            <span>Kadar Kiosk Diisi</span>
                             <span className="font-mono font-bold text-slate-900 dark:text-[#F5F2EC] tabular-nums">{occupancyRate}%</span>
                           </div>
                           <div className="w-full h-2 rounded-full bg-[#E5DFD5] dark:bg-[#2E2A26] overflow-hidden">
@@ -1531,7 +1531,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             />
                           </div>
                           <p className="text-[0.8125rem] text-slate-500 dark:text-stone-400 tabular-nums">
-                            {pendingBookingsCount + pendingGrantsCount} perkara menunggu semakan.
+                            {pendingBookingsCount + pendingGrantsCount} permohonan menunggu semakan.
                           </p>
                         </div>
                       </div>
@@ -1547,7 +1547,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       <div className="flex items-center gap-2.5">
                         <Activity className={`w-4.5 h-4.5 shrink-0 ${adminTheme.accentTextClass}`} />
                         <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-[#F5F2EC] tracking-tight">
-                          Perkara Memerlukan Perhatian
+                          Perlu Tindakan Segera
                         </h3>
                       </div>
                     </div>
@@ -1562,10 +1562,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <Clock className={`w-4.5 h-4.5 mt-0.5 shrink-0 ${adminTheme.accentTextClass}`} />
                           <div className="min-w-0 flex-1 space-y-0.5">
                             <div className="text-sm font-semibold text-slate-900 dark:text-[#F5F2EC] leading-snug break-words">
-                              Penyertaan Ruang Niaga
+                              Permohonan Kiosk
                             </div>
                             <div className="text-xs sm:text-[0.8125rem] text-slate-500 dark:text-stone-400 leading-relaxed break-words">
-                              Menunggu semakan penyelarasan
+                              Menunggu semakan admin
                             </div>
                           </div>
                         </div>
@@ -1579,10 +1579,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <Award className={`w-4.5 h-4.5 mt-0.5 shrink-0 ${adminTheme.accentStrongTextClass}`} />
                           <div className="min-w-0 flex-1 space-y-0.5">
                             <div className="text-sm font-semibold text-slate-900 dark:text-[#F5F2EC] leading-snug break-words">
-                              Sokongan Modal Usahawan
+                              Permohonan Geran Belia
                             </div>
                             <div className="text-xs sm:text-[0.8125rem] text-slate-500 dark:text-stone-400 leading-relaxed break-words">
-                              {approvedGrantsCount} telah disahkan
+                              {approvedGrantsCount} telah diluluskan
                             </div>
                           </div>
                         </div>
@@ -1596,10 +1596,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <Wrench className="w-4.5 h-4.5 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
                           <div className="min-w-0 flex-1 space-y-0.5">
                             <div className="text-sm font-semibold text-slate-900 dark:text-[#F5F2EC] leading-snug break-words">
-                              Penjagaan Kemudahan
+                              Aduan Kerosakan Kiosk
                             </div>
                             <div className="text-xs sm:text-[0.8125rem] text-slate-500 dark:text-stone-400 leading-relaxed break-words">
-                              Keperluan selenggara &amp; sokongan
+                              Permintaan baik pulih kiosk
                             </div>
                           </div>
                         </div>
@@ -1617,7 +1617,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <GraduationCap className={`w-4.5 h-4.5 mt-0.5 shrink-0 ${adminTheme.accentTextClass}`} />
                           <div className="min-w-0 flex-1 space-y-0.5">
                             <div className="text-sm font-semibold text-slate-900 dark:text-[#F5F2EC] leading-snug break-words">
-                              Sesi Bimbingan Komuniti
+                              Sesi Mentor
                             </div>
                             <div className="text-xs sm:text-[0.8125rem] text-slate-500 dark:text-stone-400 leading-relaxed break-words">
                               {mentors.length} mentor aktif
@@ -1778,31 +1778,50 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <span>Tambah</span>
               </button>
             }
-            tabs={[
-              { id: 'all', label: 'Semua', count: safeBookings.length },
-              { id: 'pending', label: 'Menunggu', count: safeBookings.filter(b => b?.status === 'pending').length },
-              { id: 'approved', label: 'Diluluskan', count: safeBookings.filter(b => b?.status === 'approved').length },
-              { id: 'rejected', label: 'Ditolak', count: safeBookings.filter(b => b?.status === 'rejected').length }
-            ]}
-            activeTab={bookingFilter}
-            onTabChange={(id) => {
-              setBookingFilter(id as 'all' | 'pending' | 'approved' | 'rejected');
-              setMobileBookingOpen(false);
-            }}
             searchValue={adminBookingSearch}
             onSearchChange={setAdminBookingSearch}
             searchPlaceholder="Cari pemohon, syarikat atau kod..."
-            extraControls={
-              <select
-                value={adminBookingSortPreset}
-                onChange={(e) => setAdminBookingSortPreset(e.target.value)}
-                aria-label="Susun permohonan sewaan"
-                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-              >
-                {adminBookingSortOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+            filterCount={(bookingFilter !== 'all' ? 1 : 0) + (adminBookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
+            onResetFilters={() => {
+              setBookingFilter('all');
+              setAdminBookingSortPreset(DEFAULT_SORT_VALUE);
+              setMobileBookingOpen(false);
+            }}
+            sortOptions={adminBookingSortOptions}
+            sortValue={adminBookingSortPreset}
+            onSortChange={setAdminBookingSortPreset}
+            filterContent={
+              <div>
+                <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                  Status Permohonan
+                </span>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {(
+                    [
+                      { id: 'all', label: 'Semua' },
+                      { id: 'pending', label: 'Menunggu' },
+                      { id: 'approved', label: 'Diluluskan' },
+                      { id: 'rejected', label: 'Ditolak' }
+                    ] as const
+                  ).map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setBookingFilter(opt.id);
+                        setMobileBookingOpen(false);
+                      }}
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors ${
+                        bookingFilter === opt.id
+                          ? adminTheme.activeMiniBtnClass
+                          : adminTheme.secondaryButtonClass
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             }
           />
 
@@ -2119,7 +2138,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <SidePreviewEmptyState
                     icon={<Clock className="w-10 h-10 text-stone-400" />}
                     title="Tiada Permohonan Dipilih"
-                    description="Pilih mana-mana permohonan sewaan kapsul di sebelah kiri untuk menyemak butiran."
+                    description="Butiran permohonan kiosk akan dipaparkan di sini."
                   />
                 )
               }
@@ -2149,43 +2168,73 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <span>Tambah</span>
               </button>
             }
-            tabs={[
-              { id: 'all', label: 'Semua', count: safeBusinesses.length },
-              { id: 'approved', label: 'Aktif', count: safeBusinesses.filter(b => b.isApproved).length },
-              { id: 'hidden', label: 'Tersembunyi', count: safeBusinesses.filter(b => !b.isApproved).length },
-              { id: 'featured', label: 'Pilihan', count: safeBusinesses.filter(b => b.isFeatured).length }
-            ]}
-            activeTab={bizStatusFilter}
-            onTabChange={(id) => {
-              setBizStatusFilter(id as 'all' | 'approved' | 'hidden' | 'featured');
-              setMobileBizOpen(false);
-            }}
             searchValue={bizSearch}
             onSearchChange={setBizSearch}
             searchPlaceholder="Cari perniagaan atau kategori..."
-            extraControls={
+            filterCount={
+              (bizStatusFilter !== 'all' ? 1 : 0) +
+              (bizDistrictFilter !== 'Semua' ? 1 : 0) +
+              (bizSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+            }
+            onResetFilters={() => {
+              setBizStatusFilter('all');
+              setBizDistrictFilter('Semua');
+              setBizSortPreset(DEFAULT_SORT_VALUE);
+              setMobileBizOpen(false);
+            }}
+            sortOptions={bizSortOptions}
+            sortValue={bizSortPreset}
+            onSortChange={setBizSortPreset}
+            filterContent={
               <>
-                <select
-                  value={bizDistrictFilter}
-                  onChange={(e) => setBizDistrictFilter(e.target.value)}
-                  aria-label="Tapis daerah perniagaan"
-                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  <option value="Semua">Semua Daerah</option>
-                  {DISTRICTS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-                <select
-                  value={bizSortPreset}
-                  onChange={(e) => setBizSortPreset(e.target.value)}
-                  aria-label="Susun senarai perniagaan"
-                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  {bizSortOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+                <div>
+                  <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                    Status Paparan
+                  </span>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {(
+                      [
+                        { id: 'all', label: 'Semua' },
+                        { id: 'approved', label: 'Aktif' },
+                        { id: 'hidden', label: 'Tersembunyi' },
+                        { id: 'featured', label: 'Pilihan' }
+                      ] as const
+                    ).map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setBizStatusFilter(opt.id);
+                          setMobileBizOpen(false);
+                        }}
+                        className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors ${
+                          bizStatusFilter === opt.id
+                            ? adminTheme.activeMiniBtnClass
+                            : adminTheme.secondaryButtonClass
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                    Daerah
+                  </label>
+                  <select
+                    value={bizDistrictFilter}
+                    onChange={(e) => setBizDistrictFilter(e.target.value)}
+                    aria-label="Tapis daerah perniagaan"
+                    className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                  >
+                    <option value="Semua">Semua Daerah</option>
+                    {DISTRICTS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
               </>
             }
           />
@@ -2260,7 +2309,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <img
                       src={biz.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                       alt={biz.businessName}
-                      className={`w-12 h-12 rounded-xl object-cover border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}
+                      className={`w-20 h-20 rounded-xl object-cover border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}
                     />
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex items-start justify-between gap-2">
@@ -2304,7 +2353,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             <img
                               src={selectedBusiness.logoUrl || '/assets/generated/product_kelantan_delights_1793924253401.jpg'}
                               alt={selectedBusiness.businessName}
-                              className={`w-14 h-14 rounded-xl object-cover border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}
+                              className={`w-24 h-24 rounded-xl object-cover border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}
                             />
                           }
                           title={selectedBusiness.businessName}
@@ -2424,7 +2473,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <SidePreviewEmptyState
                     icon={<Store className="w-10 h-10 text-stone-400" />}
                     title="Tiada Perniagaan Dipilih"
-                    description="Pilih mana-mana perniagaan di sebelah kiri untuk melihat maklumat dan mengurus produk."
+                    description="Maklumat perniagaan dan senarai produk akan dipaparkan di sini."
                   />
                 )
               }
@@ -2452,44 +2501,74 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <span>{showSlotForm ? 'Tutup' : 'Tambah Kiosk'}</span>
               </button>
             }
-            tabs={[
-              { id: 'all', label: 'Semua', count: safeSlots.length },
-              { id: 'available', label: 'Tersedia', count: safeSlots.filter(s => s.status === 'available').length },
-              { id: 'occupied', label: 'Beroperasi', count: safeSlots.filter(s => s.status === 'occupied').length },
-              { id: 'reserved', label: 'Ditempah', count: safeSlots.filter(s => s.status === 'reserved').length },
-              { id: 'maintenance', label: 'Selenggara', count: safeSlots.filter(s => s.status === 'maintenance').length }
-            ]}
-            activeTab={adminSlotStatusFilter}
-            onTabChange={(id) => {
-              setAdminSlotStatusFilter(id as 'all' | SlotStatus);
-              setMobileSlotOpen(false);
-            }}
             searchValue={adminSlotSearch}
             onSearchChange={setAdminSlotSearch}
             searchPlaceholder="Cari kod, nama, hab atau daerah..."
-            extraControls={
+            filterCount={
+              (adminSlotStatusFilter !== 'all' ? 1 : 0) +
+              (adminSlotDistrictFilter !== 'Semua' ? 1 : 0) +
+              (adminSlotSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+            }
+            onResetFilters={() => {
+              setAdminSlotStatusFilter('all');
+              setAdminSlotDistrictFilter('Semua');
+              setAdminSlotSortPreset(DEFAULT_SORT_VALUE);
+              setMobileSlotOpen(false);
+            }}
+            sortOptions={adminSlotSortOptions}
+            sortValue={adminSlotSortPreset}
+            onSortChange={setAdminSlotSortPreset}
+            filterContent={
               <>
-                <select
-                  value={adminSlotDistrictFilter}
-                  onChange={(e) => setAdminSlotDistrictFilter(e.target.value)}
-                  aria-label="Tapis daerah slot kapsul"
-                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  <option value="Semua">Semua Daerah</option>
-                  {DISTRICTS.map((d) => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-                <select
-                  value={adminSlotSortPreset}
-                  onChange={(e) => setAdminSlotSortPreset(e.target.value)}
-                  aria-label="Susun slot kapsul"
-                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  {adminSlotSortOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+                <div>
+                  <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                    Status Unit
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(
+                      [
+                        { id: 'all', label: 'Semua' },
+                        { id: 'available', label: 'Tersedia' },
+                        { id: 'occupied', label: 'Beroperasi' },
+                        { id: 'reserved', label: 'Ditempah' },
+                        { id: 'maintenance', label: 'Selenggara' }
+                      ] as const
+                    ).map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setAdminSlotStatusFilter(opt.id);
+                          setMobileSlotOpen(false);
+                        }}
+                        className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors ${
+                          adminSlotStatusFilter === opt.id
+                            ? adminTheme.activeMiniBtnClass
+                            : adminTheme.secondaryButtonClass
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                    Daerah
+                  </label>
+                  <select
+                    value={adminSlotDistrictFilter}
+                    onChange={(e) => setAdminSlotDistrictFilter(e.target.value)}
+                    aria-label="Tapis daerah slot kapsul"
+                    className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                  >
+                    <option value="Semua">Semua Daerah</option>
+                    {DISTRICTS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
               </>
             }
           />
@@ -2897,8 +2976,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 ) : (
                   <SidePreviewEmptyState
                     icon={<Building2 className="w-10 h-10 text-stone-400" />}
-                    title="Tiada Slot Kapsul Dipilih"
-                    description="Pilih mana-mana unit kapsul di sebelah kiri untuk menyemak status dan kadar sewaan."
+                    title="Tiada Unit Kiosk Dipilih"
+                    description="Status dan maklumat unit kiosk akan dipaparkan di sini."
                   />
                 )
               }
@@ -2926,32 +3005,42 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <span>{showProgramForm ? 'Tutup' : 'Tambah Program'}</span>
               </button>
             }
-            tabs={[
-              { id: 'Semua', label: 'Semua', count: safePrograms.length },
-              { id: 'Geran & Dana', label: 'Geran & Dana', count: safePrograms.filter(p => p.category === 'Geran & Dana').length },
-              { id: 'Bengkel & Latihan', label: 'Bengkel & Latihan', count: safePrograms.filter(p => p.category === 'Bengkel & Latihan').length },
-              { id: 'Pameran & Ekspo', label: 'Pameran & Ekspo', count: safePrograms.filter(p => p.category === 'Pameran & Ekspo').length },
-              { id: 'Pitching & Inkubasi', label: 'Pitching & Inkubasi', count: safePrograms.filter(p => p.category === 'Pitching & Inkubasi').length }
-            ]}
-            activeTab={progCategoryFilter}
-            onTabChange={(id) => {
-              setProgCategoryFilter(id as 'Semua' | YouthProgram['category']);
-              setMobileProgramOpen(false);
-            }}
             searchValue={progSearch}
             onSearchChange={setProgSearch}
             searchPlaceholder="Cari tajuk atau kategori program..."
-            extraControls={
-              <select
-                value={progSortPreset}
-                onChange={(e) => setProgSortPreset(e.target.value)}
-                aria-label="Susun senarai program"
-                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-              >
-                {progSortOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+            filterCount={
+              (progCategoryFilter !== 'Semua' ? 1 : 0) +
+              (progSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+            }
+            onResetFilters={() => {
+              setProgCategoryFilter('Semua');
+              setProgSortPreset(DEFAULT_SORT_VALUE);
+              setMobileProgramOpen(false);
+            }}
+            sortOptions={progSortOptions}
+            sortValue={progSortPreset}
+            onSortChange={setProgSortPreset}
+            filterContent={
+              <div>
+                <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                  Kategori Program
+                </label>
+                <select
+                  value={progCategoryFilter}
+                  onChange={(e) => {
+                    setProgCategoryFilter(e.target.value as 'Semua' | YouthProgram['category']);
+                    setMobileProgramOpen(false);
+                  }}
+                  aria-label="Tapis kategori program"
+                  className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+                >
+                  <option value="Semua">Semua Kategori</option>
+                  <option value="Geran & Dana">Geran &amp; Dana</option>
+                  <option value="Bengkel & Latihan">Bengkel &amp; Latihan</option>
+                  <option value="Pameran & Ekspo">Pameran &amp; Ekspo</option>
+                  <option value="Pitching & Inkubasi">Pitching &amp; Inkubasi</option>
+                </select>
+              </div>
             }
           />
 
@@ -3274,7 +3363,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <SidePreviewEmptyState
                     icon={<Award className="w-10 h-10 text-stone-400" />}
                     title="Tiada Program Dipilih"
-                    description="Pilih mana-mana program atau geran di sebelah kiri untuk menyemak butiran."
+                    description="Butiran program dan geran akan dipaparkan di sini."
                   />
                 )
               }
@@ -3321,18 +3410,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               searchValue={mentorListSearch}
               onSearchChange={setMentorListSearch}
               searchPlaceholder="Cari mentor, agensi atau jawatan..."
-              extraControls={
-                <select
-                  value={mentorListSortPreset}
-                  onChange={(e) => setMentorListSortPreset(e.target.value)}
-                  aria-label="Susun senarai mentor"
-                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  {mentorListSortOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              }
+              filterCount={mentorListSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0}
+              onResetFilters={() => setMentorListSortPreset(DEFAULT_SORT_VALUE)}
+              sortOptions={mentorListSortOptions}
+              sortValue={mentorListSortPreset}
+              onSortChange={setMentorListSortPreset}
             />
 
             {filteredAdminMentors.length === 0 ? (
@@ -3499,7 +3581,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <SidePreviewEmptyState
                       icon={<GraduationCap className="w-10 h-10 text-stone-400" />}
                       title="Tiada Mentor Dipilih"
-                      description="Pilih mana-mana profil mentor di sebelah kiri untuk melihat maklumat bimbingan."
+                      description="Maklumat profil mentor akan dipaparkan di sini."
                     />
                   )
                 }
@@ -3527,32 +3609,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <span>Tambah Sesi</span>
                 </button>
               }
-              tabs={[
-                { id: 'all', label: 'Semua', count: mentorshipRegistrations.length },
-                { id: 'pending', label: 'Menunggu', count: mentorshipRegistrations.filter(m => m.status === 'pending').length },
-                { id: 'confirmed', label: 'Disahkan', count: mentorshipRegistrations.filter(m => m.status === 'confirmed').length },
-                { id: 'completed', label: 'Selesai', count: mentorshipRegistrations.filter(m => m.status === 'completed').length },
-                { id: 'cancelled', label: 'Dibatalkan', count: mentorshipRegistrations.filter(m => m.status === 'cancelled').length }
-              ]}
-              activeTab={mentorshipStatusFilter}
-              onTabChange={(id) => {
-                setMentorshipStatusFilter(id as 'all' | MentorshipRegistration['status']);
-                setMobileMentorshipOpen(false);
-              }}
               searchValue={mentorshipSearch}
               onSearchChange={setMentorshipSearch}
               searchPlaceholder="Cari usahawan, mentor atau topik..."
-              extraControls={
-                <select
-                  value={mentorshipSortPreset}
-                  onChange={(e) => setMentorshipSortPreset(e.target.value)}
-                  aria-label="Susun pendaftaran bimbingan"
-                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  {mentorshipSortOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+              filterCount={
+                (mentorshipStatusFilter !== 'all' ? 1 : 0) +
+                (mentorshipSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)
+              }
+              onResetFilters={() => {
+                setMentorshipStatusFilter('all');
+                setMentorshipSortPreset(DEFAULT_SORT_VALUE);
+                setMobileMentorshipOpen(false);
+              }}
+              sortOptions={mentorshipSortOptions}
+              sortValue={mentorshipSortPreset}
+              onSortChange={setMentorshipSortPreset}
+              filterContent={
+                <div>
+                  <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                    Status Sesi
+                  </span>
+                  <div className="flex flex-wrap gap-1.5">
+                    {(
+                      [
+                        { id: 'all', label: 'Semua' },
+                        { id: 'pending', label: 'Menunggu' },
+                        { id: 'confirmed', label: 'Disahkan' },
+                        { id: 'completed', label: 'Selesai' },
+                        { id: 'cancelled', label: 'Dibatalkan' }
+                      ] as const
+                    ).map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setMentorshipStatusFilter(opt.id);
+                          setMobileMentorshipOpen(false);
+                        }}
+                        className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors ${
+                          mentorshipStatusFilter === opt.id
+                            ? adminTheme.activeMiniBtnClass
+                            : adminTheme.secondaryButtonClass
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               }
             />
 
@@ -3796,7 +3900,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <SidePreviewEmptyState
                       icon={<UserCheck className="w-10 h-10 text-stone-400" />}
                       title="Tiada Sesi Bimbingan Dipilih"
-                      description="Pilih mana-mana pendaftaran sesi bimbingan di sebelah kiri untuk mengurus status dan butiran."
+                      description="Butiran pendaftaran sesi bimbingan akan dipaparkan di sini."
                     />
                   )
                 }

@@ -124,15 +124,6 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
     filteredList.length
   ]);
 
-  const statusCounts = useMemo(
-    () => ({
-      all: newsItems.length,
-      published: newsItems.filter((n) => n.status === 'published').length,
-      draft: newsItems.filter((n) => n.status === 'draft').length
-    }),
-    [newsItems]
-  );
-
   const selectedNews = useMemo(
     () =>
       filteredList.find((item) => item.id === selectedNewsId) ||
@@ -317,52 +308,95 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
             <span>{showForm ? 'Tutup Borang' : 'Tambah Berita Baharu'}</span>
           </button>
         }
-        tabs={[
-          { id: 'all', label: 'Semua', count: statusCounts.all },
-          { id: 'published', label: 'Disiar', count: statusCounts.published },
-          { id: 'draft', label: 'Draf', count: statusCounts.draft }
-        ]}
-        activeTab={statusFilter}
-        onTabChange={(id) => {
-          setStatusFilter(id as 'all' | 'published' | 'draft');
-          setMobilePreviewOpen(false);
-        }}
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="Cari tajuk atau kategori..."
-        extraControls={
+        filterCount={activeFilterCount}
+        onResetFilters={() => {
+          setStatusFilter('all');
+          setCategoryFilter('all');
+          setPinnedFilter('all');
+          setSortPreset(DEFAULT_SORT_VALUE);
+        }}
+        sortOptions={newsSortOptions}
+        sortValue={sortPreset}
+        onSortChange={setSortPreset}
+        filterContent={
           <>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value as 'all' | NewsCategory)}
-              aria-label="Tapis kategori berita"
-              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-            >
-              <option value="all">Semua Kategori</option>
-              {NEWS_CATEGORIES.map((cat) => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-            <select
-              value={pinnedFilter}
-              onChange={(e) => setPinnedFilter(e.target.value as 'all' | 'pinned' | 'normal')}
-              aria-label="Tapis sorotan berita"
-              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-            >
-              <option value="all">Semua Sorotan</option>
-              <option value="pinned">Berita Utama Dipin</option>
-              <option value="normal">Artikel Biasa</option>
-            </select>
-            <select
-              value={sortPreset}
-              onChange={(e) => setSortPreset(e.target.value)}
-              aria-label="Susun artikel berita"
-              className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-            >
-              {newsSortOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            <div>
+              <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                Status Siaran
+              </span>
+              <div className="grid grid-cols-3 gap-1.5">
+                {(
+                  [
+                    { id: 'all', label: 'Semua' },
+                    { id: 'published', label: 'Disiar' },
+                    { id: 'draft', label: 'Draf' }
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => {
+                      setStatusFilter(opt.id);
+                      setMobilePreviewOpen(false);
+                    }}
+                    className={`px-2 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors whitespace-nowrap ${
+                      statusFilter === opt.id
+                        ? adminTheme.activeMiniBtnClass
+                        : adminTheme.secondaryButtonClass
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                Kategori Berita
+              </label>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value as 'all' | NewsCategory)}
+                className={`w-full px-3 py-2 rounded-xl text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
+              >
+                <option value="all">Semua Kategori</option>
+                {NEWS_CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                Sorotan
+              </span>
+              <div className="grid grid-cols-3 gap-1.5">
+                {(
+                  [
+                    { id: 'all', label: 'Semua' },
+                    { id: 'pinned', label: 'Dipin' },
+                    { id: 'normal', label: 'Biasa' }
+                  ] as const
+                ).map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setPinnedFilter(opt.id)}
+                    className={`px-2 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors whitespace-nowrap ${
+                      pinnedFilter === opt.id
+                        ? adminTheme.activeMiniBtnClass
+                        : adminTheme.secondaryButtonClass
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </>
         }
       />
@@ -613,7 +647,7 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
                   isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
                 }`}
               >
-                <div className={`w-12 h-12 rounded-xl overflow-hidden shrink-0 border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                <div className={`w-20 h-20 rounded-xl overflow-hidden shrink-0 border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                   {item.imageUrl ? (
                     <img
                       src={item.imageUrl}
@@ -784,8 +818,8 @@ export const AdminNewsManager: React.FC<AdminNewsManagerProps> = ({
             ) : (
               <SidePreviewEmptyState
                 icon={<Newspaper className="w-10 h-10" />}
-                title="Pilih artikel berita"
-                description="Klik mana-mana artikel di senarai sebelah kiri untuk membaca kandungan penuh dan mengurus status siaran."
+                title="Tiada Artikel Dipilih"
+                description="Kandungan berita dan tetapan siaran akan dipaparkan di sini."
               />
             )
           }

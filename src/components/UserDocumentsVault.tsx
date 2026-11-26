@@ -366,10 +366,10 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
         id: `offer-${b.id}`,
         category: 'kiosk',
         coverTag: 'Tawaran',
-        kicker: 'Kiosk Bersubsidi',
+        kicker: 'Sewa Kiosk',
         kickerColorClass: 'text-[#0B6E52] dark:text-[#34D399]',
         refCode: `KBN-${b.slotCode}`,
-        title: `Surat Tawaran Ruang Niaga · ${b.slotCode}`,
+        title: `Surat Tawaran Kiosk · ${b.slotCode}`,
         description: `${b.hubLocation || b.businessName} · RM${b.monthlyRate || 150}/bulan · ${formatDisplayDate(b.startDate)} hingga ${calculateOperationEndDate(b.startDate, b.durationMonths)}`,
         primaryLabel: 'Buka & Cetak',
         primaryIcon: 'eye',
@@ -390,11 +390,11 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
       id: 'offer-locked',
       category: 'kiosk',
       coverTag: 'Tawaran',
-      kicker: 'Ruang Niaga',
+      kicker: 'Sewa Kiosk',
       kickerColorClass: 'text-slate-500 dark:text-stone-400',
       refCode: 'BELUM-SAH',
-      title: 'Surat Tawaran Ruang Niaga',
-      description: 'Tersedia selepas permohonan ruang niaga anda disahkan.',
+      title: 'Surat Tawaran Kiosk',
+      description: 'Tersedia selepas permohonan sewa kiosk anda diluluskan.',
       locked: true,
       primaryLabel: 'Belum Tersedia',
       primaryIcon: 'lock'
@@ -408,11 +408,11 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
         id: `tenancy-${b.id}`,
         category: 'tenancy',
         coverTag: 'Perjanjian',
-        kicker: 'Kontrak Penyertaan',
+        kicker: 'Perjanjian Kiosk',
         kickerColorClass: 'text-[#B47B1E] dark:text-[#E5B85C]',
         refCode: `PRJ-${b.slotCode}`,
-        title: `Perjanjian Ruang Niaga · ${b.slotCode}`,
-        description: `${b.businessName} · Tempoh penyertaan ${b.durationMonths} bulan.`,
+        title: `Perjanjian Sewa Kiosk · ${b.slotCode}`,
+        description: `${b.businessName} · Tempoh sewaan ${b.durationMonths} bulan.`,
         primaryLabel: 'Buka Perjanjian',
         primaryIcon: 'external',
         onPrimary: () => onOpenTenancyAgreement(b)
@@ -423,26 +423,26 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
       id: 'tenancy-locked',
       category: 'tenancy',
       coverTag: 'Perjanjian',
-      kicker: 'Kontrak Penyertaan',
+      kicker: 'Perjanjian Kiosk',
       kickerColorClass: 'text-slate-500 dark:text-stone-400',
       refCode: 'BELUM-SAH',
-      title: 'Perjanjian Penyertaan Ruang Niaga',
-      description: 'Tersedia bersama surat tawaran selepas permohonan disahkan.',
+      title: 'Perjanjian Sewa Kiosk',
+      description: 'Tersedia bersama surat tawaran selepas permohonan diluluskan.',
       locked: true,
       primaryLabel: 'Belum Tersedia',
       primaryIcon: 'lock'
     });
   }
 
-  // 4. Surat Sokongan / Bantuan
+  // 4. Surat Kelulusan Geran
   if (approvedGrants.length > 0) {
     approvedGrants.forEach((g) => {
       const refCode = g.id.slice(0, 8).toUpperCase();
       cards.push({
         id: `grant-${g.id}`,
         category: 'grant',
-        coverTag: 'Sokongan',
-        kicker: 'Sokongan Modal',
+        coverTag: 'Kelulusan',
+        kicker: 'Geran Belia',
         kickerColorClass: 'text-[#0B6E52] dark:text-[#34D399]',
         refCode: `GRT-${refCode}`,
         title: `${g.programTitle} · ${refCode}`,
@@ -495,9 +495,6 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
     });
   }
 
-  const unlockedCount = cards.filter((c) => !c.locked).length;
-  const lockedCount = cards.filter((c) => c.locked).length;
-
   const filteredCards = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return cards.filter((c) => {
@@ -537,17 +534,41 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
         role="belia"
         icon={<FolderCheck className="w-5 h-5" />}
         title="Simpanan Dokumen"
-        subtitle="Pilih mana-mana dokumen di kiri untuk pratonton butiran rasmi, cetakan, dan pengesahan."
-        tabs={[
-          { id: 'all', label: 'Semua Dokumen', count: cards.length },
-          { id: 'unlocked', label: 'Tersedia', count: unlockedCount },
-          { id: 'locked', label: 'Belum Tersedia', count: lockedCount }
-        ]}
-        activeTab={statusTab}
-        onTabChange={(id) => setStatusTab(id as 'all' | 'unlocked' | 'locked')}
+        subtitle="Simpan dan semak dokumen rasmi serta surat perakuan anda."
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
         searchPlaceholder="Cari sijil, surat atau rujukan..."
+        filterCount={statusTab !== 'all' ? 1 : 0}
+        onResetFilters={() => setStatusTab('all')}
+        filterContent={
+          <div>
+            <span className="block text-xs font-semibold text-slate-700 dark:text-stone-300 mb-1.5">
+              Status Dokumen
+            </span>
+            <div className="grid grid-cols-3 gap-1.5">
+              {(
+                [
+                  { id: 'all', label: 'Semua' },
+                  { id: 'unlocked', label: 'Tersedia' },
+                  { id: 'locked', label: 'Terkunci' }
+                ] as const
+              ).map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setStatusTab(opt.id)}
+                  className={`px-2 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors whitespace-nowrap ${
+                    statusTab === opt.id
+                      ? beliaTheme.activeMiniBtnClass
+                      : beliaTheme.secondaryButtonClass
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        }
       />
 
       <GoogleWorkspaceSplitPane
@@ -590,7 +611,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
                       : beliaTheme.rowHoverClass
                   } ${card.locked ? 'opacity-75' : ''}`}
                 >
-                  <div className={`w-11 h-11 rounded-xl overflow-hidden border shrink-0 ${beliaTheme.dividerClass}`}>
+                  <div className={`w-16 h-16 rounded-xl overflow-hidden border shrink-0 ${beliaTheme.dividerClass}`}>
                     <DocumentCoverArtwork category={card.category} locked={card.locked} compact />
                   </div>
                   <div className="min-w-0 flex-1 space-y-1">
@@ -624,7 +645,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
           !activeDoc ? (
             <SidePreviewEmptyState
               icon={<FolderCheck className="w-10 h-10 text-slate-400 dark:text-stone-500" />}
-              title="Pilih dokumen daripada senarai di sebelah kiri"
+              title="Tiada Dokumen Dipilih"
               description="Butiran sijil, surat tawaran, perjanjian dan tindakan cetakan akan dipaparkan di sini."
             />
           ) : (
@@ -632,7 +653,7 @@ export const UserDocumentsVault: React.FC<UserDocumentsVaultProps> = ({
               <SidePreviewHeader
                 role="belia"
                 media={
-                  <div className={`w-14 h-14 rounded-2xl overflow-hidden border ${beliaTheme.dividerClass}`}>
+                  <div className={`w-20 h-20 rounded-2xl overflow-hidden border ${beliaTheme.dividerClass}`}>
                     <DocumentCoverArtwork category={activeDoc.category} locked={activeDoc.locked} compact />
                   </div>
                 }

@@ -477,8 +477,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
         </h1>
         <p className="text-sm text-black/65 dark:text-white/70 mt-1 max-w-2xl kbelia-prose">
           {isEn
-            ? 'Book one-on-one business coaching with Kelantan industry practitioners and university entrepreneurship advisors.'
-            : 'Tempah sesi bimbingan perniagaan satu-ke-satu bersama pakar industri dan penasihat keusahawanan Kelantan.'}
+            ? 'Book free business coaching sessions with Kelantan mentors.'
+            : 'Tempah sesi bimbingan perniagaan percuma bersama mentor KBelia.'}
         </p>
       </div>
 
@@ -704,8 +704,8 @@ export const MentorshipPage: React.FC<MentorshipPageProps> = ({
               <div className="p-5 text-sm text-black/65 dark:text-white/70 flex flex-wrap items-center justify-between gap-3">
                 <span>
                   {isEn
-                    ? 'No active mentorship appointment right now. Choose any mentor below to book a session.'
-                    : 'Tiada temu janji bimbingan aktif buat masa ini. Pilih mana-mana mentor di bawah untuk menempah sesi baharu.'}
+                    ? 'No active appointment yet.'
+                    : 'Tiada temu janji bimbingan aktif buat masa ini.'}
                 </span>
               </div>
             )

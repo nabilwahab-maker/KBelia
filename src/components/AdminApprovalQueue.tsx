@@ -285,46 +285,6 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
     sortedTickets.length
   ]);
 
-  const bookingCounts = useMemo(
-    () => ({
-      all: bookings.length,
-      pending: bookings.filter((b) => b.status === 'pending').length,
-      approved: bookings.filter((b) => b.status === 'approved').length,
-      rejected: bookings.filter((b) => b.status === 'rejected').length
-    }),
-    [bookings]
-  );
-
-  const grantCounts = useMemo(
-    () => ({
-      all: grantApplications.length,
-      pending: grantApplications.filter((g) => g.status === 'pending').length,
-      approved: grantApplications.filter((g) => g.status === 'approved').length,
-      rejected: grantApplications.filter((g) => g.status === 'rejected').length
-    }),
-    [grantApplications]
-  );
-
-  const slotCounts = useMemo(
-    () => ({
-      all: slots.length,
-      available: slots.filter((s) => s.status === 'available').length,
-      occupied: slots.filter((s) => s.status === 'occupied').length,
-      maintenance: slots.filter((s) => s.status === 'maintenance').length
-    }),
-    [slots]
-  );
-
-  const ticketCounts = useMemo(
-    () => ({
-      all: maintenanceTickets.length,
-      received: maintenanceTickets.filter((t) => t.status === 'received').length,
-      in_progress: maintenanceTickets.filter((t) => t.status === 'in_progress').length,
-      resolved: maintenanceTickets.filter((t) => t.status === 'resolved').length
-    }),
-    [maintenanceTickets]
-  );
-
   const selectedBooking = useMemo(
     () =>
       sortedBookings.find((b) => b.id === selectedBookingId) ||
@@ -988,31 +948,50 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 <span>Tambah</span>
               </button>
             }
-            tabs={[
-              { id: 'all', label: 'Semua', count: bookingCounts.all },
-              { id: 'pending', label: 'Menunggu', count: bookingCounts.pending },
-              { id: 'approved', label: 'Lulus', count: bookingCounts.approved },
-              { id: 'rejected', label: 'Ditolak', count: bookingCounts.rejected }
-            ]}
-            activeTab={statusFilter}
-            onTabChange={(id) => {
-              setStatusFilter(id as 'all' | 'pending' | 'approved' | 'rejected');
-              setMobileBookingOpen(false);
-            }}
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
             searchPlaceholder="Cari pemohon, syarikat atau kod..."
-            extraControls={
-              <select
-                value={bookingSortPreset}
-                onChange={(e) => setBookingSortPreset(e.target.value)}
-                aria-label="Susun permohonan kiosk"
-                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-              >
-                {bookingSortOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+            filterCount={(statusFilter !== 'all' ? 1 : 0) + (bookingSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
+            onResetFilters={() => {
+              setStatusFilter('all');
+              setBookingSortPreset(DEFAULT_SORT_VALUE);
+              setMobileBookingOpen(false);
+            }}
+            sortOptions={bookingSortOptions}
+            sortValue={bookingSortPreset}
+            onSortChange={setBookingSortPreset}
+            filterContent={
+              <div>
+                <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                  Status Permohonan
+                </span>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {(
+                    [
+                      { id: 'all', label: 'Semua' },
+                      { id: 'pending', label: 'Menunggu' },
+                      { id: 'approved', label: 'Lulus' },
+                      { id: 'rejected', label: 'Ditolak' }
+                    ] as const
+                  ).map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setStatusFilter(opt.id);
+                        setMobileBookingOpen(false);
+                      }}
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors ${
+                        statusFilter === opt.id
+                          ? adminTheme.activeMiniBtnClass
+                          : adminTheme.secondaryButtonClass
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             }
           />
 
@@ -1082,7 +1061,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                       isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
                     }`}
                   >
-                    <div className={`w-12 h-12 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                    <div className={`w-20 h-20 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                       <PortalImage
                         src={resolveBookingKioskImage(booking, slots)}
                         alt={`Reka bentuk kiosk ${booking.slotName}`}
@@ -1139,7 +1118,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                     <SidePreviewHeader
                       role="admin"
                       media={
-                        <div className={`w-14 h-14 rounded-xl overflow-hidden border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                        <div className={`w-24 h-24 rounded-xl overflow-hidden border ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                           <PortalImage
                             src={resolveBookingKioskImage(selectedBooking, slots)}
                             alt={selectedBooking.slotName}
@@ -1312,8 +1291,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 ) : (
                   <SidePreviewEmptyState
                     icon={<Store className="w-10 h-10" />}
-                    title="Pilih permohonan kiosk"
-                    description="Klik mana-mana permohonan di senarai kiri untuk melihat cadangan perniagaan serta meluluskan atau menolak permohonan."
+                    title="Tiada Permohonan Dipilih"
+                    description="Butiran permohonan sewaan kiosk dan tindakan kelulusan akan dipaparkan di sini."
                   />
                 )
               }
@@ -1343,31 +1322,50 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 <span>Tambah</span>
               </button>
             }
-            tabs={[
-              { id: 'all', label: 'Semua', count: grantCounts.all },
-              { id: 'pending', label: 'Menunggu', count: grantCounts.pending },
-              { id: 'approved', label: 'Lulus', count: grantCounts.approved },
-              { id: 'rejected', label: 'Ditolak', count: grantCounts.rejected }
-            ]}
-            activeTab={statusFilter}
-            onTabChange={(id) => {
-              setStatusFilter(id as 'all' | 'pending' | 'approved' | 'rejected');
-              setMobileGrantOpen(false);
-            }}
             searchValue={searchQuery}
             onSearchChange={setSearchQuery}
             searchPlaceholder="Cari pemohon, syarikat atau geran..."
-            extraControls={
-              <select
-                value={grantSortPreset}
-                onChange={(e) => setGrantSortPreset(e.target.value)}
-                aria-label="Susun permohonan geran"
-                className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-              >
-                {grantSortOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>{opt.label}</option>
-                ))}
-              </select>
+            filterCount={(statusFilter !== 'all' ? 1 : 0) + (grantSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
+            onResetFilters={() => {
+              setStatusFilter('all');
+              setGrantSortPreset(DEFAULT_SORT_VALUE);
+              setMobileGrantOpen(false);
+            }}
+            sortOptions={grantSortOptions}
+            sortValue={grantSortPreset}
+            onSortChange={setGrantSortPreset}
+            filterContent={
+              <div>
+                <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                  Status Permohonan
+                </span>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {(
+                    [
+                      { id: 'all', label: 'Semua' },
+                      { id: 'pending', label: 'Menunggu' },
+                      { id: 'approved', label: 'Lulus' },
+                      { id: 'rejected', label: 'Ditolak' }
+                    ] as const
+                  ).map((opt) => (
+                    <button
+                      key={opt.id}
+                      type="button"
+                      onClick={() => {
+                        setStatusFilter(opt.id);
+                        setMobileGrantOpen(false);
+                      }}
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors ${
+                        statusFilter === opt.id
+                          ? adminTheme.activeMiniBtnClass
+                          : adminTheme.secondaryButtonClass
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             }
           />
 
@@ -1664,8 +1662,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                 ) : (
                   <SidePreviewEmptyState
                     icon={<Coins className="w-10 h-10" />}
-                    title="Pilih permohonan geran"
-                    description="Klik mana-mana permohonan geran di sebelah kiri untuk menyemak butiran bank, tujuan dana, dan keputusan kelulusan."
+                    title="Tiada Permohonan Dipilih"
+                    description="Butiran permohonan geran dan keputusan kelulusan akan dipaparkan di sini."
                   />
                 )
               }
@@ -1694,31 +1692,50 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   <span>Tambah Unit</span>
                 </button>
               }
-              tabs={[
-                { id: 'all', label: 'Semua', count: slotCounts.all },
-                { id: 'available', label: 'Tersedia', count: slotCounts.available },
-                { id: 'occupied', label: 'Diduduki', count: slotCounts.occupied },
-                { id: 'maintenance', label: 'Pembaikan', count: slotCounts.maintenance }
-              ]}
-              activeTab={slotStatusFilter}
-              onTabChange={(id) => {
-                setSlotStatusFilter(id as 'all' | 'available' | 'occupied' | 'maintenance');
-                setMobileSlotOpen(false);
-              }}
               searchValue={slotSearch}
               onSearchChange={setSlotSearch}
               searchPlaceholder="Cari kod kiosk, nama atau daerah..."
-              extraControls={
-                <select
-                  value={slotSortPreset}
-                  onChange={(e) => setSlotSortPreset(e.target.value)}
-                  aria-label="Susun unit kiosk"
-                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  {slotSortOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+              filterCount={(slotStatusFilter !== 'all' ? 1 : 0) + (slotSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
+              onResetFilters={() => {
+                setSlotStatusFilter('all');
+                setSlotSortPreset(DEFAULT_SORT_VALUE);
+                setMobileSlotOpen(false);
+              }}
+              sortOptions={slotSortOptions}
+              sortValue={slotSortPreset}
+              onSortChange={setSlotSortPreset}
+              filterContent={
+                <div>
+                  <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                    Status Unit
+                  </span>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {(
+                      [
+                        { id: 'all', label: 'Semua' },
+                        { id: 'available', label: 'Tersedia' },
+                        { id: 'occupied', label: 'Diduduki' },
+                        { id: 'maintenance', label: 'Pembaikan' }
+                      ] as const
+                    ).map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setSlotStatusFilter(opt.id);
+                          setMobileSlotOpen(false);
+                        }}
+                        className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors ${
+                          slotStatusFilter === opt.id
+                            ? adminTheme.activeMiniBtnClass
+                            : adminTheme.secondaryButtonClass
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               }
             />
 
@@ -1786,7 +1803,7 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                         isSelected ? getWorkspaceActiveRowClass('admin') : adminTheme.rowHoverClass
                       }`}
                     >
-                      <div className={`w-12 h-12 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
+                      <div className={`w-20 h-20 rounded-xl overflow-hidden border shrink-0 ${adminTheme.surfaceMutedClass} ${adminTheme.dividerClass}`}>
                         <PortalImage
                           src={resolveSlotImage(slot)}
                           alt={slot.name}
@@ -1963,8 +1980,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   ) : (
                     <SidePreviewEmptyState
                       icon={<Building2 className="w-10 h-10" />}
-                      title="Pilih unit kiosk"
-                      description="Klik mana-mana unit di senarai kiri untuk melihat gambar kiosk, status semasa, dan kemudahan."
+                      title="Tiada Unit Kiosk Dipilih"
+                      description="Gambar kiosk, status semasa dan maklumat kemudahan akan dipaparkan di sini."
                     />
                   )
                 }
@@ -1992,31 +2009,50 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   <span>Tambah Tiket</span>
                 </button>
               }
-              tabs={[
-                { id: 'all', label: 'Semua', count: ticketCounts.all },
-                { id: 'received', label: 'Diterima', count: ticketCounts.received },
-                { id: 'in_progress', label: 'Sedang Dibaiki', count: ticketCounts.in_progress },
-                { id: 'resolved', label: 'Selesai', count: ticketCounts.resolved }
-              ]}
-              activeTab={ticketStatusFilter}
-              onTabChange={(id) => {
-                setTicketStatusFilter(id as 'all' | 'received' | 'in_progress' | 'resolved');
-                setMobileTicketOpen(false);
-              }}
               searchValue={ticketSearch}
               onSearchChange={setTicketSearch}
               searchPlaceholder="Cari kiosk, pelapor atau aduan..."
-              extraControls={
-                <select
-                  value={ticketSortPreset}
-                  onChange={(e) => setTicketSortPreset(e.target.value)}
-                  aria-label="Susun tiket aduan"
-                  className={`px-3 py-1.5 rounded-xl text-xs sm:text-sm font-medium cursor-pointer focus:outline-none ${adminTheme.inputClass}`}
-                >
-                  {ticketSortOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+              filterCount={(ticketStatusFilter !== 'all' ? 1 : 0) + (ticketSortPreset !== DEFAULT_SORT_VALUE ? 1 : 0)}
+              onResetFilters={() => {
+                setTicketStatusFilter('all');
+                setTicketSortPreset(DEFAULT_SORT_VALUE);
+                setMobileTicketOpen(false);
+              }}
+              sortOptions={ticketSortOptions}
+              sortValue={ticketSortPreset}
+              onSortChange={setTicketSortPreset}
+              filterContent={
+                <div>
+                  <span className="block text-xs font-semibold text-stone-700 dark:text-stone-300 mb-1.5">
+                    Status Tiket
+                  </span>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {(
+                      [
+                        { id: 'all', label: 'Semua' },
+                        { id: 'received', label: 'Diterima' },
+                        { id: 'in_progress', label: 'Sedang Dibaiki' },
+                        { id: 'resolved', label: 'Selesai' }
+                      ] as const
+                    ).map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        onClick={() => {
+                          setTicketStatusFilter(opt.id);
+                          setMobileTicketOpen(false);
+                        }}
+                        className={`px-2.5 py-1.5 rounded-xl text-xs font-semibold border cursor-pointer transition-colors ${
+                          ticketStatusFilter === opt.id
+                            ? adminTheme.activeMiniBtnClass
+                            : adminTheme.secondaryButtonClass
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               }
             />
 
@@ -2272,8 +2308,8 @@ export const AdminApprovalQueue: React.FC<AdminApprovalQueueProps> = ({
                   ) : (
                     <SidePreviewEmptyState
                       icon={<Wrench className="w-10 h-10" />}
-                      title="Pilih tiket aduan"
-                      description="Klik mana-mana tiket aduan di sebelah kiri untuk melihat laporan kerosakan dan tindakan penyelenggaraan."
+                      title="Tiada Tiket Aduan Dipilih"
+                      description="Laporan kerosakan dan status penyelenggaraan akan dipaparkan di sini."
                     />
                   )
                 }

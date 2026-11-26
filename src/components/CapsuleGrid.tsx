@@ -415,7 +415,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                     }`}
                   >
                     <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shrink-0">
+                      <div className="w-24 h-20 sm:w-28 sm:h-24 rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shrink-0">
                         <PortalImage
                           src={resolveSlotImage(slot)}
                           alt={slot.name}

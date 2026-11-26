@@ -740,7 +740,7 @@ export const EventsSection: React.FC = () => {
                     className="kbelia-table-row p-3.5 sm:px-5 sm:py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5"
                   >
                     <div className="flex items-center gap-3.5 min-w-0 flex-1">
-                      <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
+                      <div className="w-24 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-slate-200 dark:border-zinc-700 bg-slate-100 dark:bg-zinc-800 shrink-0">
                         <PortalImage
                           src={resolveEventImage(evt.category, evt.imageUrl)}
                           alt={evt.title}
