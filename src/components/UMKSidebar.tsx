@@ -23,7 +23,8 @@ import {
   Megaphone,
   ClipboardCheck,
   MapPin,
-  Compass
+  Compass,
+  Settings
 } from 'lucide-react';
 import { UMKTab } from './UMKHeader';
 import { useAuth } from '../context/AuthContext';
@@ -598,6 +599,19 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
               </React.Fragment>
             ))}
           </div>
+
+          <div className={`flex flex-col items-center w-full px-2 pt-3 border-t ${roleTheme.dividerClass}`}>
+            <button
+              id="kbelia-sidebar-settings-mini-btn"
+              type="button"
+              onClick={() => navigateAndClose(() => setActiveTab('settings'))}
+              title={isMs ? 'Tetapan Akaun' : 'Account Settings'}
+              aria-label={isMs ? 'Tetapan Akaun' : 'Account Settings'}
+              className={`${miniBtnBase} ${activeTab === 'settings' ? miniBtnActive : miniBtnIdle}`}
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+          </div>
         </aside>
       </>
     );
@@ -716,6 +730,32 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             ))}
           </div>
         )}
+      </div>
+
+      <div className={`mt-auto pt-3 border-t ${roleTheme.dividerClass}`}>
+        <button
+          id="kbelia-sidebar-settings-btn"
+          type="button"
+          onClick={() => navigateAndClose(() => setActiveTab('settings'))}
+          title={isMs ? 'Tetapan Akaun' : 'Account Settings'}
+          className={`${navBtnBase} ${activeTab === 'settings' ? navBtnActive : navBtnIdle}`}
+        >
+          <div className="flex items-center gap-2.5 min-w-0">
+            <Settings
+              className={`w-4 h-4 shrink-0 ${
+                activeTab === 'settings'
+                  ? 'text-black dark:text-white/75'
+                  : 'text-black/70 dark:text-white/75 group-hover:text-black dark:group-hover:text-white'
+              }`}
+            />
+            <span
+              data-reserved-text={isMs ? 'Tetapan Akaun' : 'Account Settings'}
+              className="kbelia-reserved-bold kbelia-reserved-bold-start kbelia-trim min-w-0 max-w-full truncate whitespace-nowrap"
+            >
+              {isMs ? 'Tetapan Akaun' : 'Account Settings'}
+            </span>
+          </div>
+        </button>
       </div>
     </aside>
   );

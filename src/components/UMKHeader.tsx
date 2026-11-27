@@ -11,7 +11,6 @@ import {
   Store, 
   LogIn, 
   Clock,
-  Settings,
   Bell,
   Sun,
   Moon,
@@ -1131,18 +1130,69 @@ export const UMKHeader: React.FC<UMKHeaderProps> = ({
 
                   <div className="space-y-1">
                     <button
-                      id="kbelia-dropdown-setting-btn"
+                      id="kbelia-dropdown-profile-btn"
                       type="button"
-                      onClick={() => { setActiveTab('settings'); setProfileDropdownOpen(false); }}
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
+                        if (isAdmin) {
+                          if (onSelectAdminSubTab) {
+                            onSelectAdminSubTab('queue');
+                          } else {
+                            setActiveTab('admin');
+                          }
+                        } else if (isMentor) {
+                          if (onSelectMentorSubTab) {
+                            onSelectMentorSubTab('profile');
+                          } else {
+                            setActiveTab('mentor');
+                          }
+                        } else if (onSelectMerchantSubTab) {
+                          onSelectMerchantSubTab('profile');
+                        } else {
+                          setActiveTab('merchant');
+                        }
+                      }}
                       className={`w-full flex items-center justify-between px-3 py-2.5 text-sm font-semibold rounded-xl text-left transition-colors cursor-pointer ${
-                        activeTab === 'settings'
+                        (isAdmin && activeTab === 'admin') ||
+                        (isMentor && activeTab === 'mentor') ||
+                        (!isAdmin && !isMentor && activeTab === 'merchant')
                           ? `${roleTheme.activeNavClass} border`
                           : 'text-black dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700'
                       }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <Settings className={`w-4 h-4 ${activeTab === 'settings' ? roleTheme.accentTextClass : 'text-black/70 dark:text-white/75'}`} />
-                        <span>{language === 'en' ? 'Account Settings' : 'Tetapan Akaun'}</span>
+                        {isAdmin ? (
+                          <ShieldCheck
+                            className={`w-4 h-4 ${
+                              activeTab === 'admin' ? roleTheme.accentTextClass : 'text-black/70 dark:text-white/75'
+                            }`}
+                          />
+                        ) : isMentor ? (
+                          <GraduationCap
+                            className={`w-4 h-4 ${
+                              activeTab === 'mentor' ? roleTheme.accentTextClass : 'text-black/70 dark:text-white/75'
+                            }`}
+                          />
+                        ) : (
+                          <Store
+                            className={`w-4 h-4 ${
+                              activeTab === 'merchant' ? roleTheme.accentTextClass : 'text-black/70 dark:text-white/75'
+                            }`}
+                          />
+                        )}
+                        <span>
+                          {isAdmin
+                            ? language === 'en'
+                              ? 'Admin Panel'
+                              : 'Panel Utama Pentadbir'
+                            : isMentor
+                            ? language === 'en'
+                              ? 'Mentor Profile'
+                              : 'Profil Mentor'
+                            : language === 'en'
+                            ? 'My Shop Profile'
+                            : 'Profil Kedai Saya'}
+                        </span>
                       </div>
                     </button>
 
