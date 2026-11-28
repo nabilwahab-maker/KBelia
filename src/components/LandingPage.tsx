@@ -788,8 +788,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button
               type="button"
               onClick={() => navigateToPage('login')}
-              className={`inline-flex items-center gap-2 text-sm font-semibold cursor-pointer whitespace-nowrap shrink-0 kbelia-link ${
-                isEditorialDark ? 'text-emerald-400' : 'text-[#0B6E52]'
+              className={`inline-flex items-center gap-2 text-sm font-semibold cursor-pointer whitespace-nowrap shrink-0 kbelia-link transition-colors ${
+                isEditorialDark
+                  ? 'text-emerald-400 hover:text-emerald-300'
+                  : 'text-[#0B6E52] hover:text-[#085640]'
               }`}
             >
               <span>{isBM ? 'Log masuk untuk mohon kiosk' : 'Sign in to book a kiosk'}</span>
@@ -1142,22 +1144,42 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </h4>
             <ul className={`space-y-2 text-sm ${surfaceTextMuted}`}>
               <li>
-                <a href="#hero" className="kbelia-link">
+                <a
+                  href="#hero"
+                  className={`kbelia-link transition-colors ${
+                    isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+                  }`}
+                >
                   {isBM ? 'Utama' : 'Home'}
                 </a>
               </li>
               <li>
-                <a href="#inisiatif" className="kbelia-link">
+                <a
+                  href="#inisiatif"
+                  className={`kbelia-link transition-colors ${
+                    isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+                  }`}
+                >
                   {isBM ? 'Kelebihan KBelia' : 'Benefits'}
                 </a>
               </li>
               <li>
-                <a href="#kiosk" className="kbelia-link">
+                <a
+                  href="#kiosk"
+                  className={`kbelia-link transition-colors ${
+                    isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+                  }`}
+                >
                   {isBM ? 'Lokasi Kiosk' : 'Kiosks'}
                 </a>
               </li>
               <li>
-                <a href="#direktori" className="kbelia-link">
+                <a
+                  href="#direktori"
+                  className={`kbelia-link transition-colors ${
+                    isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+                  }`}
+                >
                   {isBM ? 'Kedai Belia' : 'Youth Shops'}
                 </a>
               </li>
@@ -1165,7 +1187,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => navigateToPage('login')}
-                  className="kbelia-link cursor-pointer text-left"
+                  className={`kbelia-link cursor-pointer text-left transition-colors ${
+                    isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+                  }`}
                 >
                   {isBM ? 'Log Masuk Portal' : 'Portal Sign In'}
                 </button>
@@ -1182,7 +1206,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('privacy')}
-                  className="kbelia-link cursor-pointer text-left"
+                  className={`kbelia-link cursor-pointer text-left transition-colors ${
+                    isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+                  }`}
                 >
                   {isBM ? 'Dasar Privasi' : 'Privacy Policy'}
                 </button>
@@ -1191,7 +1217,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('terms')}
-                  className="kbelia-link cursor-pointer text-left"
+                  className={`kbelia-link cursor-pointer text-left transition-colors ${
+                    isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+                  }`}
                 >
                   {isBM ? 'Terma & Syarat' : 'Terms & Conditions'}
                 </button>
@@ -1200,7 +1228,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setLegalModalType('privacy')}
-                  className="kbelia-link cursor-pointer text-left"
+                  className={`kbelia-link cursor-pointer text-left transition-colors ${
+                    isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+                  }`}
                 >
                   {isBM ? 'Keselamatan Maklumat' : 'Data Protection'}
                 </button>
@@ -1269,7 +1299,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             <button
               type="button"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="hover:underline underline-offset-4 cursor-pointer"
+              className={`cursor-pointer transition-colors ${
+                isEditorialDark ? 'hover:text-[#F4F1EA]' : 'hover:text-[#16221D]'
+              }`}
             >
               {isBM ? 'Kembali ke Atas ↑' : 'Back to Top ↑'}
             </button>

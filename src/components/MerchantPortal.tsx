@@ -677,12 +677,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
           };
           const currentHeader = headerMap[activeTab] || headerMap.overview;
 
-          const targetBeliaTab: MerchantSubTab = activeTab === 'overview' ? 'cashflow' : 'overview';
-          const beliaActionLabel =
-            activeTab === 'overview'
-              ? (isMs ? 'Catat Jualan' : 'Log Sales')
-              : 'Dashboard';
-
           return (
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
               <div className="min-w-0">
@@ -707,14 +701,6 @@ export const MerchantPortal: React.FC<MerchantPortalProps> = ({
                   )}
                 </p>
               </div>
-
-              <button
-                type="button"
-                onClick={() => setActiveTab(targetBeliaTab)}
-                className={`self-start lg:self-auto px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold ${beliaTheme.primaryButtonClass}`}
-              >
-                {beliaActionLabel}
-              </button>
             </div>
           );
         })()}

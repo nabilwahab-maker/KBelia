@@ -1030,11 +1030,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             }
           };
           const currentAdminHeader = adminHeaderMap[adminTab] || adminHeaderMap.queue;
-          const targetTab: AdminSubTab = adminTab === 'queue' ? 'bookings' : 'queue';
-          const actionLabel =
-            adminTab === 'queue'
-              ? (isMs ? 'Semak Permohonan' : 'Review Applications')
-              : 'Dashboard';
 
           return (
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -1058,14 +1053,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   )}
                 </p>
               </div>
-
-              <button
-                type="button"
-                onClick={() => setAdminTab(targetTab)}
-                className={`self-start lg:self-auto px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold ${adminTheme.primaryButtonClass}`}
-              >
-                {actionLabel}
-              </button>
             </div>
           );
         })()}

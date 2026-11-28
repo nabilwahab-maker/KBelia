@@ -1310,23 +1310,36 @@ export const generateOfficialReceiptHtml = (
   refNumber: string,
   subsidyRate: number = 50
 ): string => {
-  const rate = Number(booking.monthlyRate || 150);
+  const rate = Number(booking.paidAmount || booking.monthlyRate || 150);
   const safeSubsidy = Math.min(99, Math.max(0, Number(subsidyRate) || 50));
   const marketRate = safeSubsidy > 0 && safeSubsidy < 100
     ? Math.round((rate / (1 - safeSubsidy / 100)) * 100) / 100
     : rate * 2;
-  const issueDate = formatDisplayDate(booking.createdAt);
+  const isPaid = booking.paymentStatus === 'paid' && Boolean(booking.paymentReference);
+  const issueDate = formatDisplayDate(booking.paidAt || booking.createdAt);
+  const methodLabel =
+    booking.paymentMethod === 'fpx'
+      ? `FPX Perbankan Internet${booking.paymentChannel ? ` (${booking.paymentChannel})` : ''}`
+      : booking.paymentMethod === 'duitnow_qr'
+      ? 'DuitNow QR'
+      : booking.paymentMethod === 'card'
+      ? `Kad Kredit / Debit${booking.paymentChannel ? ` (${booking.paymentChannel})` : ''}`
+      : 'Belum Dijelaskan';
+  const txRef = booking.paymentReference || 'Menunggu Pembayaran';
 
   const bodyHtml = `
     <div class="doc-banner">
       <div class="exec-doc-kicker">PERAKAUNAN RASMI KIOSK</div>
       <div class="doc-banner-title">RESIT RASMI PEMBAYARAN KOMITMEN &amp; SEWAAN KIOSK KBelia</div>
-      <div class="doc-banner-status">TRANSAKSI BERJAYA &amp; DIPERAKUI</div>
+      <div class="doc-banner-status">${isPaid ? 'TRANSAKSI BERJAYA &amp; DIPERAKUI' : 'MENUNGGU PEMBAYARAN ATAS TALIAN'}</div>
     </div>
     <table class="info-table">
       <tr><th>Diterima Daripada</th><td><strong>${escapeHtml(booking.applicantName)}</strong> — ${escapeHtml(booking.businessName)}</td></tr>
       <tr><th>Unit Kiosk &amp; Lokasi</th><td>${escapeHtml(booking.slotCode)} · ${escapeHtml(booking.slotName)} (${escapeHtml(booking.hubLocation)})</td></tr>
       <tr><th>Tempoh Sewaan</th><td>${escapeHtml(booking.durationMonths)} Bulan (Mula: ${escapeHtml(formatDisplayDate(booking.startDate))})</td></tr>
+      <tr><th>Saluran Pembayaran</th><td><strong>${escapeHtml(methodLabel)}</strong></td></tr>
+      <tr><th>Rujukan Transaksi</th><td style="font-family:monospace;"><strong>${escapeHtml(txRef)}</strong></td></tr>
+      <tr><th>Status Pembayaran</th><td><strong>${isPaid ? 'LUNAS (KOMITMEN BULAN PERTAMA)' : 'BELUM BAYAR (TERTUNGGAK)'}</strong></td></tr>
     </table>
     <div class="section-title">Butiran Caj &amp; Subsidi Kerajaan Negeri</div>
     <table class="data-table">
@@ -1334,11 +1347,11 @@ export const generateOfficialReceiptHtml = (
         <tr><th>Keterangan Urusniaga</th><th style="text-align:right;width:150px;">Jumlah (RM)</th></tr>
       </thead>
       <tbody>
-        <tr><td>Kadar Komitmen Sewaan Bulanan Kiosk Modular (Kadar Pasaran RM ${marketRate.toFixed(2)})</td><td style="text-align:right;font-family:monospace;">${marketRate.toFixed(2)}</td></tr>
+        <tr><td>Kadar Komitmen Sewaan Bulan Pertama Kiosk Modular (Kadar Pasaran RM ${marketRate.toFixed(2)})</td><td style="text-align:right;font-family:monospace;">${marketRate.toFixed(2)}</td></tr>
         <tr><td>Subsidi Pemerkasaan Belia Kerajaan Negeri Kelantan (${safeSubsidy}%)</td><td style="text-align:right;font-family:monospace;color:#1E3A8A;">- ${(marketRate - rate).toFixed(2)}</td></tr>
         <tr><td>Deposit Kebersihan &amp; Utiliti Elektrik 13A</td><td style="text-align:right;font-family:monospace;">50.00</td></tr>
         <tr><td>Rebat Deposit Kemasukan Usahawan Belia</td><td style="text-align:right;font-family:monospace;color:#1E3A8A;">- 50.00</td></tr>
-        <tr style="background:#F8FAFC;font-weight:900;"><td><strong>JUMLAH BERSIH DIBAYAR (SEBULAN)</strong></td><td style="text-align:right;font-family:monospace;color:#1E3A8A;"><strong>RM ${rate.toFixed(2)}</strong></td></tr>
+        <tr style="background:#F8FAFC;font-weight:900;"><td><strong>${isPaid ? 'JUMLAH BERSIH DIBAYAR (BULAN PERTAMA)' : 'JUMLAH KOMITMEN PERLU DIBAYAR'}</strong></td><td style="text-align:right;font-family:monospace;color:#1E3A8A;"><strong>RM ${rate.toFixed(2)}</strong></td></tr>
       </tbody>
     </table>
   `;
@@ -1346,18 +1359,18 @@ export const generateOfficialReceiptHtml = (
   return buildOfficialLetterheadShell({
     title: `Resit Rasmi KBelia - ${refNumber}`,
     toolbarLabel: 'Resit Rasmi Bayaran Sewaan Kiosk',
-    badgeText: 'Lunas',
+    badgeText: isPaid ? 'Lunas' : 'Belum Bayar',
     agencyKicker: 'SISTEM PERAKAUNAN BERSEPADU KBelia · KERAJAAN NEGERI KELANTAN',
     agencyHeading: 'PORTAL PEMBANGUNAN USAHAWAN BELIA KELANTAN (KBelia)',
     agencySubheading: 'Pejabat Bendahari & Urus Setia Hab Kapsul Niaga Belia Kelantan',
     refNumber,
     issueDate,
-    statusText: 'LUNAS & SAH',
+    statusText: isPaid ? 'LUNAS & SAH' : 'BELUM BAYAR',
     bodyHtml,
-    auditCode: refNumber,
+    auditCode: booking.paymentReference || refNumber,
     signatoryTitle: 'UNIT KEWANGAN & PEROLEHAN KBelia',
     signatorySub: 'Resit dijana secara automatik oleh sistem dan sah tanpa tandatangan basah.',
-    sealText: 'RESIT SAH'
+    sealText: isPaid ? 'RESIT SAH' : 'INVOIS KOMITMEN'
   });
 };
 

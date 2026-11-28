@@ -33,7 +33,8 @@ import {
   Search,
   SlidersHorizontal,
   ArrowUpDown,
-  Edit3
+  Edit3,
+  CreditCard
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import {
@@ -49,9 +50,16 @@ import { useAuth } from '../context/AuthContext';
 import {
   createCapsuleBooking,
   updateBookingStatus,
+  recordBookingPayment,
   createMaintenanceTicket,
   loadLocalPortalSettings
 } from '../services/dataService';
+import {
+  KioskOnlinePaymentPanel,
+  OnlinePaymentResult,
+  isBookingPaid,
+  formatPaymentMethodLabel
+} from './KioskOnlinePaymentPanel';
 import { emitAdminOrMentorNotification } from '../services/notificationStore';
 import { showToast } from './ToastNotification';
 import { PortalImage } from './PortalImage';
@@ -152,6 +160,8 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
   const isMaintenanceMode = portalSettings?.systemStatus === 'maintenance';
   const todayISO = new Date().toISOString().split('T')[0];
 
+  const [paidBookingOverrides, setPaidBookingOverrides] = useState<Record<string, CapsuleBooking>>({});
+
   // Derive user's kiosk bookings (strict 1 active booking limit)
   const myBookings = useMemo(() => {
     if (!user) return [];
@@ -161,13 +171,31 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
           b.applicantId === user.uid ||
           (user.email && b.applicantEmail?.toLowerCase() === user.email.toLowerCase())
       )
+      .map((b) => {
+        const override = paidBookingOverrides[b.id];
+        return override && !isBookingPaid(b) ? { ...b, ...override } : b;
+      })
       .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-  }, [bookings, user]);
+  }, [bookings, user, paidBookingOverrides]);
 
-  const activeBooking = useMemo(
+  const [recentBookedBooking, setRecentBookedBooking] = useState<CapsuleBooking | null>(null);
+
+  const serverActiveBooking = useMemo(
     () => myBookings.find((b) => b.status === 'pending' || b.status === 'approved') || null,
     [myBookings]
   );
+
+  useEffect(() => {
+    if (serverActiveBooking && recentBookedBooking) {
+      setRecentBookedBooking(null);
+    }
+  }, [serverActiveBooking, recentBookedBooking]);
+
+  const activeBookingRaw = serverActiveBooking || recentBookedBooking;
+  const activeBooking =
+    activeBookingRaw && paidBookingOverrides[activeBookingRaw.id] && !isBookingPaid(activeBookingRaw)
+      ? { ...activeBookingRaw, ...paidBookingOverrides[activeBookingRaw.id] }
+      : activeBookingRaw;
 
   const hasActiveBooking = Boolean(activeBooking);
 
@@ -196,7 +224,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
   }, [availableSlots, safeAllSlots]);
 
   // Form states for inline dedicated booking page
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [selectedSlotId, setSelectedSlotId] = useState<string>(() => {
     const isFree = (s?: CapsuleSlot | null) =>
       Boolean(s && s.status === 'available' && !s.currentTenantBusinessName);
@@ -224,8 +252,10 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
   const [isConfirmingCancel, setIsConfirmingCancel] = useState(false);
   const [cancellingBooking, setCancellingBooking] = useState(false);
 
-  // Official Receipt & Facility Maintenance Complaint states (migrated into unified Kiosk Saya page)
+  // Official Receipt, Pending Payment Settlement & Facility Maintenance Complaint states
   const [selectedReceiptBooking, setSelectedReceiptBooking] = useState<CapsuleBooking | null>(null);
+  const [paymentModalBooking, setPaymentModalBooking] = useState<CapsuleBooking | null>(null);
+  const [payingBooking, setPayingBooking] = useState(false);
   const [maintenanceComplaintBooking, setMaintenanceComplaintBooking] = useState<CapsuleBooking | null>(null);
   const [complaintType, setComplaintType] = useState('Bekalan Elektrik 13A & Lampu');
   const [complaintNotes, setComplaintNotes] = useState('');
@@ -620,11 +650,16 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
       }
 
       setStep(3);
+    } else if (step === 3) {
+      if (!pdpaConsent) {
+        setError('Sila tandakan kotak persetujuan sebelum meneruskan ke pembayaran.');
+        return;
+      }
+      setStep(4);
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCompleteBookingWithPayment = async (paymentResult: OnlinePaymentResult) => {
     if (!user) {
       setError('Sila log masuk terlebih dahulu untuk memohon.');
       return;
@@ -654,7 +689,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
       setLoading(true);
       setError(null);
 
-      await createCapsuleBooking({
+      const createdBooking = await createCapsuleBooking({
         slotId: currentSlot.id,
         slotCode: currentSlot.code,
         slotName: currentSlot.name,
@@ -669,15 +704,22 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
         durationMonths,
         startDate: startDate || todayISO,
         monthlyRate,
-        pitchNotes
+        pitchNotes,
+        paymentStatus: 'paid',
+        paymentMethod: paymentResult.paymentMethod,
+        paymentChannel: paymentResult.paymentChannel,
+        paymentReference: paymentResult.paymentReference,
+        paidAmount: paymentResult.paidAmount,
+        paidAt: paymentResult.paidAt
       });
 
       confetti({ particleCount: 70, spread: 60 });
       clearFormDraft('kiosk_booking');
-      setSubmitted(true);
+      setRecentBookedBooking(createdBooking);
+      setSubmitted(false);
       emitAdminOrMentorNotification({
-        title: `Permohonan Kiosk Baharu: ${currentSlot.code}`,
-        message: `${businessName} (${userProfile?.fullName || user.displayName || 'Usahawan Belia'}) telah memohon unit ${currentSlot.name}.`,
+        title: `Permohonan & Bayaran Kiosk: ${currentSlot.code}`,
+        message: `${businessName} (${userProfile?.fullName || user.displayName || 'Usahawan Belia'}) telah memohon unit ${currentSlot.name} dengan bayaran Lunas (${paymentResult.paymentReference}).`,
         senderRole: 'user',
         targetRole: 'admin',
         targetUserId: '',
@@ -687,15 +729,65 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
       });
       showToast({
         type: 'success',
-        title: 'Permohonan Kiosk Berjaya Dihantar!',
-        message: `Permohonan kiosk ${currentSlot?.name || 'Kiosk Belia'} telah direkodkan.`
+        title: 'Bayaran Lunas & Permohonan Direkodkan',
+        message: `Unit ${currentSlot.code} berstatus Lunas (Rujukan: ${paymentResult.paymentReference}).`
       });
       onRefresh();
+      onChangeView('browse');
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Gagal menghantar permohonan. Sila cuba lagi.');
+      throw err;
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSettlePendingPayment = async (paymentResult: OnlinePaymentResult) => {
+    if (!paymentModalBooking) return;
+    try {
+      setPayingBooking(true);
+      const updated = await recordBookingPayment(
+        paymentModalBooking.id,
+        paymentResult,
+        paymentModalBooking
+      );
+      const mergedBooking: CapsuleBooking = updated || {
+        ...paymentModalBooking,
+        paymentStatus: 'paid',
+        paymentMethod: paymentResult.paymentMethod,
+        paymentChannel: paymentResult.paymentChannel,
+        paymentReference: paymentResult.paymentReference,
+        paidAmount: paymentResult.paidAmount,
+        paidAt: paymentResult.paidAt
+      };
+      setPaidBookingOverrides((prev) => ({
+        ...prev,
+        [mergedBooking.id]: mergedBooking
+      }));
+      if (recentBookedBooking?.id === mergedBooking.id) {
+        setRecentBookedBooking(mergedBooking);
+      }
+      if (selectedReceiptBooking?.id === mergedBooking.id) {
+        setSelectedReceiptBooking(mergedBooking);
+      }
+      setPaymentModalBooking(null);
+      confetti({ particleCount: 60, spread: 55 });
+      showToast({
+        type: 'success',
+        title: 'Pembayaran Berjaya Disahkan (Lunas)',
+        message: `Rujukan Transaksi: ${paymentResult.paymentReference}`
+      });
+      onRefresh();
+    } catch (err: any) {
+      showToast({
+        type: 'error',
+        title: 'Ralat Pembayaran',
+        message: err?.message || 'Gagal merekodkan pembayaran atas talian. Sila cuba lagi.'
+      });
+      throw err;
+    } finally {
+      setPayingBooking(false);
     }
   };
 
@@ -712,11 +804,12 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
         activeBooking.applicantId,
         activeBooking
       );
+      setRecentBookedBooking(null);
       setIsConfirmingCancel(false);
       showToast({
         type: 'info',
         title: 'Tempahan Kiosk Dibatalkan',
-        message: `Tempahan slot ${activeBooking.slotCode} telah dibatalkan. Anda kini boleh memohon kiosk lain.`
+        message: `Tempahan slot ${activeBooking.slotCode} telah dibatalkan. Anda kini boleh memohon unit lain.`
       });
       onRefresh();
     } catch {
@@ -734,14 +827,199 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
     <div className="w-full space-y-4">
 
       {/* ================================================================= */}
-      {/* VIEW 1: SENARAI KIOSK (BROWSE)                                    */}
+      {/* VIEW 1: KIOSK SAYA & DIREKTORI KIOSK (BROWSE)                     */}
       {/* ================================================================= */}
       {view === 'browse' && (
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-300 dark:border-zinc-600 p-3 sm:p-4 shadow-sm transition-colors">
+        <div className="space-y-5">
+          {/* Bar Tajuk Rasmi Kiosk Saya */}
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight kbelia-trim">
+                Kiosk Saya
+              </h1>
+              <p className="text-sm text-black/65 dark:text-white/70 mt-0.5">
+                {activeBooking
+                  ? 'Semak status tempahan aktif dan teroka hab kiosk Kelantan.'
+                  : 'Teroka lokasi hab dan pilih unit kiosk untuk memulakan permohonan.'}
+              </p>
+            </div>
+            {!activeBooking && (
+              <button
+                type="button"
+                disabled={availableSlots.length === 0 || isMaintenanceMode}
+                onClick={() => onChangeView('book')}
+                className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed ${roleTheme.primaryButtonClass}`}
+              >
+                <Store className="w-4 h-4" />
+                <span>Mohon Kiosk</span>
+              </button>
+            )}
+          </div>
+
+          {/* Kad Ringkasan Kiosk Ditempah (Dipaparkan Secara Langsung) */}
+          {activeBooking && (() => {
+            const activePaid = isBookingPaid(activeBooking);
+            const activeRate = Number(activeBooking.paidAmount || activeBooking.monthlyRate || activeBookingSlot?.monthlyRate || 150);
+            return (
+              <section
+                aria-label="Kiosk Ditempah"
+                className="rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 p-5 sm:p-6 shadow-2xs transition-colors"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-3.5 border-b border-slate-200 dark:border-zinc-700">
+                  <div className="flex items-center gap-2 text-xs font-bold text-black/60 dark:text-white/65">
+                    <span className="uppercase tracking-wider">Kiosk Ditempah</span>
+                    <span aria-hidden="true">·</span>
+                    <span className="font-mono text-black dark:text-white tabular-nums">
+                      KBN-{activeBooking.slotCode}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4 text-xs font-bold">
+                    <span
+                      className={`inline-flex items-center gap-1.5 whitespace-nowrap ${
+                        activeBooking.status === 'approved'
+                          ? 'text-emerald-700 dark:text-emerald-400'
+                          : 'text-amber-700 dark:text-amber-400'
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full shrink-0 ${
+                          activeBooking.status === 'approved' ? 'bg-emerald-600' : 'bg-amber-500'
+                        }`}
+                      />
+                      <span>
+                        {activeBooking.status === 'approved' ? 'Aktif · Diluluskan' : 'Dalam Semakan'}
+                      </span>
+                    </span>
+
+                    <span
+                      className={`inline-flex items-center gap-1.5 whitespace-nowrap ${
+                        activePaid
+                          ? 'text-emerald-700 dark:text-emerald-400'
+                          : 'text-amber-700 dark:text-amber-400'
+                      }`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full shrink-0 ${
+                          activePaid ? 'bg-emerald-600' : 'bg-amber-500'
+                        }`}
+                      />
+                      <span>{activePaid ? 'Lunas' : 'Belum Bayar'}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 min-w-0 flex-1">
+                    <div className="w-full sm:w-44 aspect-[16/10] rounded-xl overflow-hidden bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 shrink-0">
+                      <PortalImage
+                        src={resolveBookingKioskImage(activeBooking, safeAllSlots)}
+                        alt={activeBooking.slotName}
+                        fallbackType="kiosk"
+                        fallbackLabel={activeBooking.slotCode}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    <div className="min-w-0 flex-1 space-y-2.5">
+                      <div>
+                        <h2 className="text-base sm:text-lg font-extrabold text-black dark:text-white tracking-tight truncate">
+                          {activeBooking.slotCode} · {activeBooking.slotName}
+                        </h2>
+                        <p className="text-sm text-black/65 dark:text-white/70 truncate mt-0.5">
+                          {activeBooking.hubLocation} · {activeBooking.businessName}
+                        </p>
+                      </div>
+
+                      <div className="pt-2.5 border-t border-slate-200/80 dark:border-zinc-700/80 flex flex-wrap items-center gap-x-6 gap-y-1.5 text-xs sm:text-sm tabular-nums">
+                        <div>
+                          <span className="text-black/55 dark:text-white/60">Sewa: </span>
+                          <span className="font-bold text-black dark:text-white">
+                            RM {activeRate.toLocaleString('ms-MY')}/bln
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-black/55 dark:text-white/60">Tempoh: </span>
+                          <span className="font-bold text-black dark:text-white">
+                            {activeBooking.durationMonths} Bulan
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-black/55 dark:text-white/60">Bayaran: </span>
+                          <span
+                            className={`font-bold ${
+                              activePaid
+                                ? 'text-emerald-700 dark:text-emerald-400'
+                                : 'text-amber-700 dark:text-amber-400'
+                            }`}
+                          >
+                            {activePaid
+                              ? `Lunas (${formatPaymentMethodLabel(activeBooking.paymentMethod)})`
+                              : `RM ${activeRate.toLocaleString('ms-MY')} (Tertunggak)`}
+                          </span>
+                        </div>
+                        {activePaid && activeBooking.paymentReference ? (
+                          <div>
+                            <span className="text-black/55 dark:text-white/60">Rujukan: </span>
+                            <span className="font-mono font-bold text-black dark:text-white">
+                              {activeBooking.paymentReference}
+                            </span>
+                          </div>
+                        ) : (
+                          <div>
+                            <span className="text-black/55 dark:text-white/60">Mula: </span>
+                            <span className="font-bold text-black dark:text-white">
+                              {formatDisplayDate(activeBooking.startDate)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-stretch gap-2 shrink-0 lg:min-w-[164px]">
+                    {!activePaid && (
+                      <button
+                        type="button"
+                        onClick={() => setPaymentModalBooking(activeBooking)}
+                        className={`px-4 py-2.5 text-sm inline-flex items-center justify-center gap-1.5 whitespace-nowrap ${roleTheme.primaryButtonClass}`}
+                      >
+                        <CreditCard className="w-4 h-4" />
+                        <span>Bayar Sekarang</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsConfirmingCancel(false);
+                        onChangeView('manage');
+                      }}
+                      className={`px-4 py-2.5 text-sm inline-flex items-center justify-center gap-1.5 whitespace-nowrap ${
+                        activePaid ? roleTheme.primaryButtonClass : roleTheme.secondaryButtonClass
+                      }`}
+                    >
+                      <span>Urus Kiosk</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedReceiptBooking(activeBooking)}
+                      className={`px-4 py-2 text-sm inline-flex items-center justify-center gap-1.5 whitespace-nowrap ${roleTheme.secondaryButtonClass}`}
+                    >
+                      <Receipt className="w-4 h-4" />
+                      <span>Resit</span>
+                    </button>
+                  </div>
+                </div>
+              </section>
+            );
+          })()}
+
           <CapsuleGrid
             slots={slots}
             bookings={bookings}
             portalSettings={portalSettings}
+            hideHeader={true}
             onSelectSlot={(slot) => {
               if (hasActiveBooking) {
                 onChangeView('manage');
@@ -777,36 +1055,38 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
       {/* ================================================================= */}
       {view === 'book' && (
         <div className="space-y-4">
-          {/* Bar Atas Ringkas Tanpa Teks Penerangan Berlebihan */}
+          {/* Bar Atas Ringkas */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${roleTheme.activeMiniBtnClass}`}>
                 <Store className="w-5 h-5" />
               </div>
               <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight kbelia-trim">
-                Permohonan Sewa Kiosk Belia
+                Permohonan Kiosk
               </h1>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsConfirmingCancel(false);
-                  onChangeView('manage');
-                }}
-                className={`px-3.5 py-2 text-sm inline-flex items-center gap-2 ${roleTheme.secondaryButtonClass}`}
-              >
-                <ClipboardList className="w-4 h-4" />
-                <span>Urus Tempahan</span>
-              </button>
+              {hasActiveBooking && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsConfirmingCancel(false);
+                    onChangeView('manage');
+                  }}
+                  className={`px-3.5 py-2 text-sm inline-flex items-center gap-2 ${roleTheme.secondaryButtonClass}`}
+                >
+                  <ClipboardList className="w-4 h-4" />
+                  <span>Urus Kiosk</span>
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => onChangeView('browse')}
                 className={`px-4 py-2 text-sm inline-flex items-center gap-2 ${roleTheme.secondaryButtonClass}`}
               >
                 <ArrowLeft className="w-4 h-4" />
-                <span>Peta Kiosk</span>
+                <span>Kembali</span>
               </button>
             </div>
           </div>
@@ -919,13 +1199,14 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Penunjuk 3 Langkah Mendatar Gaya Rujukan */}
+              {/* Penunjuk 4 Langkah Mendatar */}
               <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 px-4 sm:px-8 py-4 shadow-2xs">
-                <div className="flex items-center justify-between max-w-2xl mx-auto">
+                <div className="flex items-center justify-between max-w-3xl mx-auto">
                   {[
                     { num: 1 as const, title: 'Unit & Tempoh' },
                     { num: 2 as const, title: 'Butiran Perniagaan' },
-                    { num: 3 as const, title: 'Pengesahan' }
+                    { num: 3 as const, title: 'Pengesahan' },
+                    { num: 4 as const, title: 'Pembayaran' }
                   ].map((item, idx) => {
                     const isCompleted = step > item.num;
                     const isActive = step === item.num;
@@ -941,7 +1222,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                               setStep(item.num);
                             }
                           }}
-                          className={`flex items-center gap-2.5 shrink-0 transition-opacity ${
+                          className={`flex items-center gap-2 shrink-0 transition-opacity ${
                             canJumpBack ? 'cursor-pointer hover:opacity-85' : 'cursor-default'
                           }`}
                         >
@@ -957,7 +1238,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                             {isCompleted ? <Check className="w-4 h-4 stroke-[2.5]" /> : item.num}
                           </div>
                           <span
-                            className={`text-sm whitespace-nowrap hidden sm:inline ${
+                            className={`text-xs sm:text-sm whitespace-nowrap hidden md:inline ${
                               isActive
                                 ? 'font-extrabold text-black dark:text-white'
                                 : isCompleted
@@ -968,9 +1249,9 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                             {item.title}
                           </span>
                         </button>
-                        {idx < 2 && (
+                        {idx < 3 && (
                           <div
-                            className={`flex-1 mx-3 sm:mx-4 border-t-2 ${
+                            className={`flex-1 mx-2 sm:mx-3 border-t-2 ${
                               step > item.num
                                 ? 'border-emerald-500 dark:border-emerald-500'
                                 : 'border-dashed border-slate-300 dark:border-zinc-700'
@@ -1366,13 +1647,49 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                       </label>
                     </div>
                   )}
+
+                  {step === 4 && (
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-5 sm:p-6 space-y-5 shadow-2xs">
+                      <div className="flex flex-wrap items-center justify-between gap-2 pb-3.5 border-b border-slate-200 dark:border-zinc-700">
+                        <div>
+                          <h2 className="text-base sm:text-lg font-extrabold text-black dark:text-white">
+                            Kaedah Pembayaran Atas Talian
+                          </h2>
+                          <p className="text-xs sm:text-sm text-black/65 dark:text-white/70 mt-0.5">
+                            Lengkapkan bayaran komitmen bulan pertama untuk menghantar permohonan anda.
+                          </p>
+                        </div>
+                        <span className="text-sm font-extrabold text-blue-700 dark:text-blue-400 tabular-nums">
+                          RM {monthlyRate.toLocaleString('ms-MY', { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
+
+                      <KioskOnlinePaymentPanel
+                        amount={monthlyRate}
+                        slotCode={currentSlot.code}
+                        slotName={currentSlot.name}
+                        businessName={businessName || 'Perniagaan Belia'}
+                        primaryButtonClass={roleTheme.primaryButtonClass}
+                        secondaryButtonClass={roleTheme.secondaryButtonClass}
+                        submitLabel={`Bayar RM ${monthlyRate.toLocaleString('ms-MY', {
+                          minimumFractionDigits: 2
+                        })} & Hantar`}
+                        submitting={loading}
+                        onBack={() => {
+                          setError(null);
+                          setStep(3);
+                        }}
+                        onConfirmPayment={handleCompleteBookingWithPayment}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* LAJUR KANAN MELEKIT (4/12): RINGKASAN PERMOHONAN & SEWAAN */}
                 <aside className="lg:col-span-4 lg:sticky lg:top-24">
                   <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-700 p-5 space-y-5 shadow-2xs">
                     <h2 className="text-base font-extrabold text-black dark:text-white tracking-tight">
-                      Ringkasan Permohonan
+                      {step === 4 ? 'Ringkasan Bayaran Awal' : 'Ringkasan Permohonan'}
                     </h2>
 
                     <div className="rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-700 p-4 space-y-3.5">
@@ -1410,90 +1727,93 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                         <div className="text-xs text-black/65 dark:text-white/70">
                           {currentSlot.hubLocation}
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => onChangeView('browse')}
-                          className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline pt-1 inline-block cursor-pointer"
-                        >
-                          Tukar di Peta Kiosk
-                        </button>
+                        {step < 4 && (
+                          <button
+                            type="button"
+                            onClick={() => onChangeView('browse')}
+                            className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline pt-1 inline-block cursor-pointer"
+                          >
+                            Tukar di Peta Kiosk
+                          </button>
+                        )}
                       </div>
                     </div>
 
                     <div className="space-y-2.5 text-sm tabular-nums">
                       <h3 className="text-sm font-extrabold text-black dark:text-white">
-                        Ringkasan Sewaan
+                        {step === 4 ? 'Pecahan Komitmen Awal' : 'Ringkasan Sewaan'}
                       </h3>
                       <div className="flex items-center justify-between text-black/75 dark:text-white/75">
-                        <span>Kadar Pasaran</span>
-                        <span className="font-semibold line-through">
-                          RM {marketRate.toLocaleString('ms-MY')}
+                        <span>Sewa Bulan Pertama</span>
+                        <span className="font-semibold">
+                          RM {monthlyRate.toLocaleString('ms-MY', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-black/75 dark:text-white/75">
-                        <span>Subsidi Belia ({subsidyRate}%)</span>
+                        <span>Deposit Utiliti 13A</span>
+                        <span className="font-semibold">RM 50.00</span>
+                      </div>
+                      <div className="flex items-center justify-between text-black/75 dark:text-white/75">
+                        <span>Subsidi Belia ({subsidyRate}%) &amp; Rebat</span>
                         <span className="font-semibold text-emerald-700 dark:text-emerald-400">
-                          - RM {Math.max(0, marketRate - monthlyRate).toLocaleString('ms-MY')}
+                          - RM 50.00
                         </span>
-                      </div>
-                      <div className="flex items-center justify-between text-black/75 dark:text-white/75">
-                        <span>Utiliti Asas Hab</span>
-                        <span className="font-semibold">Termasuk</span>
                       </div>
 
                       <div className="pt-2.5 border-t border-slate-200 dark:border-zinc-700 flex items-center justify-between">
-                        <span className="font-extrabold text-emerald-700 dark:text-emerald-400">
-                          Sewa Bulanan
+                        <span className="font-extrabold text-blue-700 dark:text-blue-400">
+                          {step === 4 ? 'Jumlah Dibayar Sekarang' : 'Komitmen Bulan Pertama'}
                         </span>
-                        <span className="text-lg font-black text-emerald-700 dark:text-emerald-400">
-                          RM {monthlyRate.toLocaleString('ms-MY')}
+                        <span className="text-lg font-black text-blue-700 dark:text-blue-400">
+                          RM {monthlyRate.toLocaleString('ms-MY', { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-xs font-semibold text-black/65 dark:text-white/70">
-                        <span>Jumlah ({durationMonths} Bulan)</span>
+                        <span>Nilai Kontrak ({durationMonths} Bulan · Subsidi)</span>
                         <span className="font-bold text-black dark:text-white">
                           RM {(monthlyRate * durationMonths).toLocaleString('ms-MY')}
                         </span>
                       </div>
+                      <div className="flex items-center justify-between text-[11px] text-black/55 dark:text-white/60">
+                        <span>Kadar Pasaran Tanpa Subsidi</span>
+                        <span className="line-through">
+                          RM {marketRate.toLocaleString('ms-MY')}/bln
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="space-y-2 pt-1">
-                      {step < 3 ? (
+                    {step < 4 && (
+                      <div className="space-y-2 pt-1">
                         <button
                           type="button"
-                          disabled={step === 1 && !isCurrentSlotAvailable}
+                          disabled={
+                            (step === 1 && !isCurrentSlotAvailable) ||
+                            (step === 3 && !pdpaConsent)
+                          }
                           onClick={handleNextStep}
                           className={`w-full py-3 px-4 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${roleTheme.primaryButtonClass}`}
                         >
-                          <span>Seterusnya</span>
+                          <span>
+                            {step === 3 ? 'Teruskan ke Pembayaran' : 'Seterusnya'}
+                          </span>
                           <ArrowRight className="w-4 h-4" />
                         </button>
-                      ) : (
-                        <button
-                          type="button"
-                          disabled={loading || !pdpaConsent || !isCurrentSlotAvailable}
-                          onClick={handleSubmit}
-                          className={`w-full py-3 px-4 text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${roleTheme.primaryButtonClass}`}
-                        >
-                          <CheckCircle2 className="w-4 h-4" />
-                          <span>{loading ? 'Menghantar...' : 'Hantar'}</span>
-                        </button>
-                      )}
 
-                      {step > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setError(null);
-                            setStep(step === 3 ? 2 : 1);
-                          }}
-                          className={`w-full py-2.5 px-4 text-sm flex items-center justify-center gap-1.5 ${roleTheme.secondaryButtonClass}`}
-                        >
-                          <ArrowLeft className="w-4 h-4" />
-                          <span>Kembali</span>
-                        </button>
-                      )}
-                    </div>
+                        {step > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setError(null);
+                              setStep(step === 3 ? 2 : 1);
+                            }}
+                            className={`w-full py-2.5 px-4 text-sm flex items-center justify-center gap-1.5 ${roleTheme.secondaryButtonClass}`}
+                          >
+                            <ArrowLeft className="w-4 h-4" />
+                            <span>Kembali</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </aside>
               </div>
@@ -1556,14 +1876,14 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-semibold text-black dark:text-white transition-colors cursor-pointer shrink-0 shadow-2xs"
                 >
                   <ArrowLeft className="w-4 h-4" />
-                  <span>Peta Kiosk</span>
+                  <span>Kembali</span>
                 </button>
                 <div className="min-w-0">
                   <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight truncate kbelia-trim">
-                    Kiosk Saya
+                    Pengurusan Kiosk
                   </h1>
                   <p className="text-sm text-black/65 dark:text-white/70 truncate">
-                    Pantau dan urus kiosk anda di sini.
+                    Pantau status, dokumen, dan rekod sewaan kiosk anda.
                   </p>
                 </div>
               </div>
@@ -1573,17 +1893,17 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   <button
                     type="button"
                     onClick={() => setIsQuickActionsOpen(true)}
-                    className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
+                    className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 whitespace-nowrap ${roleTheme.primaryButtonClass}`}
                   >
                     <Edit3 className="w-4 h-4" />
-                    <span>Kemaskini</span>
+                    <span>Tindakan</span>
                   </button>
                 ) : (
                   <button
                     type="button"
                     disabled={availableSlots.length === 0 || isMaintenanceMode}
                     onClick={() => onChangeView('book')}
-                    className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${roleTheme.primaryButtonClass}`}
+                    className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed ${roleTheme.primaryButtonClass}`}
                   >
                     <Store className="w-4 h-4" />
                     <span>Mohon</span>
@@ -1603,6 +1923,19 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
 
                   {isHeaderMenuOpen && (
                     <div className="animate-popover-enter absolute right-0 mt-2 w-56 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 shadow-xl py-1.5 z-40 text-left">
+                      {activeBooking && !isBookingPaid(activeBooking) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsHeaderMenuOpen(false);
+                            setPaymentModalBooking(activeBooking);
+                          }}
+                          className="w-full px-3.5 py-2 text-sm font-bold text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 flex items-center gap-2.5 cursor-pointer"
+                        >
+                          <CreditCard className="w-4 h-4" />
+                          <span>Bayar Tertunggak</span>
+                        </button>
+                      )}
                       {activeBooking?.status === 'approved' && onViewOfferLetter && (
                         <button
                           type="button"
@@ -1904,6 +2237,30 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                           {activeBooking.status === 'approved' ? 'Aktif' : 'Diproses'}
                         </span>
                       </div>
+                      <div className="flex items-center justify-between gap-3">
+                        <span className="text-black/65 dark:text-white/70">Bayaran Awal</span>
+                        {isBookingPaid(activeBooking) ? (
+                          <span className="font-bold text-emerald-700 dark:text-emerald-400 text-right">
+                            Lunas · {formatPaymentMethodLabel(activeBooking.paymentMethod)}
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setPaymentModalBooking(activeBooking)}
+                            className="font-bold text-blue-700 dark:text-blue-400 hover:underline cursor-pointer"
+                          >
+                            Belum Bayar · Bayar Sekarang
+                          </button>
+                        )}
+                      </div>
+                      {isBookingPaid(activeBooking) && activeBooking.paymentReference && (
+                        <div className="flex items-center justify-between gap-3">
+                          <span className="text-black/65 dark:text-white/70">Rujukan Transaksi</span>
+                          <span className="font-mono text-xs font-bold text-black dark:text-white tabular-nums">
+                            {activeBooking.paymentReference}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex items-center justify-between gap-3">
                         <span className="text-black/65 dark:text-white/70">Perniagaan</span>
                         <span className="font-bold text-black dark:text-white text-right truncate max-w-[60%]">
@@ -2257,6 +2614,16 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
 
                         if (item.rawBooking) {
                           const bookingItem = item.rawBooking;
+                          if (
+                            (bookingItem.status === 'pending' || bookingItem.status === 'approved') &&
+                            !isBookingPaid(bookingItem)
+                          ) {
+                            rowActions.push({
+                              label: 'Bayar Sekarang',
+                              tone: 'accent',
+                              onClick: () => setPaymentModalBooking(bookingItem)
+                            });
+                          }
                           rowActions.push({
                             label: 'Resit Bayaran',
                             onClick: () => setSelectedReceiptBooking(bookingItem)
@@ -2338,6 +2705,17 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                                         <span className="font-bold text-black dark:text-white">Butiran: </span>
                                         {item.subtext}
                                       </p>
+                                      {item.rawBooking && (
+                                        <p className="text-black/75 dark:text-white/80 tabular-nums">
+                                          <span className="font-bold text-black dark:text-white">Bayaran Awal: </span>
+                                          {isBookingPaid(item.rawBooking)
+                                            ? `Lunas (${formatPaymentMethodLabel(
+                                                item.rawBooking.paymentMethod,
+                                                item.rawBooking.paymentChannel
+                                              )}) · Rujukan: ${item.rawBooking.paymentReference}`
+                                            : 'Belum Bayar (Tertunggak)'}
+                                        </p>
+                                      )}
                                       {item.rawTicket?.adminNotes && (
                                         <p className="text-black/70 dark:text-white/75">
                                           <span className="font-bold text-black dark:text-white">Tindakan Admin: </span>
@@ -2352,13 +2730,25 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                                       )}
                                     </div>
                                     {item.rawBooking && (
-                                      <button
-                                        type="button"
-                                        onClick={() => setSelectedReceiptBooking(item.rawBooking!)}
-                                        className={roleTheme.compactSecondaryButtonClass}
-                                      >
-                                        Buka Resit
-                                      </button>
+                                      <div className="flex items-center gap-2 shrink-0">
+                                        {(item.rawBooking.status === 'pending' || item.rawBooking.status === 'approved') &&
+                                          !isBookingPaid(item.rawBooking) && (
+                                            <button
+                                              type="button"
+                                              onClick={() => setPaymentModalBooking(item.rawBooking!)}
+                                              className={`${roleTheme.primaryButtonClass} px-3 py-1.5 text-xs`}
+                                            >
+                                              Bayar Sekarang
+                                            </button>
+                                          )}
+                                        <button
+                                          type="button"
+                                          onClick={() => setSelectedReceiptBooking(item.rawBooking!)}
+                                          className={roleTheme.compactSecondaryButtonClass}
+                                        >
+                                          Buka Resit
+                                        </button>
+                                      </div>
                                     )}
                                   </div>
                                 </td>
@@ -2466,11 +2856,29 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                     {selectedReceiptBooking.durationMonths} Bulan ({formatDisplayDate(selectedReceiptBooking.startDate)} hingga {calculateOperationEndDate(selectedReceiptBooking.startDate, selectedReceiptBooking.durationMonths)})
                   </span>
                 </div>
+                <div className="flex justify-between gap-2 pt-1.5 border-t border-slate-200 dark:border-zinc-700">
+                  <span className="text-black/70 dark:text-white/75">Saluran Bayaran:</span>
+                  <span className="font-bold text-black dark:text-white text-right">
+                    {isBookingPaid(selectedReceiptBooking)
+                      ? formatPaymentMethodLabel(
+                          selectedReceiptBooking.paymentMethod,
+                          selectedReceiptBooking.paymentChannel
+                        )
+                      : 'Belum Dijelaskan'}
+                  </span>
+                </div>
+                <div className="flex justify-between gap-2">
+                  <span className="text-black/70 dark:text-white/75">Rujukan Transaksi:</span>
+                  <span className="font-mono font-bold text-black dark:text-white text-right tabular-nums">
+                    {selectedReceiptBooking.paymentReference || 'Menunggu Bayaran'}
+                  </span>
+                </div>
               </div>
 
               {/* Fee Breakdown */}
               {(() => {
-                const rate = Number(selectedReceiptBooking.monthlyRate || 150);
+                const rate = Number(selectedReceiptBooking.paidAmount || selectedReceiptBooking.monthlyRate || 150);
+                const paidReceipt = isBookingPaid(selectedReceiptBooking);
                 return (
                   <div className="border border-slate-300 dark:border-zinc-600 rounded-2xl overflow-hidden">
                     <table className="w-full text-left text-sm">
@@ -2482,7 +2890,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                       </thead>
                       <tbody className="divide-y divide-slate-300 dark:divide-zinc-600">
                         <tr>
-                          <td className="p-3 font-medium">Yuran Komitmen Sewaan Kiosk Modular Subsidi Belia (Sebulan)</td>
+                          <td className="p-3 font-medium">Yuran Komitmen Sewaan Bulan Pertama (Subsidi Belia)</td>
                           <td className="p-3 text-right font-mono font-bold tabular-nums">{rate.toFixed(2)}</td>
                         </tr>
                         <tr>
@@ -2494,7 +2902,7 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                           <td className="p-3 text-right font-mono tabular-nums">-50.00</td>
                         </tr>
                         <tr className={`font-extrabold text-sm ${roleTheme.badgeClass}`}>
-                          <td className="p-3">JUMLAH DIBAYAR</td>
+                          <td className="p-3">{paidReceipt ? 'JUMLAH DIBAYAR (LUNAS)' : 'JUMLAH PERLU DIBAYAR'}</td>
                           <td className="p-3 text-right font-mono tabular-nums">RM {rate.toFixed(2)}</td>
                         </tr>
                       </tbody>
@@ -2503,10 +2911,34 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                 );
               })()}
 
-              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center gap-2 text-black dark:text-white text-[0.8125rem] font-semibold">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>Status Transaksi: Berjaya &amp; Sah Diperakui Sistem Perakaunan Bersepadu KBelia.</span>
-              </div>
+              {isBookingPaid(selectedReceiptBooking) ? (
+                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl flex items-center gap-2 text-black dark:text-white text-[0.8125rem] font-semibold">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <span>
+                    Status Transaksi: Lunas &amp; Sah ({selectedReceiptBooking.paymentReference}).
+                  </span>
+                </div>
+              ) : (
+                <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center justify-between gap-2 text-black dark:text-white text-[0.8125rem] font-semibold">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span>Status Transaksi: Belum Bayar (Komitmen Bulan Pertama Tertunggak).</span>
+                  </div>
+                  {(selectedReceiptBooking.status === 'pending' || selectedReceiptBooking.status === 'approved') && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = selectedReceiptBooking;
+                        setSelectedReceiptBooking(null);
+                        setPaymentModalBooking(target);
+                      }}
+                      className="text-xs font-extrabold text-blue-700 dark:text-blue-400 hover:underline whitespace-nowrap cursor-pointer"
+                    >
+                      Bayar Sekarang
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Actions */}
               <div className="pt-2 flex flex-wrap items-center justify-end gap-2.5">
@@ -2730,6 +3162,23 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
             </div>
 
             <div className="p-5 space-y-2.5 text-sm">
+              {!isBookingPaid(activeBooking) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsQuickActionsOpen(false);
+                    setPaymentModalBooking(activeBooking);
+                  }}
+                  className="w-full px-4 py-3 rounded-xl border border-blue-200 dark:border-blue-800 bg-blue-50/80 dark:bg-blue-950/40 hover:border-blue-400 flex items-center justify-between font-bold text-blue-800 dark:text-blue-300 transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-2.5">
+                    <CreditCard className="w-4 h-4" />
+                    <span>Bayar Komitmen Tertunggak</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )}
+
               {activeBooking.status === 'approved' && onViewOfferLetter && (
                 <button
                   type="button"
@@ -2845,6 +3294,54 @@ export const KioskBookingPage: React.FC<KioskBookingPageProps> = ({
                   Tutup
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ================================================================= */}
+      {/* MODAL 4: PEMBAYARAN ATAS TALIAN TERTUNGGAK (BAYAR SEKARANG)       */}
+      {/* ================================================================= */}
+      {paymentModalBooking && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
+          <div className="w-full max-w-lg max-h-[92vh] overflow-y-auto bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-zinc-700 text-black dark:text-white">
+            <div className="px-5 py-4 border-b border-slate-200 dark:border-zinc-700 flex items-center justify-between sticky top-0 bg-white dark:bg-zinc-900 z-10">
+              <div>
+                <h4 className="font-extrabold text-base text-black dark:text-white">
+                  Pembayaran Atas Talian Kiosk
+                </h4>
+                <p className="text-xs text-black/65 dark:text-white/70 mt-0.5">
+                  {paymentModalBooking.slotCode} · {paymentModalBooking.slotName}
+                </p>
+              </div>
+              <button
+                type="button"
+                aria-label="Tutup"
+                disabled={payingBooking}
+                onClick={() => setPaymentModalBooking(null)}
+                className={roleTheme.iconButtonClass}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-5">
+              <KioskOnlinePaymentPanel
+                amount={Number(paymentModalBooking.monthlyRate || 150)}
+                slotCode={paymentModalBooking.slotCode}
+                slotName={paymentModalBooking.slotName}
+                businessName={paymentModalBooking.businessName}
+                primaryButtonClass={roleTheme.primaryButtonClass}
+                secondaryButtonClass={roleTheme.secondaryButtonClass}
+                submitLabel={`Bayar RM ${Number(paymentModalBooking.monthlyRate || 150).toLocaleString(
+                  'ms-MY',
+                  { minimumFractionDigits: 2 }
+                )} Sekarang`}
+                submitting={payingBooking}
+                showInlineSummary={true}
+                onBack={() => setPaymentModalBooking(null)}
+                onConfirmPayment={handleSettlePendingPayment}
+              />
             </div>
           </div>
         </div>

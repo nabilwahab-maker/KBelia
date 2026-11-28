@@ -129,6 +129,12 @@
         "tenancySigned": { "type": "boolean" },
         "tenancySignedAt": { "type": "string", "maxLength": 50 },
         "tenancySignatureName": { "type": "string", "maxLength": 120 },
+        "paymentStatus": { "type": "string", "enum": ["unpaid", "paid"] },
+        "paymentMethod": { "type": "string", "enum": ["fpx", "duitnow_qr", "card"] },
+        "paymentChannel": { "type": "string", "maxLength": 80 },
+        "paymentReference": { "type": "string", "maxLength": 64 },
+        "paidAmount": { "type": "number" },
+        "paidAt": { "type": "string", "maxLength": 50 },
         "createdAt": { "type": "string", "maxLength": 50 },
         "updatedAt": { "type": "string", "maxLength": 50 }
       },

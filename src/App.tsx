@@ -2641,7 +2641,7 @@ export function App() {
                   href="https://developers.google.com/maps/ai/ai-studio?utm_campaign=gmp_mcp_codeassist_v1_aistudio#quota_exceeded_errors"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="underline font-semibold text-amber-950 hover:text-amber-800"
+                  className="font-semibold text-amber-950 hover:text-amber-700 transition-colors"
                 >
                   maps developer site
                 </a>{' '}

@@ -270,13 +270,17 @@ export async function createCapsuleBooking(
   const id = booking.id || `book-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
   const path = 'capsule_bookings';
   const now = new Date().toISOString();
-  const bookingData: CapsuleBooking = {
+  const rawBooking: CapsuleBooking = {
     ...booking,
     id,
     status: 'pending',
+    paymentStatus: booking.paymentStatus || 'unpaid',
     createdAt: now,
     updatedAt: now
   };
+  const bookingData = Object.fromEntries(
+    Object.entries(rawBooking).filter(([, v]) => v !== undefined)
+  ) as CapsuleBooking;
 
   if (!isProductionAuthenticated()) {
     try {
@@ -492,6 +496,72 @@ export async function signBookingTenancyAgreement(
     } else {
       await publishDemoSyncRecord('booking', bookingId, { id: bookingId, ...payload });
     }
+  } catch (error) {
+    handleFirestoreError(error, OperationType.UPDATE, 'capsule_bookings');
+    throw error;
+  }
+}
+
+export async function recordBookingPayment(
+  bookingId: string,
+  payment: {
+    paymentMethod: 'fpx' | 'duitnow_qr' | 'card';
+    paymentChannel: string;
+    paymentReference: string;
+    paidAmount: number;
+    paidAt?: string;
+  },
+  baseBooking?: CapsuleBooking
+): Promise<CapsuleBooking | null> {
+  const now = new Date().toISOString();
+  const paidAt = payment.paidAt || now;
+  const payload = {
+    paymentStatus: 'paid' as const,
+    paymentMethod: payment.paymentMethod,
+    paymentChannel: payment.paymentChannel.slice(0, 80),
+    paymentReference: payment.paymentReference.slice(0, 64),
+    paidAmount: Number(payment.paidAmount) || 150,
+    paidAt,
+    updatedAt: now
+  };
+
+  if (!isProductionAuthenticated()) {
+    let targetBooking: CapsuleBooking | null = baseBooking ? { ...baseBooking, ...payload } : null;
+    try {
+      const key = 'kbelia_demo_bookings';
+      const existing: CapsuleBooking[] = JSON.parse(localStorage.getItem(key) || '[]');
+      let foundLocal = false;
+      const updated = existing.map((b) => {
+        if (b.id === bookingId) {
+          foundLocal = true;
+          targetBooking = { ...b, ...payload };
+          return targetBooking;
+        }
+        return b;
+      });
+      if (!foundLocal && targetBooking) {
+        updated.unshift(targetBooking);
+      }
+      localStorage.setItem(key, JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+    await publishDemoSyncRecord('booking', bookingId, targetBooking || { id: bookingId, ...payload });
+    return targetBooking;
+  }
+
+  try {
+    const ref = doc(db, 'capsule_bookings', bookingId);
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      await setDocWithUpdatedAtFallback(ref, payload, true);
+      const merged = { ...(snap.data() as CapsuleBooking), ...payload };
+      await publishDemoSyncRecord('booking', bookingId, merged);
+      return merged;
+    }
+    const fallbackRecord = baseBooking ? { ...baseBooking, ...payload } : ({ id: bookingId, ...payload } as CapsuleBooking);
+    await publishDemoSyncRecord('booking', bookingId, fallbackRecord);
+    return fallbackRecord;
   } catch (error) {
     handleFirestoreError(error, OperationType.UPDATE, 'capsule_bookings');
     throw error;

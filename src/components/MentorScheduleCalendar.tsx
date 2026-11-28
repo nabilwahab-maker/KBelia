@@ -698,7 +698,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                   <button
                     type="button"
                     onClick={() => handleJumpToDate(activeReminder.dateObj)}
-                    className="text-[11px] font-semibold text-sky-100 hover:text-white underline underline-offset-2 shrink-0 cursor-pointer"
+                    className="text-[11px] font-semibold text-sky-100 hover:text-white transition-colors shrink-0 cursor-pointer"
                   >
                     {isEn ? 'View' : 'Lihat'}
                   </button>
@@ -789,7 +789,7 @@ export const MentorScheduleCalendar: React.FC<MentorScheduleCalendarProps> = ({
                   <button
                     type="button"
                     onClick={() => setDismissedReminderIds([])}
-                    className="text-xs font-semibold text-cyan-200 hover:text-cyan-100 underline underline-offset-2 cursor-pointer"
+                    className="text-xs font-semibold text-cyan-200 hover:text-cyan-100 transition-colors cursor-pointer"
                   >
                     {isEn ? 'Restore reminders' : 'Papar semula peringatan'}
                   </button>

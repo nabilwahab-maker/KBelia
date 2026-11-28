@@ -683,7 +683,7 @@ export const UMKSidebar: React.FC<UMKSidebarProps> = ({
             <button
               type="button"
               onClick={() => setSidebarSearch('')}
-              className="text-sm font-semibold text-black dark:text-white/80 kbelia-link cursor-pointer"
+              className="text-sm font-semibold text-black hover:text-emerald-700 dark:text-white/80 dark:hover:text-white transition-colors kbelia-link cursor-pointer"
             >
               {isMs ? 'Set Semula' : 'Reset'}
             </button>

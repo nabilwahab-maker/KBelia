@@ -173,7 +173,9 @@ service cloud.firestore {
           'applicantName', 'applicantEmail', 'applicantPhone', 'applicantMyKad',
           'businessName', 'businessCategory', 'durationMonths', 'startDate',
           'monthlyRate', 'pitchNotes', 'status', 'adminNotes', 'tenancySigned',
-          'tenancySignedAt', 'tenancySignatureName', 'createdAt', 'updatedAt'
+          'tenancySignedAt', 'tenancySignatureName', 'paymentStatus', 'paymentMethod',
+          'paymentChannel', 'paymentReference', 'paidAmount', 'paidAt',
+          'createdAt', 'updatedAt'
         ]) &&
         validStr(data.id, 128) &&
         validStr(data.slotId, 128) &&
@@ -196,6 +198,12 @@ service cloud.firestore {
         (!('tenancySigned' in data) || data.tenancySigned is bool) &&
         (!('tenancySignedAt' in data) || validStr(data.tenancySignedAt, 50)) &&
         (!('tenancySignatureName' in data) || validStr(data.tenancySignatureName, 120)) &&
+        (!('paymentStatus' in data) || data.paymentStatus in ['unpaid', 'paid']) &&
+        (!('paymentMethod' in data) || data.paymentMethod in ['fpx', 'duitnow_qr', 'card']) &&
+        (!('paymentChannel' in data) || validStr(data.paymentChannel, 80)) &&
+        (!('paymentReference' in data) || validStr(data.paymentReference, 64)) &&
+        (!('paidAmount' in data) || (data.paidAmount is number && data.paidAmount >= 0 && data.paidAmount <= 100000)) &&
+        (!('paidAt' in data) || validStr(data.paidAt, 50)) &&
         (!('createdAt' in data) || validStr(data.createdAt, 50)) &&
         (!('updatedAt' in data) || validStr(data.updatedAt, 50));
     }
@@ -700,6 +708,21 @@ service cloud.firestore {
           incoming().applicantId == existing().applicantId &&
           incoming().status == existing().status &&
           incoming().diff(existing()).affectedKeys().hasOnly(['tenancySigned', 'tenancySignedAt', 'tenancySignatureName', 'pitchNotes', 'applicantPhone', 'updatedAt'])
+        ) || (
+          existing().applicantId == request.auth.uid &&
+          incoming().applicantId == existing().applicantId &&
+          existing().status in ['pending', 'approved'] &&
+          incoming().status == existing().status &&
+          (!('paymentStatus' in existing()) || existing().paymentStatus != 'paid') &&
+          incoming().paymentStatus == 'paid' &&
+          incoming().paymentMethod in ['fpx', 'duitnow_qr', 'card'] &&
+          validStr(incoming().paymentReference, 64) &&
+          incoming().paidAmount is number &&
+          incoming().paidAmount > 0 &&
+          incoming().diff(existing()).affectedKeys().hasOnly([
+            'paymentStatus', 'paymentMethod', 'paymentChannel',
+            'paymentReference', 'paidAmount', 'paidAt', 'updatedAt'
+          ])
         ) || (
           existing().applicantId == request.auth.uid &&
           incoming().applicantId == existing().applicantId &&

@@ -36,6 +36,7 @@ interface CapsuleGridProps {
   isReadOnly?: boolean;
   hasActiveBooking?: boolean;
   onGoToManageBooking?: () => void;
+  hideHeader?: boolean;
 }
 
 const DISTRICT_TO_HUB: Record<string, string> = {
@@ -59,7 +60,6 @@ const HUB_TO_DISTRICT: Record<string, KelantanDistrict> = {
 export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   slots,
   bookings = [],
-  portalSettings,
   onSelectSlot,
   onViewTenantDetail,
   onOpenNewBooking,
@@ -70,9 +70,9 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   onBudgetChange: externalSetBudget,
   isReadOnly = false,
   hasActiveBooking = false,
-  onGoToManageBooking
+  onGoToManageBooking,
+  hideHeader = false
 }) => {
-  const subsidyRate = portalSettings?.portalSubsidyRate ?? 50;
   const { user, isAdmin, isMentor } = useAuth();
   const roleTheme = getRoleTheme(getDashboardRole(isAdmin, isMentor));
   const { language } = useLanguage();
@@ -177,23 +177,30 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
   ]);
 
   return (
-    <div className="w-full space-y-4">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight kbelia-trim">
-          Senarai Kiosk Belia Kelantan
-        </h1>
-        {!isReadOnly && onGoToManageBooking && (
-          <button
-            type="button"
-            onClick={onGoToManageBooking}
-            className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 ${roleTheme.primaryButtonClass}`}
-          >
-            <Building2 className="w-4 h-4" />
-            <span>{hasActiveBooking ? 'Urus Kiosk' : 'Kiosk Saya'}</span>
-          </button>
-        )}
-      </div>
+    <div className="w-full space-y-5">
+      {/* Header (shown in standalone/admin mode) */}
+      {!hideHeader && (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="font-display text-fluid-portal font-extrabold text-black dark:text-white tracking-tight kbelia-trim">
+              Direktori Kiosk Kelantan
+            </h1>
+            <p className="text-sm text-black/65 dark:text-white/70 mt-0.5">
+              Semak kekosongan unit dan kadar sewa mengikut hab jajahan.
+            </p>
+          </div>
+          {!isReadOnly && onGoToManageBooking && (
+            <button
+              type="button"
+              onClick={onGoToManageBooking}
+              className={`px-4 py-2.5 text-sm inline-flex items-center gap-2 whitespace-nowrap ${roleTheme.primaryButtonClass}`}
+            >
+              <Building2 className="w-4 h-4" />
+              <span>{hasActiveBooking ? 'Urus Kiosk' : 'Kiosk Saya'}</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Live Google Maps Kiosk Hub Explorer */}
       <KelantanDistrictsMap
@@ -204,6 +211,8 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
           setSelectedHub(DISTRICT_TO_HUB[district] || 'Semua');
         }}
         onSelectSlot={onSelectSlot}
+        hasActiveBooking={hasActiveBooking}
+        onGoToManageBooking={onGoToManageBooking}
         onOpenBookingForDistrict={(_district, slot) => {
           if (hasActiveBooking) {
             if (onGoToManageBooking) onGoToManageBooking();
@@ -370,29 +379,32 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                 const isAvailable = slot.status === 'available' && !isRegistered;
 
                 const statusTag = myBooking ? (
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.8125rem] font-bold text-white shrink-0 ${
-                    myBooking.status === 'approved' ? 'bg-emerald-600' : 'bg-amber-600'
+                  <span className={`inline-flex items-center gap-1.5 text-xs font-bold shrink-0 whitespace-nowrap ${
+                    myBooking.status === 'approved'
+                      ? 'text-emerald-700 dark:text-emerald-400'
+                      : 'text-amber-700 dark:text-amber-400'
                   }`}>
-                    {myBooking.status === 'approved' ? <CheckCircle2 className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
-                    <span>{myBooking.status === 'approved' ? 'Diluluskan' : 'Disemak'}</span>
+                    {myBooking.status === 'approved' ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Clock className="w-3.5 h-3.5" />}
+                    <span>{myBooking.status === 'approved' ? 'Diluluskan' : 'Dalam Semakan'}</span>
                   </span>
                 ) : isOccupiedOrTenant ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.8125rem] font-bold bg-slate-100 dark:bg-zinc-800 text-black dark:text-white border border-slate-300 dark:border-zinc-600 shrink-0">
-                    <Lock className="w-3 h-3" />
-                    <span>Telah Berdaftar</span>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-black/55 dark:text-white/60 shrink-0 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-blue-600 shrink-0" />
+                    <span>Disewa</span>
                   </span>
                 ) : isReserved ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.8125rem] font-bold bg-amber-50 dark:bg-amber-950/60 text-black dark:text-white border border-amber-300 dark:border-amber-700 shrink-0">
-                    <Clock className="w-3 h-3" />
-                    <span>Dalam Tempahan</span>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-400 shrink-0 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+                    <span>Ditempah</span>
                   </span>
                 ) : isMaintenance ? (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[0.8125rem] font-bold bg-rose-50 dark:bg-rose-950/60 text-black dark:text-white border border-rose-300 dark:border-rose-700 shrink-0">
-                    Penyelenggaraan
+                  <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-rose-700 dark:text-rose-400 shrink-0 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-rose-500 shrink-0" />
+                    <span>Selenggara</span>
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[0.8125rem] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-black dark:text-white border border-emerald-300 dark:border-emerald-700 shrink-0">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 shrink-0 whitespace-nowrap">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 shrink-0" />
                     <span>Tersedia</span>
                   </span>
                 );
@@ -426,7 +438,7 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                       </div>
 
                       <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex items-center gap-2 min-w-0">
+                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5 min-w-0">
                           <h3
                             title={`${slot.code} · ${slot.name}`}
                             className="font-bold text-black dark:text-white text-sm sm:text-base kbelia-clamp-1 kbelia-trim"
@@ -435,9 +447,9 @@ export const CapsuleGrid: React.FC<CapsuleGridProps> = ({
                           </h3>
                           {statusTag}
                         </div>
-                        <p className="text-sm text-black/70 dark:text-white/75 truncate tabular-nums kbelia-prose">
-                          {slot.hubLocation} ({slot.district}) · Saiz {slot.size} · RM{slot.monthlyRate}/bulan (Subsidi {subsidyRate}%)
-                          {slot.currentTenantBusinessName ? ` · Penyewa: ${slot.currentTenantBusinessName}` : ''}
+                        <p className="text-sm text-black/65 dark:text-white/70 truncate tabular-nums kbelia-prose">
+                          {slot.hubLocation} · {slot.district} · {slot.size} · RM {slot.monthlyRate}/bln
+                          {slot.currentTenantBusinessName ? ` · ${slot.currentTenantBusinessName}` : ''}
                         </p>
                       </div>
                     </div>

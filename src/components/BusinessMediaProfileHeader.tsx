@@ -337,7 +337,7 @@ export const BusinessMediaProfileHeader: React.FC<BusinessMediaProfileHeaderProp
             <button
               type="button"
               onClick={handleRemoveLogo}
-              className="text-xs font-medium text-rose-600 dark:text-rose-400 hover:underline kbelia-link inline-flex items-center gap-1 cursor-pointer shrink-0"
+              className="text-xs font-medium text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 transition-colors kbelia-link inline-flex items-center gap-1 cursor-pointer shrink-0"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>Padam Logo</span>

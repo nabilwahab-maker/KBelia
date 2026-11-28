@@ -115,6 +115,8 @@ export interface CapsuleSlot {
 }
 
 export type BookingStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type KioskPaymentStatus = 'unpaid' | 'paid';
+export type KioskPaymentMethod = 'fpx' | 'duitnow_qr' | 'card';
 
 export interface CapsuleBooking {
   id: string;
@@ -138,6 +140,12 @@ export interface CapsuleBooking {
   tenancySigned?: boolean;
   tenancySignedAt?: string;
   tenancySignatureName?: string;
+  paymentStatus?: KioskPaymentStatus;
+  paymentMethod?: KioskPaymentMethod;
+  paymentChannel?: string;
+  paymentReference?: string;
+  paidAmount?: number;
+  paidAt?: string;
   createdAt: string;
   updatedAt?: string;
 }

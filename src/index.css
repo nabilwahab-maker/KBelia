@@ -94,8 +94,11 @@
     -webkit-hyphens: none;
   }
 
-  /* 3. Underline Offset: consistent breathable underlines that skip descenders */
-  a,
+  /* 3. Clean Links: remove default underlines on links across the site */
+  a {
+    text-decoration-line: none;
+  }
+
   button.underline,
   .hover\:underline {
     text-underline-offset: 0.22em;
@@ -217,18 +220,14 @@ html.dark {
   }
 }
 
-/* 3. Explicit Editorial Link Utility */
+/* 3. Explicit Editorial Link Utility (clean color transition without underline) */
 .kbelia-link {
-  text-decoration-line: underline;
-  text-underline-offset: 0.24em;
-  text-decoration-thickness: 1.5px;
-  text-decoration-skip-ink: auto;
-  text-decoration-color: color-mix(in srgb, currentColor 42%, transparent);
-  transition: text-decoration-color 0.16s ease, opacity 0.16s ease;
+  text-decoration-line: none;
+  transition: color 0.16s ease, opacity 0.16s ease;
 }
 
 .kbelia-link:hover {
-  text-decoration-color: currentColor;
+  text-decoration-line: none;
 }
 
 /* 4. Superscript optical helper */

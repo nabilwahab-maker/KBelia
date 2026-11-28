@@ -43,6 +43,8 @@ interface KelantanDistrictsMapProps {
   onSelectDistrict: (district: KelantanDistrict) => void;
   onOpenBookingForDistrict?: (district: KelantanDistrict, slot?: CapsuleSlot) => void;
   onSelectSlot?: (slot: CapsuleSlot) => void;
+  hasActiveBooking?: boolean;
+  onGoToManageBooking?: () => void;
 }
 
 interface DistrictGeoData {
@@ -242,32 +244,32 @@ const HubAdvancedMarker: React.FC<HubMarkerProps> = ({
       </AdvancedMarker>
 
       {isInfoOpen && marker && (
-        <InfoWindow anchor={marker} maxWidth={290} onCloseClick={onCloseInfo}>
-          <div className="p-1 text-slate-900 space-y-2 min-w-[220px]">
+        <InfoWindow anchor={marker} maxWidth={270} onCloseClick={onCloseInfo}>
+          <div className="p-1 text-slate-900 space-y-2 min-w-[210px]">
             <div>
-              <div className="text-[0.8125rem] font-bold uppercase tracking-wider text-blue-700">
-                Jajahan {geo.name}
+              <div className="text-xs font-bold text-blue-700">
+                {geo.name}
               </div>
-              <h4 className="text-sm font-extrabold text-slate-900 leading-snug mt-0.5">
+              <h4 className="text-sm font-bold text-slate-900 leading-snug mt-0.5">
                 {geo.mainHubName}
               </h4>
             </div>
 
-            <div className="flex items-center justify-between gap-2 text-[0.8125rem] bg-slate-100 rounded-lg px-2.5 py-1.5">
+            <div className="flex items-center justify-between gap-2 text-xs bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 tabular-nums">
               <span>
-                <strong className="text-emerald-700">{stats.available}</strong> unit tersedia
+                <strong className="text-emerald-700">{stats.available}</strong> tersedia
               </span>
               <span className="font-bold text-slate-800">
-                RM{stats.minMonthlyRate}/bulan
+                RM {stats.minMonthlyRate}/bln
               </span>
             </div>
 
             <button
               type="button"
               onClick={() => onBookHub(geo.district, firstAvailable)}
-              className={`w-full py-2 px-3 text-[0.8125rem] ${roleTheme.primaryButtonClass}`}
+              className={`w-full py-2 px-3 text-xs ${roleTheme.primaryButtonClass}`}
             >
-              {stats.available > 0 ? 'Mohon Kiosk' : 'Lihat Hab'}
+              {stats.available > 0 ? 'Mohon Unit' : 'Lihat Hab'}
             </button>
           </div>
         </InfoWindow>
@@ -394,20 +396,10 @@ const LiveMapCanvas: React.FC<LiveMapCanvasProps> = ({
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-100/80 dark:bg-slate-900/80 backdrop-blur-xs pointer-events-none">
           <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 shadow-sm text-sm font-bold text-black dark:text-white">
             <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
-            <span>Memuatkan Google Maps Kelantan...</span>
+            <span>Memuatkan peta...</span>
           </div>
         </div>
       )}
-
-      {/* Top Location Indicator */}
-      <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xs px-3 py-1.5 rounded-xl shadow-xs border border-slate-200 dark:border-zinc-700 text-xs sm:text-sm max-w-[calc(100%-5rem)]">
-        <MapPin className="w-3.5 h-3.5 text-[#EA4335] shrink-0" />
-        <span className="font-semibold text-black dark:text-white truncate">
-          {selectedDistrict === 'Semua Jajahan'
-            ? `Kelantan (${visibleDistricts.length} Hab Kiosk)`
-            : `${selectedDistrict}, Kelantan`}
-        </span>
-      </div>
 
       {/* Floating Zoom & Reset Controls */}
       <div className="absolute bottom-24 right-3 z-20 flex flex-col gap-1.5">
@@ -486,7 +478,9 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
   selectedDistrict,
   onSelectDistrict,
   onOpenBookingForDistrict,
-  onSelectSlot
+  onSelectSlot,
+  hasActiveBooking = false,
+  onGoToManageBooking
 }) => {
   const { language } = useLanguage();
   const { isAdmin, isMentor } = useAuth();
@@ -701,14 +695,14 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
       {/* 1. Header Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-zinc-700">
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-black/60 dark:text-white/65">
-            <MapPin className="w-3.5 h-3.5 text-[#EA4335] shrink-0" />
-            <span>Google Maps</span>
-          </span>
-
-          <h2 className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tracking-tight mt-0.5">
+          <h2 className="text-lg sm:text-xl font-extrabold text-black dark:text-white tracking-tight">
             Peta Hab Kios
           </h2>
+          <p className="text-xs sm:text-sm text-black/60 dark:text-white/65 mt-0.5">
+            {isEn
+              ? 'Select a district hub to check available units.'
+              : 'Pilih hab jajahan untuk semak kekosongan unit.'}
+          </p>
         </div>
 
         {/* Single Unified View & Map Layer Control */}
@@ -867,13 +861,13 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                 >
                   <option value="all">{isEn ? 'All Statuses' : 'Semua Status'}</option>
                   <option value="available">
-                    {isEn ? 'Has Available Units' : 'Ada Kekosongan Unit'}
+                    {isEn ? 'Available' : 'Tersedia'}
                   </option>
                   <option value="full">
-                    {isEn ? 'Fully Occupied' : 'Beroperasi Penuh'}
+                    {isEn ? 'Full' : 'Penuh'}
                   </option>
                   <option value="expansion">
-                    {isEn ? 'Expansion Zone' : 'Zon Pengembangan'}
+                    {isEn ? 'Upcoming' : 'Akan Datang'}
                   </option>
                 </select>
               </div>
@@ -970,107 +964,99 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                 </div>
               )}
 
-              {/* Map Legend Footer */}
-              <div className="w-full flex flex-wrap items-center justify-between text-xs text-black/75 dark:text-white/80 px-4 py-2.5 bg-white dark:bg-zinc-900 border-t border-slate-200 dark:border-zinc-700 gap-2">
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <span className="w-2 h-2 rounded-full bg-[#EA4335] inline-block" />
-                    Hab Dipilih
-                  </span>
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <span className="w-2 h-2 rounded-full bg-emerald-600 inline-block" />
-                    Ada Kekosongan
-                  </span>
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <span className="w-2 h-2 rounded-full bg-blue-600 inline-block" />
-                    Beroperasi Penuh
-                  </span>
-                  <span className="flex items-center gap-1.5 font-medium">
-                    <span className="w-2 h-2 rounded-full bg-slate-500 inline-block" />
-                    Zon Pengembangan
-                  </span>
-                </div>
+              {/* Formal Single-Line Status Indicator Bar */}
+              <div className="w-full flex flex-wrap items-center justify-between sm:justify-start gap-x-6 gap-y-2 text-xs font-semibold text-black/80 dark:text-white/85 px-4 py-3 bg-slate-50/80 dark:bg-zinc-950/80 border-t border-slate-200 dark:border-zinc-700">
+                <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#EA4335] inline-block shrink-0" />
+                  <span>{isEn ? 'Selected' : 'Dipilih'}</span>
+                </span>
+                <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block shrink-0" />
+                  <span>{isEn ? 'Available' : 'Tersedia'}</span>
+                </span>
+                <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block shrink-0" />
+                  <span>{isEn ? 'Full' : 'Penuh'}</span>
+                </span>
+                <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-400 dark:bg-zinc-500 inline-block shrink-0" />
+                  <span>{isEn ? 'Upcoming' : 'Akan Datang'}</span>
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Side Location & Slot Availability Panel (5 Cols) */}
+          {/* Right Column: Concise Formal Location & Unit Panel (5 Cols) */}
           <div className="xl:col-span-5 flex flex-col w-full min-w-0">
             <div className="h-full rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 p-5 sm:p-6 flex flex-col justify-between gap-5">
               <div className="space-y-4">
                 {/* 1. Hub Header */}
-                <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400 block">
-                    Jajahan {activeDistrictData.name}
-                  </span>
-                  <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white leading-snug tracking-tight mt-1">
-                    {activeDistrictData.mainHubName}
-                  </h3>
-                  <p className="text-sm text-black/65 dark:text-white/70 mt-1">
-                    {activeDistrictData.tagline}
-                  </p>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="text-lg sm:text-xl font-bold text-black dark:text-white leading-snug tracking-tight">
+                      {activeDistrictData.name}
+                    </h3>
+                    <p className="text-sm text-black/65 dark:text-white/70 mt-0.5 leading-snug">
+                      {activeDistrictData.mainHubName}
+                    </p>
+                  </div>
+
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${activeDistrictData.lat},${activeDistrictData.lng}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 shrink-0 whitespace-nowrap pt-1 transition-colors"
+                  >
+                    <span>Peta Google</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
 
-                {/* 2. Focus Niche (Modern unboxed accent text right beneath hub title) */}
-                <div className="border-l-2 border-blue-600/75 dark:border-blue-400/75 pl-3 py-0.5">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-black/55 dark:text-white/60 block">
-                    Tumpuan Produk Jajahan
-                  </span>
-                  <p className="text-sm font-medium text-black dark:text-white leading-relaxed mt-0.5">
-                    {activeDistrictData.popularNiche}
-                  </p>
-                </div>
-
-                {/* 3. Hairline Availability & Rate Metrics */}
+                {/* 2. Hairline Availability & Rate Metrics */}
                 <div className="grid grid-cols-2 border-y border-slate-200 dark:border-zinc-700 divide-x divide-slate-200 dark:divide-zinc-700 py-3">
                   <div className="pr-3">
                     <span className="text-xs font-semibold text-black/55 dark:text-white/60 block">
-                      Kekosongan Unit
+                      {isEn ? 'Available' : 'Kekosongan'}
                     </span>
                     <div className="flex items-baseline gap-1.5 mt-0.5">
                       <span className="text-xl sm:text-2xl font-extrabold text-emerald-700 dark:text-emerald-400 tabular-nums">
                         {activeStats.available}
                       </span>
                       <span className="text-xs sm:text-sm text-black/65 dark:text-white/70 font-medium">
-                        unit tersedia
+                        {isEn ? 'units' : 'unit'}
                       </span>
                     </div>
                   </div>
 
                   <div className="pl-4">
                     <span className="text-xs font-semibold text-black/55 dark:text-white/60 block">
-                      Kadar Bermula
+                      {isEn ? 'Monthly Rate' : 'Kadar Sewa'}
                     </span>
                     <div className="flex items-baseline gap-1 mt-0.5">
                       <span className="text-xl sm:text-2xl font-extrabold text-black dark:text-white tabular-nums">
                         RM {activeStats.minMonthlyRate}
                       </span>
                       <span className="text-xs sm:text-sm text-black/65 dark:text-white/70 font-medium">
-                        / bulan
+                        / bln
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* 4. Selectable Available Units inside Selected Hub */}
+                {/* 3. Selectable Available Units inside Selected Hub */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-end">
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${activeDistrictData.lat},${activeDistrictData.lng}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline shrink-0"
-                    >
-                      <span>Buka di Google Maps</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
+                  <div className="flex items-center justify-between text-xs font-semibold text-black/55 dark:text-white/60">
+                    <span>{isEn ? 'Available Units' : 'Unit Tersedia'}</span>
+                    {availableDistrictSlots.length > 0 && (
+                      <span className="tabular-nums">{availableDistrictSlots.length} pilihan</span>
+                    )}
                   </div>
 
                   {availableDistrictSlots.length > 0 ? (
                     <div
                       role="radiogroup"
                       aria-label={isEn ? 'Select kiosk unit' : 'Pilih unit kiosk'}
-                      className="divide-y divide-slate-100 dark:divide-zinc-800 max-h-[196px] overflow-y-auto pr-1"
+                      className="divide-y divide-slate-100 dark:divide-zinc-800 max-h-[210px] overflow-y-auto pr-1"
                     >
                       {availableDistrictSlots.map((slot) => {
                         const isSlotSelected = activeSelectedSlot?.id === slot.id;
@@ -1081,16 +1067,16 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                             role="radio"
                             aria-checked={isSlotSelected}
                             onClick={() => setSelectedSlotId(slot.id)}
-                            className={`w-full text-left py-2.5 px-2.5 rounded-lg flex items-center justify-between gap-3 transition-colors cursor-pointer ${
+                            className={`w-full text-left py-2.5 px-3 rounded-xl flex items-center justify-between gap-3 transition-colors cursor-pointer ${
                               isSlotSelected
-                                ? 'bg-blue-50/80 dark:bg-blue-950/35'
+                                ? 'bg-blue-50/85 dark:bg-blue-950/35'
                                 : 'hover:bg-slate-50/90 dark:hover:bg-zinc-800/50'
                             }`}
                           >
                             <div className="min-w-0">
-                              <div className="flex items-center gap-1.5 text-xs">
+                              <div className="flex items-center gap-1.5 text-sm">
                                 <span
-                                  className={`font-mono font-bold ${
+                                  className={`font-mono font-bold tabular-nums ${
                                     isSlotSelected
                                       ? 'text-blue-700 dark:text-blue-300'
                                       : 'text-black dark:text-white'
@@ -1099,14 +1085,11 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                                   {slot.code}
                                 </span>
                                 <span className="text-black/35 dark:text-white/35">·</span>
-                                <span className="font-semibold text-emerald-700 dark:text-emerald-400">
-                                  Tersedia
+                                <span className="font-semibold text-black dark:text-white truncate">
+                                  {slot.name}
                                 </span>
                               </div>
-                              <div className="text-sm font-semibold text-black dark:text-white truncate mt-0.5">
-                                {slot.name}
-                              </div>
-                              <div className="text-xs text-black/60 dark:text-white/65 truncate tabular-nums">
+                              <div className="text-xs text-black/60 dark:text-white/65 truncate tabular-nums mt-0.5">
                                 {slot.size} · RM {slot.monthlyRate}/bln
                               </div>
                             </div>
@@ -1128,34 +1111,45 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
                       })}
                     </div>
                   ) : (
-                    <p className="py-2 text-sm text-black/65 dark:text-white/70">
-                      Tiada unit kiosk tersedia di hab ini buat masa ini.
-                    </p>
+                    <div className="py-4 px-3 rounded-xl bg-slate-50 dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 text-sm text-black/65 dark:text-white/70">
+                      {isEn ? 'No units available at this hub.' : 'Tiada unit tersedia di hab ini.'}
+                    </div>
                   )}
                 </div>
               </div>
 
               {/* Single Primary Action CTA */}
-              <button
-                type="button"
-                disabled={!activeSelectedSlot}
-                onClick={() =>
-                  activeSelectedSlot &&
-                  handleBookHub(activeDistrictData.district, activeSelectedSlot)
-                }
-                className={`w-full py-2.5 px-4 text-sm shadow-2xs flex items-center justify-center gap-2 whitespace-nowrap ${
-                  activeSelectedSlot
-                    ? roleTheme.primaryButtonClass
-                    : 'rounded-xl font-semibold text-black/45 dark:text-white/45 bg-slate-200 dark:bg-zinc-800 cursor-not-allowed'
-                }`}
-              >
-                <span>
-                  {activeSelectedSlot
-                    ? `Mohon ${activeSelectedSlot.code}`
-                    : 'Tiada Unit'}
-                </span>
-                {activeSelectedSlot && <ArrowRight className="w-4 h-4" />}
-              </button>
+              {hasActiveBooking && onGoToManageBooking ? (
+                <button
+                  type="button"
+                  onClick={onGoToManageBooking}
+                  className={`w-full py-2.5 px-4 text-sm shadow-2xs flex items-center justify-center gap-2 whitespace-nowrap ${roleTheme.primaryButtonClass}`}
+                >
+                  <span>Urus Kiosk Saya</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={!activeSelectedSlot}
+                  onClick={() =>
+                    activeSelectedSlot &&
+                    handleBookHub(activeDistrictData.district, activeSelectedSlot)
+                  }
+                  className={`w-full py-2.5 px-4 text-sm shadow-2xs flex items-center justify-center gap-2 whitespace-nowrap ${
+                    activeSelectedSlot
+                      ? roleTheme.primaryButtonClass
+                      : 'rounded-xl font-semibold text-black/45 dark:text-white/45 bg-slate-200 dark:bg-zinc-800 cursor-not-allowed'
+                  }`}
+                >
+                  <span>
+                    {activeSelectedSlot
+                      ? `Mohon ${activeSelectedSlot.code}`
+                      : 'Penuh'}
+                  </span>
+                  {activeSelectedSlot && <ArrowRight className="w-4 h-4" />}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1226,10 +1220,10 @@ export const KelantanDistrictsMap: React.FC<KelantanDistrictsMapProps> = ({
             </div>
             <div className="space-y-1">
               <h4 className="text-base font-bold text-black dark:text-white">
-                Tiada Jajahan Sepadan Ditemui
+                Tiada Jajahan Sepadan
               </h4>
               <p className="text-sm text-black/65 dark:text-white/70 max-w-md mx-auto">
-                Tiada hab jajahan memenuhi kata kunci carian atau penapis yang dipilih.
+                Cuba laraskan kata kunci carian atau penapis di atas.
               </p>
             </div>
             <button
